@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.cqf.urpvolumetricfog": {
+      "version": "https://github.com/Skyshin1/UnityURPVolumeFog.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ee9fe591e6af0b39857e7b3aa3cd4296a900db66"
+    },
     "com.unity.burst": {
       "version": "1.8.21",
       "depth": 1,

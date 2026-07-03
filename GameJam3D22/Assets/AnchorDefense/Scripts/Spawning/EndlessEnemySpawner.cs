@@ -11,6 +11,7 @@ namespace AnchorDefense
         private GameFlowController gameFlow;
         private VfxService vfxService;
         private ComponentPool<EnemyController> pool;
+        private KillResourceWallet killWallet;
         private float spawnTimer;
 
         public float ElapsedTime { get; private set; }
@@ -23,6 +24,7 @@ namespace AnchorDefense
             CoreHealth targetCore,
             GameFlowController flow,
             VfxService effects,
+            KillResourceWallet wallet,
             Transform poolRoot)
         {
             endlessConfig = modeConfig;
@@ -31,6 +33,7 @@ namespace AnchorDefense
             core = targetCore;
             gameFlow = flow;
             vfxService = effects;
+            killWallet = wallet;
             pool = new ComponentPool<EnemyController>(CreateEnemy, poolRoot, endlessConfig.EnemyPrewarmCount);
             spawnTimer = 0.35f;
             ElapsedTime = 0f;
@@ -90,7 +93,14 @@ namespace AnchorDefense
 
         private EnemyController CreateEnemy()
         {
-            return Instantiate(enemyConfig.Prefab);
+            EnemyController enemy = Instantiate(enemyConfig.Prefab);
+            enemy.Killed += HandleEnemyKilled;
+            return enemy;
+        }
+
+        private void HandleEnemyKilled(EnemyController enemy)
+        {
+            killWallet?.RegisterKill();
         }
     }
 }

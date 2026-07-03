@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed6000dfe90b77b41b2b900f16b81419, type: 3}
+  m_Name: Ring02Capacity
+  m_EditorClassIdentifier: 
+  <Id>k__BackingField: ring.middle.capacity
+  <DisplayName>k__BackingField: "\u7B2C\u4E8C\u8F68\u9053\u6269\u5BB9"
+  <Description>k__BackingField: "\u63A5\u901A\u7B2C\u4E8C\u8F68\u9053\u7684\u6269\u5C55\u56DE\u8DEF\uFF0C\u589E\u52A0
+    2 \u5EA7\u70AE\u53F0\u3002\u9700\u8981\u5148\u6269\u5BB9\u7B2C\u4E00\u8F68\u9053\u3002"
+  <ShortLabel>k__BackingField: II
+  <Icon>k__BackingField: {fileID: 0}
+  <KillCost>k__BackingField: 12
+  <Placeholder>k__BackingField: 0
+  <Prerequisites>k__BackingField:
+  - {fileID: 11400000, guid: 1c9dd570fa74d1742b6fcdae4b0a8e48, type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: 3abfde8865d98c5419e46830786e321b, type: 2}

@@ -6,22 +6,25 @@ namespace AnchorDefense
     {
         [SerializeField] private Transform firePoint;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
+        [SerializeField] private TurretHealth health;
 
-        private TurretConfig config;
+        private TurretRuntimeStats runtimeStats;
         private EnemyRegistry registry;
         private ProjectileService projectileService;
         private EnemyController currentTarget;
         private float cooldown;
 
         public void Initialize(
-            TurretConfig turretConfig,
+            TurretRuntimeStats turretStats,
             EnemyRegistry enemyRegistry,
             ProjectileService projectiles)
         {
-            config = turretConfig;
+            runtimeStats = turretStats;
             registry = enemyRegistry;
             projectileService = projectiles;
-            cooldown = Random.Range(0f, config.FireInterval);
+            health = health != null ? health : GetComponent<TurretHealth>();
+            health?.Initialize(runtimeStats);
+            cooldown = Random.Range(0f, runtimeStats.FireInterval);
         }
 
         public void ConfigureFirePoint(Transform projectileOrigin)
@@ -34,9 +37,14 @@ namespace AnchorDefense
             directionalVisual = visual;
         }
 
+        public void ConfigureHealth(TurretHealth turretHealth)
+        {
+            health = turretHealth;
+        }
+
         private void Update()
         {
-            if (config == null || firePoint == null)
+            if (runtimeStats == null || firePoint == null || (health != null && !health.IsAlive))
             {
                 return;
             }
@@ -61,21 +69,21 @@ namespace AnchorDefense
 
             if (cooldown <= 0f)
             {
-                projectileService.Fire(firePoint.position, currentTarget);
-                cooldown = config.FireInterval;
+                projectileService.Fire(firePoint.position, currentTarget, runtimeStats.Damage);
+                cooldown = runtimeStats.FireInterval;
             }
         }
 
         private bool IsTargetValid(EnemyController target)
         {
             return target != null && target.IsAlive &&
-                   (target.transform.position - transform.position).sqrMagnitude <= config.Range * config.Range;
+                   (target.transform.position - transform.position).sqrMagnitude <= runtimeStats.Range * runtimeStats.Range;
         }
 
         private EnemyController FindNearestTarget()
         {
             EnemyController nearest = null;
-            float nearestSqrDistance = config.Range * config.Range;
+            float nearestSqrDistance = runtimeStats.Range * runtimeStats.Range;
             var enemies = registry.ActiveEnemies;
 
             for (int i = 0; i < enemies.Count; i++)

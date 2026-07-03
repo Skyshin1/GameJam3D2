@@ -25,7 +25,7 @@ namespace AnchorDefense
             }
         }
 
-        public void Fire(Vector3 origin, EnemyController target)
+        public void Fire(Vector3 origin, EnemyController target, float damage)
         {
             if (target == null || !target.IsAlive)
             {
@@ -36,7 +36,7 @@ namespace AnchorDefense
             projectile.Launch(
                 origin,
                 target,
-                config.Damage,
+                damage,
                 config.ProjectileSpeed,
                 config.ProjectileHitRadius,
                 config.ProjectileLifetime,

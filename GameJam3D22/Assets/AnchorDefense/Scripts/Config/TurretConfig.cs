@@ -9,6 +9,7 @@ namespace AnchorDefense
         [field: SerializeField, Min(0.1f)] public float Range { get; private set; } = 9f;
         [field: SerializeField, Min(0f)] public float Damage { get; private set; } = 10f;
         [field: SerializeField, Min(0.03f)] public float FireInterval { get; private set; } = 0.72f;
+        [field: SerializeField, Min(1f)] public float MaxHealth { get; private set; } = 100f;
         [field: SerializeField, Min(0.1f)] public float ProjectileSpeed { get; private set; } = 12f;
         [field: SerializeField, Min(0.1f)] public float ProjectileLifetime { get; private set; } = 3f;
         [field: SerializeField, Min(0.01f)] public float ProjectileHitRadius { get; private set; } = 0.25f;

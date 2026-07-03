@@ -47,3 +47,11 @@
 - `EnemyRegistry`：炮台查找目标时使用活动敌人列表，不进行逐炮台全场物理扫描。
 
 Play Mode 冒烟测试位于 `Assets/AnchorDefense/Tests/PlayMode`。
+
+## Anchor 升级树
+
+- 点击左上角“升级协议”或按 `U` 打开升级树；打开时游戏暂停。
+- 击杀敌人获得可消费击杀点，进入核心的敌人不计入击杀。
+- 当前包含三条轨道扩容、全体炮台伤害、射击间隔和最大生命升级。
+- 节点配置位于 `Assets/AnchorDefense/Configs/Upgrades`，界面 Prefab 位于 `Assets/AnchorDefense/Prefabs/UI/UpgradeTreeUI.prefab`。
+- 使用 `Tools > Anchor Defense > Build or Refresh Upgrade Tree` 可重新生成或修复相关资产和场景引用。

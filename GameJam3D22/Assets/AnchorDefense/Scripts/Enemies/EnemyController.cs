@@ -23,6 +23,7 @@ namespace AnchorDefense
 
         public bool IsAlive => isAlive;
         public int SpawnVersion { get; private set; }
+        public event Action<EnemyController> Killed;
 
         public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
         {
@@ -141,6 +142,7 @@ namespace AnchorDefense
 
             isAlive = false;
             deathEffectAction?.Invoke(transform.position, config.BaseColor);
+            Killed?.Invoke(this);
             releaseAction?.Invoke(this);
         }
 

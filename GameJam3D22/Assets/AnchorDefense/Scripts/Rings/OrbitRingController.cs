@@ -2,6 +2,13 @@ using UnityEngine;
 
 namespace AnchorDefense
 {
+    public enum OrbitRingId
+    {
+        Inner,
+        Middle,
+        Outer
+    }
+
     public sealed class OrbitRingController : MonoBehaviour
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -11,14 +18,62 @@ namespace AnchorDefense
         [SerializeField] private Renderer[] selectionRenderers;
         [SerializeField] private Color normalColor = new Color(0.2f, 0.75f, 1f);
         [SerializeField] private Color selectedColor = Color.white;
+        [Header("Turret Slots")]
+        [SerializeField] private OrbitRingId ringId;
+        [SerializeField] private TurretController[] initialTurrets;
+        [SerializeField] private TurretController[] upgradeTurrets;
 
         private MaterialPropertyBlock propertyBlock;
+
+        public OrbitRingId RingId => ringId;
+        public int ActiveTurretCount { get; private set; }
 
         public void Configure(Renderer[] renderers, Color idleColor, Color highlightColor)
         {
             selectionRenderers = renderers;
             normalColor = idleColor;
             selectedColor = highlightColor;
+        }
+
+        public void ConfigureTurretSlots(
+            OrbitRingId id,
+            TurretController[] startingTurrets,
+            TurretController[] unlockableTurrets)
+        {
+            ringId = id;
+            initialTurrets = startingTurrets;
+            upgradeTurrets = unlockableTurrets;
+        }
+
+        public void InitializeTurretSlots()
+        {
+            ActiveTurretCount = 0;
+            SetTurretsActive(initialTurrets, true);
+            SetTurretsActive(upgradeTurrets, false);
+        }
+
+        public int UnlockTurrets(int count)
+        {
+            if (upgradeTurrets == null || count <= 0)
+            {
+                return 0;
+            }
+
+            int unlocked = 0;
+            for (int i = 0; i < upgradeTurrets.Length && unlocked < count; i++)
+            {
+                TurretController turret = upgradeTurrets[i];
+                if (turret == null || turret.gameObject.activeSelf)
+                {
+                    continue;
+                }
+
+                turret.gameObject.SetActive(true);
+                ActiveTurretCount++;
+                unlocked++;
+            }
+
+            return unlocked;
         }
 
         public void RotateByDrag(float horizontalPixels, float sensitivity)
@@ -54,6 +109,28 @@ namespace AnchorDefense
         private void Awake()
         {
             SetSelected(false);
+        }
+
+        private void SetTurretsActive(TurretController[] turrets, bool active)
+        {
+            if (turrets == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < turrets.Length; i++)
+            {
+                if (turrets[i] == null)
+                {
+                    continue;
+                }
+
+                turrets[i].gameObject.SetActive(active);
+                if (active)
+                {
+                    ActiveTurretCount++;
+                }
+            }
         }
     }
 }

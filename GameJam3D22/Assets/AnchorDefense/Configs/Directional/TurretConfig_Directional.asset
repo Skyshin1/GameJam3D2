@@ -15,6 +15,7 @@ MonoBehaviour:
   <Range>k__BackingField: 9
   <Damage>k__BackingField: 10
   <FireInterval>k__BackingField: 0.72
+  <MaxHealth>k__BackingField: 100
   <ProjectileSpeed>k__BackingField: 12
   <ProjectileLifetime>k__BackingField: 3
   <ProjectileHitRadius>k__BackingField: 0.25

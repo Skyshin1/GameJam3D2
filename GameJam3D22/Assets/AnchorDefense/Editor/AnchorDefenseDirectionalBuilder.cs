@@ -74,6 +74,7 @@ namespace AnchorDefense.Editor
             CreateDirectionalScene(enemyConfig, turretConfig, innerRing, middleRing, outerRing);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            AnchorDefenseUpgradeBuilder.RepairAfterGameplayRebuild();
             Debug.Log("Anchor Defense directional Sprite scene rebuilt successfully.");
         }
 

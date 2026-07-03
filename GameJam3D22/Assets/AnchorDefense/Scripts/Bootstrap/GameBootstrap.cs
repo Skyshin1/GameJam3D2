@@ -10,6 +10,7 @@ namespace AnchorDefense
         [SerializeField] private EnemyConfig enemyConfig;
         [SerializeField] private TurretConfig turretConfig;
         [SerializeField] private EndlessModeConfig endlessModeConfig;
+        [SerializeField] private UpgradeTreeConfig upgradeTreeConfig;
 
         [Header("Scene References")]
         [SerializeField] private Camera gameplayCamera;
@@ -18,9 +19,14 @@ namespace AnchorDefense
         [SerializeField] private EndlessEnemySpawner spawner;
         [SerializeField] private RingInputController ringInput;
         [SerializeField] private HudController hud;
+        [SerializeField] private UpgradeTreeController upgradeTree;
         [SerializeField] private Transform poolRoot;
 
         private bool initialized;
+
+        public KillResourceWallet KillWallet { get; private set; }
+        public TurretRuntimeStats TurretStats { get; private set; }
+        public UpgradeSystem UpgradeSystem { get; private set; }
 
         public void Configure(
             CoreConfig newCoreConfig,
@@ -48,6 +54,12 @@ namespace AnchorDefense
             poolRoot = newPoolRoot;
         }
 
+        public void ConfigureUpgradeSystem(UpgradeTreeConfig treeConfig, UpgradeTreeController treeView)
+        {
+            upgradeTreeConfig = treeConfig;
+            upgradeTree = treeView;
+        }
+
         private void Awake()
         {
             if (!ValidateReferences())
@@ -61,6 +73,17 @@ namespace AnchorDefense
 
             core.Initialize(coreConfig);
             EnemyRegistry registry = new EnemyRegistry();
+            KillWallet = new KillResourceWallet();
+            TurretStats = new TurretRuntimeStats(turretConfig);
+            OrbitRingController[] rings = FindObjectsOfType<OrbitRingController>(true);
+            for (int i = 0; i < rings.Length; i++)
+            {
+                rings[i].InitializeTurretSlots();
+            }
+            UpgradeSystem = new UpgradeSystem(
+                upgradeTreeConfig,
+                KillWallet,
+                new UpgradeContext(TurretStats, rings));
             VfxService vfxService = new VfxService(enemyConfig, poolRoot);
             ProjectileService projectileService = new ProjectileService(
                 turretConfig,
@@ -70,7 +93,7 @@ namespace AnchorDefense
             TurretController[] turrets = FindObjectsOfType<TurretController>(true);
             for (int i = 0; i < turrets.Length; i++)
             {
-                turrets[i].Initialize(turretConfig, registry, projectileService);
+                turrets[i].Initialize(TurretStats, registry, projectileService);
             }
 
             ringInput.Initialize(gameplayCamera, core.transform);
@@ -81,8 +104,10 @@ namespace AnchorDefense
                 core,
                 gameFlow,
                 vfxService,
+                KillWallet,
                 poolRoot);
             hud.Initialize(core, spawner, registry, gameFlow);
+            upgradeTree.Initialize(UpgradeSystem, gameFlow);
 
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();
@@ -95,14 +120,16 @@ namespace AnchorDefense
             {
                 core.Died -= gameFlow.EndGame;
             }
+            UpgradeSystem?.Dispose();
         }
 
         private bool ValidateReferences()
         {
             bool sceneReferencesValid = gameplayCamera != null && core != null && gameFlow != null &&
-                                        spawner != null && ringInput != null && hud != null && poolRoot != null;
+                                        spawner != null && ringInput != null && hud != null && upgradeTree != null &&
+                                        poolRoot != null;
             bool configReferencesValid = coreConfig != null && enemyConfig != null &&
-                                         turretConfig != null && endlessModeConfig != null;
+                                         turretConfig != null && endlessModeConfig != null && upgradeTreeConfig != null;
             bool prefabReferencesValid = configReferencesValid && enemyConfig.Prefab != null &&
                                          enemyConfig.HitEffectPrefab != null && enemyConfig.DeathEffectPrefab != null &&
                                          turretConfig.ProjectilePrefab != null;

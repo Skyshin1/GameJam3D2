@@ -46,10 +46,4 @@
 - `ComponentPool<T>`：敌人、子弹和高频粒子共用的对象池基础。
 - `EnemyRegistry`：炮台查找目标时使用活动敌人列表，不进行逐炮台全场物理扫描。
 
-## 全局描边
-
-两个 Gameplay 场景共享 `Assets/AnchorDefense/Scenes/Gameplay/Global Volume Profile.asset` 中的 `Anchor Defense > Global Outline` 配置。可以实时调整描边颜色、透明度、屏幕像素线宽、深度/法线/颜色边缘权重与阈值、距离衰减、混合模式和调试视图。将 `Enabled` 关闭即可完全停用。
-
-描边 Renderer Feature 已安装到 Performant、Balanced、High Fidelity 三档 URP Renderer。编辑器工具 `Tools > Anchor Defense > Install or Refresh Global Outline` 可以重新安装或修复引用。
-
 Play Mode 冒烟测试位于 `Assets/AnchorDefense/Tests/PlayMode`。

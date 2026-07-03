@@ -1,5 +1,142 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9106181404190313771
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdab785ebfd4964418da382cd3101ce2, type: 3}
+  m_Name: GlobalOutlineVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  <displayName>k__BackingField: 
+  enabled:
+    <fieldHash>k__BackingField: 470149000
+    m_OverrideState: 0
+    m_Value: 0
+  outlineColor:
+    <fieldHash>k__BackingField: 709499392
+    m_OverrideState: 1
+    m_Value:
+      r: 0.015
+      g: 0.035
+      b: 0.08
+      a: 1
+  opacity:
+    <fieldHash>k__BackingField: 1295366864
+    m_OverrideState: 1
+    m_Value: 0.9
+  thickness:
+    <fieldHash>k__BackingField: 1308706624
+    m_OverrideState: 1
+    m_Value: 1.35
+  blendMode:
+    <fieldHash>k__BackingField: 1787407408
+    m_OverrideState: 1
+    m_Value: 1
+  depthWeight:
+    <fieldHash>k__BackingField: -2028859104
+    m_OverrideState: 1
+    m_Value: 0.74
+  normalWeight:
+    <fieldHash>k__BackingField: -1789508712
+    m_OverrideState: 1
+    m_Value: 0.75
+  colorWeight:
+    <fieldHash>k__BackingField: -1550158320
+    m_OverrideState: 1
+    m_Value: 0.2
+  edgeCombination:
+    <fieldHash>k__BackingField: 843345600
+    m_OverrideState: 1
+    m_Value: 0
+  depthThreshold:
+    <fieldHash>k__BackingField: -818767384
+    m_OverrideState: 1
+    m_Value: 0.012
+  normalThreshold:
+    <fieldHash>k__BackingField: -100716208
+    m_OverrideState: 1
+    m_Value: 0.16
+  colorThreshold:
+    <fieldHash>k__BackingField: 2053437320
+    m_OverrideState: 1
+    m_Value: 0.12
+  thresholdSoftness:
+    <fieldHash>k__BackingField: -2002179584
+    m_OverrideState: 1
+    m_Value: 0.06
+  distanceFade:
+    <fieldHash>k__BackingField: 1718742608
+    m_OverrideState: 1
+    m_Value: 1
+  fadeStart:
+    <fieldHash>k__BackingField: 1958093000
+    m_OverrideState: 1
+    m_Value: 20
+  fadeEnd:
+    <fieldHash>k__BackingField: -2097523904
+    m_OverrideState: 1
+    m_Value: 65
+  includeSkyEdges:
+    <fieldHash>k__BackingField: -1858173512
+    m_OverrideState: 1
+    m_Value: 0
+  debugMode:
+    <fieldHash>k__BackingField: -1618823120
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &-6312590206471488536
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+  m_Name: Bloom
+  m_EditorClassIdentifier: 
+  active: 1
+  skipIterations:
+    m_OverrideState: 0
+    m_Value: 1
+  threshold:
+    m_OverrideState: 0
+    m_Value: 0.9
+  intensity:
+    m_OverrideState: 0
+    m_Value: 0
+  scatter:
+    m_OverrideState: 0
+    m_Value: 0.7
+  clamp:
+    m_OverrideState: 0
+    m_Value: 65472
+  tint:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  highQualityFiltering:
+    m_OverrideState: 0
+    m_Value: 0
+  downscale:
+    m_OverrideState: 0
+    m_Value: 0
+  maxIterations:
+    m_OverrideState: 0
+    m_Value: 6
+  dirtTexture:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+    dimension: 1
+  dirtIntensity:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14,6 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   components:
   - {fileID: 5221165968358387209}
+  - {fileID: -6312590206471488536}
 --- !u!114 &5221165968358387209
 MonoBehaviour:
   m_ObjectHideFlags: 3

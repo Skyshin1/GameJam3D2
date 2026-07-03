@@ -3,7 +3,6 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using UnityEngine.Rendering;
 
 namespace AnchorDefense.Tests
 {
@@ -36,10 +35,6 @@ namespace AnchorDefense.Tests
             Assert.That(Object.FindObjectsOfType<TurretController>().Length, Is.EqualTo(18));
             Assert.That(Object.FindObjectOfType<CoreHealth>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<HudController>(), Is.Not.Null);
-
-            GlobalOutlineVolume outlineSettings = VolumeManager.instance.stack.GetComponent<GlobalOutlineVolume>();
-            Assert.That(outlineSettings, Is.Not.Null);
-            Assert.That(outlineSettings.IsActive(), Is.True);
 
             RingInputController inputController = Object.FindObjectOfType<RingInputController>();
             Assert.That(inputController, Is.Not.Null);

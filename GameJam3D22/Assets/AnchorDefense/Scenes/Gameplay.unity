@@ -627,8 +627,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1167034088930624363, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
+      propertyPath: radius
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1167034088930624363, guid: cb3376a631509e74cb09ee6305d7dc79,
+        type: 3}
       propertyPath: anisotropy
-      value: -0.924
+      value: 0.942
+      objectReference: {fileID: 0}
+    - target: {fileID: 1167034088930624363, guid: cb3376a631509e74cb09ee6305d7dc79,
+        type: 3}
+      propertyPath: scattering
+      value: 10.48
       objectReference: {fileID: 0}
     - target: {fileID: 1233232149118763175, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
@@ -643,27 +653,27 @@ PrefabInstance:
     - target: {fileID: 7802498946845518757, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
       propertyPath: m_Range
-      value: 13.9
+      value: 15.39
       objectReference: {fileID: 0}
     - target: {fileID: 7802498946845518757, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
       propertyPath: m_Color.b
-      value: 0.7610062
+      value: 0.8050314
       objectReference: {fileID: 0}
     - target: {fileID: 7802498946845518757, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
       propertyPath: m_Color.g
-      value: 0.6004186
+      value: 0.36881894
       objectReference: {fileID: 0}
     - target: {fileID: 7802498946845518757, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
       propertyPath: m_Color.r
-      value: 0.47144088
+      value: 0.017720684
       objectReference: {fileID: 0}
     - target: {fileID: 7802498946845518757, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
       propertyPath: m_Intensity
-      value: 15
+      value: 2.61
       objectReference: {fileID: 0}
     - target: {fileID: 8783719524613365253, guid: cb3376a631509e74cb09ee6305d7dc79,
         type: 3}
@@ -768,7 +778,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anisotropy: 0.25
-  scattering: 1
+  scattering: 0.85
   radius: 0.2
 --- !u!114 &1109483772
 MonoBehaviour:

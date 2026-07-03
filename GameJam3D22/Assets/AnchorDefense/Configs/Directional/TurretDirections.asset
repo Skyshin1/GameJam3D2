@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d8a195d945d90043bb0338209290701, type: 3}
+  m_Name: TurretDirections
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: -3980550878937621366, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -1437738725016914451, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 1373942049362147023, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 9209146025245593063, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -1540027993384108100, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 421501024860348017, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -3426106869260096362, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 2533810396362059242, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}

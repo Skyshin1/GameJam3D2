@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d8a195d945d90043bb0338209290701, type: 3}
+  m_Name: ProjectileDirections
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 1880954208741839116, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 3140734954958577608, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 5741849755996048847, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 6861995487742562470, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 7672367453045497984, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -5400965956098134806, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 5604510108728745645, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -7870620652884480744, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}

@@ -2,7 +2,9 @@
   "name": "AnchorDefense.PlayModeTests",
   "rootNamespace": "AnchorDefense.Tests",
   "references": [
-    "AnchorDefense.Runtime"
+    "AnchorDefense.Runtime",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

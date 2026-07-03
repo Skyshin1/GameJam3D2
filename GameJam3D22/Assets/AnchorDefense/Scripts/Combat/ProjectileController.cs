@@ -8,6 +8,7 @@ namespace AnchorDefense
         private EnemyController target;
         private Action<ProjectileController> releaseAction;
         [SerializeField] private TrailRenderer trail;
+        [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         private Vector3 direction;
         private float damage;
         private float speed;
@@ -19,6 +20,11 @@ namespace AnchorDefense
         public void Configure(TrailRenderer projectileTrail)
         {
             trail = projectileTrail;
+        }
+
+        public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
+        {
+            directionalVisual = visual;
         }
 
         public void Launch(
@@ -39,6 +45,7 @@ namespace AnchorDefense
             lifetime = projectileLifetime;
             releaseAction = onRelease;
             direction = target != null ? (target.transform.position - position).normalized : transform.forward;
+            directionalVisual?.SetWorldDirection(direction);
             isFlying = true;
             trail?.Clear();
         }
@@ -77,6 +84,7 @@ namespace AnchorDefense
                 float distance = toTarget.magnitude;
                 float travelDistance = speed * Time.deltaTime;
                 direction = distance > 0.001f ? toTarget / distance : direction;
+                directionalVisual?.SetWorldDirection(direction);
 
                 if (distance <= travelDistance + hitRadius)
                 {

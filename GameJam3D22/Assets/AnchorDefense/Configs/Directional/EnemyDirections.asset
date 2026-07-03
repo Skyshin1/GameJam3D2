@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d8a195d945d90043bb0338209290701, type: 3}
+  m_Name: EnemyDirections
+  m_EditorClassIdentifier: 
+  sprites:
+  - {fileID: 9110331649108778237, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -2879960974862310817, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -6786164421864113872, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -5184444918053221634, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 4518484440960271995, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: 1269617740202664101, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -5111029024538337279, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}
+  - {fileID: -6790224210035917638, guid: ff7bd20e3f7d4ce4b8406802db3ecdf3, type: 3}

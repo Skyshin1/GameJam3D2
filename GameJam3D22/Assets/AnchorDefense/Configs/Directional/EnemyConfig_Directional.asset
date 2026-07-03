@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b005f2de3d2af4e9f646374938ce14, type: 3}
+  m_Name: EnemyConfig_Directional
+  m_EditorClassIdentifier: 
+  <Prefab>k__BackingField: {fileID: 639252475420547890, guid: 30e16b6db80e8c04f837a29d2e101e5b,
+    type: 3}
+  <MaxHealth>k__BackingField: 24
+  <MoveSpeed>k__BackingField: 1.8
+  <CoreDamage>k__BackingField: 10
+  <Size>k__BackingField: 0.55
+  <BaseColor>k__BackingField: {r: 0.92, g: 0.16, b: 0.25, a: 1}
+  <HitColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <HitFlashDuration>k__BackingField: 0.1
+  <HitEffectPrefab>k__BackingField: {fileID: 1501207461257158460, guid: db43b879890749f40bb21b4017ec477f,
+    type: 3}
+  <DeathEffectPrefab>k__BackingField: {fileID: 1485718088780051649, guid: 3f5cd603e6c4fc249b2bfcce88cdc0c0,
+    type: 3}

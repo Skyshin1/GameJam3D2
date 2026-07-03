@@ -19,9 +19,15 @@ namespace AnchorDefense
         private float moveSpeed;
         private float flashRemaining;
         private bool isAlive;
+        [SerializeField] private DirectionalSpriteRenderer directionalVisual;
 
         public bool IsAlive => isAlive;
         public int SpawnVersion { get; private set; }
+
+        public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
+        {
+            directionalVisual = visual;
+        }
 
         public void Initialize(
             EnemyConfig enemyConfig,
@@ -99,6 +105,7 @@ namespace AnchorDefense
             if (distance > 0.001f)
             {
                 Vector3 direction = toCore / distance;
+                directionalVisual?.SetWorldDirection(direction);
                 transform.position += direction * (moveSpeed * Time.deltaTime);
                 transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }

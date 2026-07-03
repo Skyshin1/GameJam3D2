@@ -73,7 +73,7 @@ namespace AnchorDefense
                 turrets[i].Initialize(turretConfig, registry, projectileService);
             }
 
-            ringInput.Initialize(gameplayCamera);
+            ringInput.Initialize(gameplayCamera, core.transform);
             spawner.Initialize(
                 endlessModeConfig,
                 enemyConfig,

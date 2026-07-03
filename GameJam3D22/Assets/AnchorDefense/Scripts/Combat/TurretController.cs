@@ -5,6 +5,7 @@ namespace AnchorDefense
     public sealed class TurretController : MonoBehaviour
     {
         [SerializeField] private Transform firePoint;
+        [SerializeField] private DirectionalSpriteRenderer directionalVisual;
 
         private TurretConfig config;
         private EnemyRegistry registry;
@@ -28,6 +29,11 @@ namespace AnchorDefense
             firePoint = projectileOrigin;
         }
 
+        public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
+        {
+            directionalVisual = visual;
+        }
+
         private void Update()
         {
             if (config == null || firePoint == null)
@@ -49,6 +55,7 @@ namespace AnchorDefense
             Vector3 direction = currentTarget.transform.position - transform.position;
             if (direction.sqrMagnitude > 0.001f)
             {
+                directionalVisual?.SetWorldDirection(direction);
                 transform.rotation = Quaternion.LookRotation(direction.normalized, transform.parent.up);
             }
 

@@ -14,8 +14,6 @@ namespace AnchorDefense
         [SerializeField, Min(0.01f)] private float fireSoundWindowSeconds = 0.2f;
         [SerializeField, Min(1)] private int maxFireSoundsPerWindow = 3;
         [SerializeField, Range(0f, 1f)] private float fireSoundRepeatVolumeMultiplier = 0.6f;
-[SerializeField, Min(1)] private int maxFireSoundsPerWindow = 3;
-
         private static float fireSoundWindowStart = float.NegativeInfinity;
         private static int fireSoundsInWindow;
         private TurretRuntimeStats runtimeStats;

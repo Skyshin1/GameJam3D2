@@ -15,18 +15,16 @@ namespace AnchorDefense
         [SerializeField] private Renderer zoneRenderer;
         [SerializeField] private BoxCollider zoneCollider;
         [SerializeField] private Transform localVfxAnchor;
-        [Tooltip("放在这里的预制体只属于这个区域立方体，并会随该立方体一起移动。")]
-        [SerializeField] private GameObject localVfxPrefab;
 
         private MaterialPropertyBlock propertyBlock;
         private CubeZoneEffectDefinition currentEffect;
         private GameObject localVfxInstance;
+        private GameObject currentZoneVfxPrefab;
         private bool isSelected;
         private bool isDropCandidate;
 
         public int CubeId => cubeId;
         public Vector3Int GridPosition => gridPosition;
-        public GameObject LocalVfxPrefab => localVfxPrefab;
 
         public void Configure(int id, Vector3Int position, Renderer visual, BoxCollider bounds, Transform vfxAnchor)
         {
@@ -47,9 +45,17 @@ namespace AnchorDefense
             return zoneCollider != null && zoneCollider.bounds.Contains(worldPosition);
         }
 
+        public void ApplySize(float cubeSize)
+        {
+            float size = Mathf.Max(1f, cubeSize);
+            if (zoneCollider != null) zoneCollider.size = Vector3.one * size;
+            if (zoneRenderer != null) zoneRenderer.transform.localScale = Vector3.one * size;
+        }
+
         public void SetEffect(CubeZoneEffectDefinition effect)
         {
             currentEffect = effect;
+            SetZoneVfx(effect != null ? effect.ZoneVfxPrefab : null);
             RefreshVisual();
         }
 
@@ -65,15 +71,21 @@ namespace AnchorDefense
             RefreshVisual();
         }
 
-        public void EnsureLocalVfx()
+        private void SetZoneVfx(GameObject prefab)
         {
-            if (localVfxPrefab == null || localVfxInstance != null || localVfxAnchor == null)
+            if (currentZoneVfxPrefab == prefab && (prefab == null || localVfxInstance != null))
             {
                 return;
             }
-
-            localVfxInstance = Instantiate(localVfxPrefab, localVfxAnchor);
-            localVfxInstance.name = localVfxPrefab.name + " (Zone Local VFX)";
+            if (localVfxInstance != null)
+            {
+                Destroy(localVfxInstance);
+                localVfxInstance = null;
+            }
+            currentZoneVfxPrefab = prefab;
+            if (prefab == null || localVfxAnchor == null) return;
+            localVfxInstance = Instantiate(prefab, localVfxAnchor);
+            localVfxInstance.name = prefab.name + " (Zone Effect VFX)";
             localVfxInstance.transform.localPosition = Vector3.zero;
             localVfxInstance.transform.localRotation = Quaternion.identity;
             localVfxInstance.transform.localScale = Vector3.one;

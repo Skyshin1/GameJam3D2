@@ -142,6 +142,16 @@ namespace AnchorDefense.Tests
             for (int i = 0; i < zoneVolumes.Length; i++)
             {
                 Assert.That(zoneVolumes[i].gameObject.layer, Is.EqualTo(CubeZoneGridController.ZoneRaycastLayer));
+                Vector3Int gridPosition = zoneVolumes[i].GridPosition;
+                Assert.That(gridPosition.x, Is.InRange(-1, 1));
+                Assert.That(gridPosition.y, Is.InRange(-1, 1));
+                Assert.That(gridPosition.z, Is.InRange(-1, 1));
+                Assert.That(zoneVolumes[i].transform.localPosition,
+                    Is.EqualTo((Vector3)gridPosition * zoneGrid.Config.CubeSize));
+                for (int j = i + 1; j < zoneVolumes.Length; j++)
+                {
+                    Assert.That(zoneVolumes[j].GridPosition, Is.Not.EqualTo(gridPosition));
+                }
             }
             Assert.That(Object.FindObjectOfType<CubeZoneAssignmentController>(true), Is.Not.Null);
             Assert.That(zoneGrid.Config.AvailableEffects.Length, Is.EqualTo(3));

@@ -25,6 +25,14 @@ namespace AnchorDefense
         [field: SerializeField, Min(0f)] public float EnemyDamagePerSecond { get; private set; }
         [field: SerializeField] public UpgradeNodeDefinition UnlockRequirement { get; private set; }
 
+        [field: Header("Effect Presentation")]
+        [field: Tooltip("显示在区域方块内部，并随绑定该效果的方块一起移动。")]
+        [field: SerializeField] public GameObject ZoneVfxPrefab { get; private set; }
+        [field: Tooltip("显示在该效果区域内每座炮塔身上的 Buff 特效。")]
+        [field: SerializeField] public GameObject TurretVfxPrefab { get; private set; }
+        [field: Tooltip("显示在该效果区域内每个敌人身上的 Buff / Debuff 特效。")]
+        [field: SerializeField] public GameObject EnemyVfxPrefab { get; private set; }
+
 #if UNITY_EDITOR
         public void Configure(string id, string displayName, string description, Color color,
             CubeZoneEffectType effectType, float turretIntervalMultiplier,

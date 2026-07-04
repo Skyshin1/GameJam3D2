@@ -7,7 +7,8 @@ namespace AnchorDefense
     {
         public const int ZoneCount = 8;
 
-        [field: SerializeField, Min(1f)] public float GridHalfExtent { get; private set; } = 10.5f;
+        [Tooltip("所有区域方块的统一边长。位置步长、碰撞体和吸附虚影都会使用这个值，因此不会产生间隙。")]
+        [field: SerializeField, Min(1f)] public float CubeSize { get; private set; } = 10.5f;
         [field: SerializeField] public CubeZoneEffectDefinition[] AvailableEffects { get; private set; }
         [field: SerializeField] public CubeZoneEffectDefinition[] DefaultZoneEffects { get; private set; }
 
@@ -19,10 +20,10 @@ namespace AnchorDefense
         }
 
 #if UNITY_EDITOR
-        public void Configure(float halfExtent, CubeZoneEffectDefinition[] effects,
+        public void Configure(float cubeSize, CubeZoneEffectDefinition[] effects,
             CubeZoneEffectDefinition[] defaults)
         {
-            GridHalfExtent = Mathf.Max(1f, halfExtent);
+            CubeSize = Mathf.Max(1f, cubeSize);
             AvailableEffects = effects ?? new CubeZoneEffectDefinition[0];
             DefaultZoneEffects = new CubeZoneEffectDefinition[ZoneCount];
             if (defaults != null)

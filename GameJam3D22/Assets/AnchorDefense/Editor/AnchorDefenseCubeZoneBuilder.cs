@@ -75,7 +75,8 @@ namespace AnchorDefense.Editor
                 defaults[i] = (i & 1) == 0 ? blue : red;
             }
             CubeZoneConfig config = CreateOrLoad<CubeZoneConfig>(ConfigPath);
-            config.Configure(10.5f, new[] { blue, red, green }, defaults);
+            float cubeSize = config.CubeSize >= 1f ? config.CubeSize : 10.5f;
+            config.Configure(cubeSize, new[] { blue, red, green }, defaults);
             EditorUtility.SetDirty(config);
             return config;
         }
@@ -112,18 +113,16 @@ namespace AnchorDefense.Editor
         private static GameObject CreateGridPrefab(CubeZoneConfig config, Material material)
         {
             GameObject root = new GameObject("CubeZoneGrid", typeof(CubeZoneGridController));
-            float cubeSize = config.GridHalfExtent;
-            float centerOffset = cubeSize * 0.5f;
+            float cubeSize = config.CubeSize;
             var volumes = new List<CubeZoneVolume>(CubeZoneConfig.ZoneCount);
             for (int i = 0; i < CubeZoneConfig.ZoneCount; i++)
             {
                 GameObject cube = new GameObject($"Zone Cube C{i + 1:00}", typeof(BoxCollider), typeof(CubeZoneVolume));
                 cube.layer = CubeZoneGridController.ZoneRaycastLayer;
                 cube.transform.SetParent(root.transform, false);
-                cube.transform.localPosition = new Vector3(
-                    (i & 1) != 0 ? centerOffset : -centerOffset,
-                    (i & 2) != 0 ? centerOffset : -centerOffset,
-                    (i & 4) != 0 ? centerOffset : -centerOffset);
+                Vector3Int gridPosition = new Vector3Int((i & 1) != 0 ? 0 : -1,
+                    (i & 2) != 0 ? 0 : -1, (i & 4) != 0 ? 0 : -1);
+                cube.transform.localPosition = (Vector3)gridPosition * cubeSize;
                 BoxCollider collider = cube.GetComponent<BoxCollider>();
                 collider.size = Vector3.one * cubeSize;
                 collider.isTrigger = true;
@@ -142,8 +141,6 @@ namespace AnchorDefense.Editor
                 Transform vfxAnchor = new GameObject("Local VFX Anchor").transform;
                 vfxAnchor.SetParent(cube.transform, false);
                 CubeZoneVolume volume = cube.GetComponent<CubeZoneVolume>();
-                Vector3Int gridPosition = new Vector3Int((i & 1) != 0 ? 1 : 0,
-                    (i & 2) != 0 ? 1 : 0, (i & 4) != 0 ? 1 : 0);
                 volume.Configure(i, gridPosition, renderer, collider, vfxAnchor);
                 volume.SetEffect(config.GetDefaultEffect(i));
                 volumes.Add(volume);
@@ -156,7 +153,7 @@ namespace AnchorDefense.Editor
                 hint.name = $"Adjacent Drop Silhouette {i + 1}";
                 hint.layer = CubeZoneGridController.ZoneRaycastLayer;
                 hint.transform.SetParent(root.transform, false);
-                hint.transform.localScale = Vector3.one * (cubeSize * 1.025f);
+                hint.transform.localScale = Vector3.one * cubeSize;
                 BoxCollider hintCollider = hint.GetComponent<BoxCollider>();
                 hintCollider.isTrigger = true;
                 MeshRenderer renderer = hint.GetComponent<MeshRenderer>();

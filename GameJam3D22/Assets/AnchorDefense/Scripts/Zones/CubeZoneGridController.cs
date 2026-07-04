@@ -8,6 +8,8 @@ namespace AnchorDefense
     public sealed class CubeZoneGridController : MonoBehaviour
     {
         public const int ZoneRaycastLayer = 2;
+        public const int MinimumGridCoordinate = -1;
+        public const int MaximumGridCoordinate = 1;
 
         private static readonly Vector3Int[] NeighborDirections =
         {
@@ -41,6 +43,8 @@ namespace AnchorDefense
 
         private readonly Dictionary<CubeZoneVolume, Coroutine> cubeMoveRoutines =
             new Dictionary<CubeZoneVolume, Coroutine>();
+        private readonly Dictionary<GameObject, ZoneEffectVfxBinding> actorVfxBindings =
+            new Dictionary<GameObject, ZoneEffectVfxBinding>();
 
         private MaterialPropertyBlock hintPropertyBlock;
         private EnemyRegistry enemyRegistry;
@@ -92,13 +96,21 @@ namespace AnchorDefense
                     cubeById[id] = cube;
                     cubeEffects[id] = config != null ? config.GetDefaultEffect(id) : null;
 
+                    cube.ApplySize(config != null ? config.CubeSize : 10.5f);
                     cube.transform.localPosition = GetGridLocalPosition(cube.GridPosition);
                     cube.SetEffect(cubeEffects[id]);
-                    cube.EnsureLocalVfx();
                 }
             }
 
             SetHintsVisible(false);
+            if (dropHintTransforms != null)
+            {
+                float size = config != null ? config.CubeSize : 10.5f;
+                for (int i = 0; i < dropHintTransforms.Length; i++)
+                {
+                    if (dropHintTransforms[i] != null) dropHintTransforms[i].localScale = Vector3.one * size;
+                }
+            }
             initialized = config != null && enemyRegistry != null && turretRegistry != null;
             SelectCubeById(0);
         }
@@ -230,7 +242,7 @@ namespace AnchorDefense
             swapResult = null;
 
             float bestScore = 1f;
-            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
+            float cubeSize = config != null ? config.CubeSize : 10.5f;
 
             // 1. 优先用屏幕空间判断空位提示，不再依赖射线是否被挡住。
             if (dropHintTransforms != null)
@@ -349,7 +361,7 @@ namespace AnchorDefense
                 for (int i = 0; i < NeighborDirections.Length; i++)
                 {
                     Vector3Int candidate = occupied + NeighborDirections[i];
-                    if (!occupiedPositions.Contains(candidate))
+                    if (IsInsideAllowedGrid(candidate) && !occupiedPositions.Contains(candidate))
                     {
                         uniqueCandidates.Add(candidate);
                     }
@@ -433,6 +445,7 @@ namespace AnchorDefense
         private void MoveSelectedCube(Vector3Int targetPosition)
         {
             if (selectedCube == null ||
+                !IsInsideAllowedGrid(targetPosition) ||
                 IsOccupied(targetPosition, selectedCube) ||
                 !IsAdjacentToAnotherCube(targetPosition, selectedCube))
             {
@@ -593,6 +606,8 @@ namespace AnchorDefense
                     effect != null && effect.EffectType == CubeZoneEffectType.TurretDamageBoost
                         ? effect.TurretDamageMultiplier
                         : 1f);
+
+                ApplyActorVfx(health.gameObject, effect != null ? effect.TurretVfxPrefab : null);
             }
         }
 
@@ -618,6 +633,8 @@ namespace AnchorDefense
                 {
                     enemy.SetZoneEffect(1f, 0f);
                 }
+
+                ApplyActorVfx(enemy.gameObject, effect != null ? effect.EnemyVfxPrefab : null);
             }
         }
 
@@ -642,12 +659,29 @@ namespace AnchorDefense
 
         private Vector3 GetGridLocalPosition(Vector3Int gridPosition)
         {
-            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
+            float cubeSize = config != null ? config.CubeSize : 10.5f;
 
-            return new Vector3(
-                (gridPosition.x - 0.5f) * cubeSize,
-                (gridPosition.y - 0.5f) * cubeSize,
-                (gridPosition.z - 0.5f) * cubeSize);
+            return new Vector3(gridPosition.x * cubeSize,
+                gridPosition.y * cubeSize, gridPosition.z * cubeSize);
+        }
+
+        private static bool IsInsideAllowedGrid(Vector3Int position)
+        {
+            return position.x >= MinimumGridCoordinate && position.x <= MaximumGridCoordinate &&
+                   position.y >= MinimumGridCoordinate && position.y <= MaximumGridCoordinate &&
+                   position.z >= MinimumGridCoordinate && position.z <= MaximumGridCoordinate;
+        }
+
+        private void ApplyActorVfx(GameObject actor, GameObject prefab)
+        {
+            if (actor == null) return;
+            if (!actorVfxBindings.TryGetValue(actor, out ZoneEffectVfxBinding binding) || binding == null)
+            {
+                binding = actor.GetComponent<ZoneEffectVfxBinding>();
+                if (binding == null && prefab != null) binding = actor.AddComponent<ZoneEffectVfxBinding>();
+                if (binding != null) actorVfxBindings[actor] = binding;
+            }
+            binding?.SetPrefab(prefab);
         }
 
         private void SetHintsVisible(bool visible)
@@ -677,6 +711,11 @@ namespace AnchorDefense
             }
 
             cubeMoveRoutines.Clear();
+            foreach (KeyValuePair<GameObject, ZoneEffectVfxBinding> pair in actorVfxBindings)
+            {
+                if (pair.Value != null) pair.Value.SetPrefab(null);
+            }
+            actorVfxBindings.Clear();
         }
     }
 }

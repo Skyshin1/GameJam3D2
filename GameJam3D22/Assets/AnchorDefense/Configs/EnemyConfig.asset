@@ -24,7 +24,8 @@ MonoBehaviour:
   <ProjectileSpeed>k__BackingField: 8
   <ProjectileLifetime>k__BackingField: 4
   <ProjectileHitRadius>k__BackingField: 0.18
-  <ProjectilePrefab>k__BackingField: {fileID: 0}
+  <ProjectilePrefab>k__BackingField: {fileID: 3928814468507712704, guid: 3611861485cf92942aa89325b992c2b1,
+    type: 3}
   <ProjectileColor>k__BackingField: {r: 1, g: 0.22, b: 0.08, a: 1}
   <Size>k__BackingField: 0.55
   <BaseColor>k__BackingField: {r: 0.92, g: 0.16, b: 0.25, a: 1}

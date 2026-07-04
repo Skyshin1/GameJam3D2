@@ -25,3 +25,6 @@ MonoBehaviour:
   <EnemyDamagePerSecond>k__BackingField: 0
   <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: 0196049df4a741044998d846ef3591a2,
     type: 2}
+  <ZoneVfxPrefab>k__BackingField: {fileID: 0}
+  <TurretVfxPrefab>k__BackingField: {fileID: 0}
+  <EnemyVfxPrefab>k__BackingField: {fileID: 0}

@@ -8,8 +8,13 @@ namespace AnchorDefense
         private EnemyController target;
         private Action<ProjectileController> releaseAction;
         private Action<ProjectileController> movedAction;
+
         [SerializeField] private TrailRenderer trail;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
+
+        private TrailRenderer[] trails;
+        private ParticleSystem[] particleSystems;
+
         private Vector3 direction;
         private float damage;
         private float speed;
@@ -23,9 +28,21 @@ namespace AnchorDefense
         public float Damage => damage;
         public EnemyController Target => target;
 
+        private void Awake()
+        {
+            trails = GetComponentsInChildren<TrailRenderer>(true);
+            particleSystems = GetComponentsInChildren<ParticleSystem>(true);
+
+            if (trail == null && trails != null && trails.Length > 0)
+            {
+                trail = trails[0];
+            }
+        }
+
         public void Configure(TrailRenderer projectileTrail)
         {
             trail = projectileTrail;
+            trails = GetComponentsInChildren<TrailRenderer>(true);
         }
 
         public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
@@ -44,7 +61,12 @@ namespace AnchorDefense
             Action<ProjectileController> onRelease,
             Action<ProjectileController> onMoved = null)
         {
+            isFlying = false;
+
+            StopAndClearVfx();
+
             transform.position = position;
+
             target = newTarget;
             targetSpawnVersion = target != null ? target.SpawnVersion : 0;
             damage = projectileDamage;
@@ -54,15 +76,27 @@ namespace AnchorDefense
             releaseAction = onRelease;
             movedAction = onMoved;
             ProjectileType = type;
-            direction = target != null ? (target.transform.position - position).normalized : transform.forward;
+
+            direction = target != null
+                ? (target.transform.position - position).normalized
+                : transform.forward;
+
+            if (direction.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(direction);
+            }
+
             directionalVisual?.SetWorldDirection(direction);
+
+            ResetAndPlayVfx();
+
             isFlying = true;
-            trail?.Clear();
         }
 
         public void OnTakenFromPool()
         {
             isFlying = false;
+            StopAndClearVfx();
         }
 
         public void OnReturnedToPool()
@@ -72,7 +106,7 @@ namespace AnchorDefense
             targetSpawnVersion = 0;
             releaseAction = null;
             movedAction = null;
-            trail?.Clear();
+            StopAndClearVfx();
         }
 
         private void Update()
@@ -107,10 +141,12 @@ namespace AnchorDefense
             }
 
             transform.position += direction * (speed * Time.deltaTime);
+
             if (direction.sqrMagnitude > 0.001f)
             {
                 transform.rotation = Quaternion.LookRotation(direction);
             }
+
             movedAction?.Invoke(this);
         }
 
@@ -127,7 +163,59 @@ namespace AnchorDefense
             }
 
             isFlying = false;
+            StopAndClearVfx();
             releaseAction?.Invoke(this);
+        }
+
+        private void StopAndClearVfx()
+        {
+            if (trails != null)
+            {
+                foreach (TrailRenderer t in trails)
+                {
+                    if (t == null) continue;
+
+                    t.emitting = false;
+                    t.Clear();
+                }
+            }
+
+            if (particleSystems != null)
+            {
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    if (ps == null) continue;
+
+                    ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    ps.Clear(true);
+                }
+            }
+        }
+
+        private void ResetAndPlayVfx()
+        {
+            if (trails != null)
+            {
+                foreach (TrailRenderer t in trails)
+                {
+                    if (t == null) continue;
+
+                    t.Clear();
+                    t.emitting = true;
+                }
+            }
+
+            if (particleSystems != null)
+            {
+                foreach (ParticleSystem ps in particleSystems)
+                {
+                    if (ps == null) continue;
+
+                    ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                    ps.Clear(true);
+                    ps.Play(true);
+                }
+            }
         }
     }
 }

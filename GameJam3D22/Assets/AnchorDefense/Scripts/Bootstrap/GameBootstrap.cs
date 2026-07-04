@@ -139,23 +139,37 @@ namespace AnchorDefense
 
         private bool ValidateReferences()
         {
-            bool sceneReferencesValid = gameplayCamera != null && core != null && gameFlow != null &&
-                                        spawner != null && ringInput != null && hud != null && upgradeTree != null &&
-                                        inputController != null &&
-                                        poolRoot != null;
-            bool configReferencesValid = coreConfig != null && enemyConfig != null &&
-                                         turretConfig != null && endlessModeConfig != null && upgradeTreeConfig != null;
-            bool prefabReferencesValid = configReferencesValid && enemyConfig.Prefab != null &&
-                                         enemyConfig.HitEffectPrefab != null && enemyConfig.DeathEffectPrefab != null &&
-                                         turretConfig.ProjectilePrefab != null;
+            bool valid = true;
 
-            if (!sceneReferencesValid || !configReferencesValid || !prefabReferencesValid)
+            if (gameplayCamera == null) { Debug.LogError("Missing Gameplay Camera", this); valid = false; }
+            if (core == null) { Debug.LogError("Missing Core", this); valid = false; }
+            if (gameFlow == null) { Debug.LogError("Missing Game Flow", this); valid = false; }
+            if (spawner == null) { Debug.LogError("Missing Spawner", this); valid = false; }
+            if (ringInput == null) { Debug.LogError("Missing Ring Input", this); valid = false; }
+            if (hud == null) { Debug.LogError("Missing HUD", this); valid = false; }
+            if (upgradeTree == null) { Debug.LogError("Missing Upgrade Tree", this); valid = false; }
+            if (inputController == null) { Debug.LogError("Missing Input Controller", this); valid = false; }
+            if (poolRoot == null) { Debug.LogError("Missing Pool Root", this); valid = false; }
+
+            if (coreConfig == null) { Debug.LogError("Missing Core Config", this); valid = false; }
+            if (enemyConfig == null) { Debug.LogError("Missing Enemy Config", this); valid = false; }
+            if (turretConfig == null) { Debug.LogError("Missing Turret Config", this); valid = false; }
+            if (endlessModeConfig == null) { Debug.LogError("Missing Endless Mode Config", this); valid = false; }
+            if (upgradeTreeConfig == null) { Debug.LogError("Missing Upgrade Tree Config", this); valid = false; }
+
+            if (enemyConfig != null)
             {
-                Debug.LogError("GameBootstrap is missing scene, config, or prefab references.", this);
-                return false;
+                if (enemyConfig.Prefab == null) { Debug.LogError("Missing EnemyConfig.Prefab", enemyConfig); valid = false; }
+                if (enemyConfig.HitEffectPrefab == null) { Debug.LogError("Missing EnemyConfig.HitEffectPrefab", enemyConfig); valid = false; }
+                if (enemyConfig.DeathEffectPrefab == null) { Debug.LogError("Missing EnemyConfig.DeathEffectPrefab", enemyConfig); valid = false; }
             }
 
-            return true;
+            if (turretConfig != null)
+            {
+                if (turretConfig.ProjectilePrefab == null) { Debug.LogError("Missing TurretConfig.ProjectilePrefab", turretConfig); valid = false; }
+            }
+
+            return valid;
         }
     }
 }

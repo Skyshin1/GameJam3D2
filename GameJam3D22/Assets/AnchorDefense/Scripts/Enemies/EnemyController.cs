@@ -23,6 +23,7 @@ namespace AnchorDefense
         private bool isAlive;
         private float fireCooldown;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
+        [SerializeField] private SingleSpriteBillboardVisual singleSpriteVisual;
 
         public bool IsAlive => isAlive;
         public int SpawnVersion { get; private set; }
@@ -31,6 +32,11 @@ namespace AnchorDefense
         public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
         {
             directionalVisual = visual;
+        }
+
+        public void ConfigureSingleSpriteVisual(SingleSpriteBillboardVisual visual)
+        {
+            singleSpriteVisual = visual;
         }
 
         public void Initialize(
@@ -121,6 +127,7 @@ namespace AnchorDefense
             {
                 Vector3 direction = toCore / distance;
                 directionalVisual?.SetWorldDirection(direction);
+                singleSpriteVisual?.SetWorldDirection(direction);
                 transform.position += direction * (moveSpeed * Time.deltaTime);
                 transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }
@@ -148,6 +155,7 @@ namespace AnchorDefense
                 ? (target.transform.position - transform.position).normalized
                 : coreDirection;
             directionalVisual?.SetWorldDirection(fireDirection);
+            singleSpriteVisual?.SetWorldDirection(fireDirection);
             if (fireDirection.sqrMagnitude > 0.001f)
             {
                 transform.rotation = Quaternion.LookRotation(fireDirection, Vector3.up);

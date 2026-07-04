@@ -142,6 +142,11 @@ namespace AnchorDefense.Tests
                 }
             }
             Assert.That(killTarget, Is.Not.Null);
+            SingleSpriteBillboardVisual billboardVisual = killTarget.GetComponentInChildren<SingleSpriteBillboardVisual>();
+            Assert.That(billboardVisual, Is.Not.Null);
+            Assert.That(billboardVisual.TargetRenderer, Is.Not.Null);
+            yield return null;
+            Assert.That(Vector3.Dot(billboardVisual.transform.forward, Camera.main.transform.forward), Is.GreaterThan(0.999f));
             int killsBeforeDamage = bootstrap.KillWallet.TotalKills;
             killTarget.TakeDamage(new DamageInfo(100000f, killTarget.transform.position, bootstrap.gameObject));
             Assert.That(bootstrap.KillWallet.TotalKills, Is.EqualTo(killsBeforeDamage + 1));

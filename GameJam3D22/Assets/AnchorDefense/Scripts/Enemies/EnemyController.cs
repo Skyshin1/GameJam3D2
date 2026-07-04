@@ -22,12 +22,22 @@ namespace AnchorDefense
         private float flashRemaining;
         private bool isAlive;
         private float fireCooldown;
+        private float zoneSpeedMultiplier = 1f;
+        private float zoneDamagePerSecond;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         [SerializeField] private SingleSpriteBillboardVisual singleSpriteVisual;
 
         public bool IsAlive => isAlive;
         public int SpawnVersion { get; private set; }
+        public float ZoneSpeedMultiplier => zoneSpeedMultiplier;
+        public float ZoneDamagePerSecond => zoneDamagePerSecond;
         public event Action<EnemyController> Killed;
+
+        public void SetZoneEffect(float speedMultiplier, float damagePerSecond)
+        {
+            zoneSpeedMultiplier = Mathf.Clamp(speedMultiplier, 0.05f, 4f);
+            zoneDamagePerSecond = Mathf.Max(0f, damagePerSecond);
+        }
 
         public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
         {
@@ -65,6 +75,8 @@ namespace AnchorDefense
             isAlive = true;
             flashRemaining = 0f;
             fireCooldown = UnityEngine.Random.Range(0.15f, Mathf.Max(0.15f, config.FireInterval));
+            zoneSpeedMultiplier = 1f;
+            zoneDamagePerSecond = 0f;
             transform.localScale = Vector3.one * config.Size;
             SetColor(config.BaseColor);
         }
@@ -102,6 +114,8 @@ namespace AnchorDefense
             deathEffectAction = null;
             turretRegistry = null;
             enemyProjectiles = null;
+            zoneSpeedMultiplier = 1f;
+            zoneDamagePerSecond = 0f;
         }
 
         private void Update()
@@ -109,6 +123,16 @@ namespace AnchorDefense
             if (!isAlive || core == null)
             {
                 return;
+            }
+
+            if (zoneDamagePerSecond > 0f)
+            {
+                currentHealth -= zoneDamagePerSecond * Time.deltaTime;
+                if (currentHealth <= 0f)
+                {
+                    Die();
+                    return;
+                }
             }
 
             Vector3 toCore = core.transform.position - transform.position;
@@ -128,7 +152,7 @@ namespace AnchorDefense
                 Vector3 direction = toCore / distance;
                 directionalVisual?.SetWorldDirection(direction);
                 singleSpriteVisual?.SetWorldDirection(direction);
-                transform.position += direction * (moveSpeed * Time.deltaTime);
+                transform.position += direction * (moveSpeed * zoneSpeedMultiplier * Time.deltaTime);
                 transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }
 
@@ -147,7 +171,7 @@ namespace AnchorDefense
             Vector3 coreDirection = distance > 0.001f ? toCore / distance : transform.forward;
             if (distance > config.RangedStopRadius)
             {
-                transform.position += coreDirection * (moveSpeed * Time.deltaTime);
+                transform.position += coreDirection * (moveSpeed * zoneSpeedMultiplier * Time.deltaTime);
             }
 
             TurretHealth target = turretRegistry?.FindNearestOperational(transform.position);

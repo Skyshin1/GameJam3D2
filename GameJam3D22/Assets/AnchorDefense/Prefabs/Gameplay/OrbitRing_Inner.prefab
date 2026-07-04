@@ -977,8 +977,7 @@ MonoBehaviour:
   normalColor: {r: 0.08, g: 0.62, b: 0.9, a: 1}
   selectedColor: {r: 0.678, g: 0.867, b: 0.965, a: 1}
   ringId: 0
-  initialTurrets:
-  - {fileID: 0}
+  initialTurrets: []
   upgradeTurrets: []
   initialTurretSlots:
   - {fileID: 1017747769725088648}

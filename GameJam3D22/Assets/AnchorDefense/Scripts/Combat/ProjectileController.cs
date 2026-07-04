@@ -7,6 +7,7 @@ namespace AnchorDefense
     {
         private EnemyController target;
         private Action<ProjectileController> releaseAction;
+        private Action<ProjectileController> movedAction;
         [SerializeField] private TrailRenderer trail;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         private Vector3 direction;
@@ -16,6 +17,11 @@ namespace AnchorDefense
         private float lifetime;
         private bool isFlying;
         private int targetSpawnVersion;
+
+        public bool IsFlying => isFlying;
+        public TurretProjectileType ProjectileType { get; private set; }
+        public float Damage => damage;
+        public EnemyController Target => target;
 
         public void Configure(TrailRenderer projectileTrail)
         {
@@ -34,7 +40,9 @@ namespace AnchorDefense
             float projectileSpeed,
             float projectileHitRadius,
             float projectileLifetime,
-            Action<ProjectileController> onRelease)
+            TurretProjectileType type,
+            Action<ProjectileController> onRelease,
+            Action<ProjectileController> onMoved = null)
         {
             transform.position = position;
             target = newTarget;
@@ -44,6 +52,8 @@ namespace AnchorDefense
             hitRadius = projectileHitRadius;
             lifetime = projectileLifetime;
             releaseAction = onRelease;
+            movedAction = onMoved;
+            ProjectileType = type;
             direction = target != null ? (target.transform.position - position).normalized : transform.forward;
             directionalVisual?.SetWorldDirection(direction);
             isFlying = true;
@@ -61,6 +71,7 @@ namespace AnchorDefense
             target = null;
             targetSpawnVersion = 0;
             releaseAction = null;
+            movedAction = null;
             trail?.Clear();
         }
 
@@ -100,6 +111,12 @@ namespace AnchorDefense
             {
                 transform.rotation = Quaternion.LookRotation(direction);
             }
+            movedAction?.Invoke(this);
+        }
+
+        public void ReleaseForFusion()
+        {
+            Release();
         }
 
         private void Release()

@@ -65,6 +65,7 @@ namespace AnchorDefense.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             AnchorDefenseFrontendBuilder.RepairAfterGameplayRebuild();
+            AnchorDefenseCubeZoneBuilder.BuildAll();
             Debug.Log("Anchor Defense upgrade tree assets and scenes refreshed successfully.");
         }
 
@@ -150,10 +151,21 @@ namespace AnchorDefense.Editor
                 null,
                 new UpgradeEffect[] { healthEffect });
 
+            UpgradeNodeDefinition zoneDamageFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneDamageFragment.asset");
+            zoneDamageFragment.Configure(
+                "zone.fragment.damage",
+                "翠绿火控碎片",
+                "解锁绿色区域配置：处于该区域内的炮塔伤害提高 50%。解锁后可在区域配置界面中分配。",
+                "GRN",
+                18,
+                false,
+                null,
+                null);
+
             UnityEngine.Object[] dirtyAssets =
             {
                 innerEffect, middleEffect, outerEffect, damageEffect, intervalEffect, healthEffect,
-                innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode
+                innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode, zoneDamageFragment
             };
             for (int i = 0; i < dirtyAssets.Length; i++)
             {
@@ -161,7 +173,7 @@ namespace AnchorDefense.Editor
             }
 
             UpgradeTreeConfig tree = CreateOrLoad<UpgradeTreeConfig>(UpgradeTreePath);
-            tree.Configure(new[] { innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode });
+            tree.Configure(new[] { innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode, zoneDamageFragment });
             EditorUtility.SetDirty(tree);
             return tree;
         }
@@ -392,6 +404,7 @@ namespace AnchorDefense.Editor
             UpgradeNodeDefinition damage = config.FindNode("turret.damage.01");
             UpgradeNodeDefinition interval = config.FindNode("turret.interval.01");
             UpgradeNodeDefinition health = config.FindNode("turret.health.01");
+            UpgradeNodeDefinition zoneDamageFragment = config.FindNode("zone.fragment.damage");
 
             Vector2 hub = new Vector2(0f, -25f);
             Vector2 innerPos = new Vector2(-230f, 115f);
@@ -400,6 +413,7 @@ namespace AnchorDefense.Editor
             Vector2 damagePos = new Vector2(15f, 210f);
             Vector2 intervalPos = new Vector2(200f, 325f);
             Vector2 healthPos = new Vector2(245f, -190f);
+            Vector2 zoneDamagePos = new Vector2(-40f, -300f);
 
             CreateLine(treeArea.transform, hub, innerPos, Cyan, 4f);
             CreateLine(treeArea.transform, innerPos, middlePos, Violet, 4f);
@@ -407,6 +421,7 @@ namespace AnchorDefense.Editor
             CreateLine(treeArea.transform, hub, damagePos, Gold, 4f);
             CreateLine(treeArea.transform, damagePos, intervalPos, Mint, 4f);
             CreateLine(treeArea.transform, hub, healthPos, Mint, 4f);
+            CreateLine(treeArea.transform, hub, zoneDamagePos, new Color(0.25f, 1f, 0.45f), 4f);
 
             var views = new List<UpgradeNodeView>
             {
@@ -415,14 +430,15 @@ namespace AnchorDefense.Editor
                 CreateNode(treeArea.transform, font, outerPos, outer, Orange),
                 CreateNode(treeArea.transform, font, damagePos, damage, Gold),
                 CreateNode(treeArea.transform, font, intervalPos, interval, Mint),
-                CreateNode(treeArea.transform, font, healthPos, health, Mint)
+                CreateNode(treeArea.transform, font, healthPos, health, Mint),
+                CreateNode(treeArea.transform, font, zoneDamagePos, zoneDamageFragment, new Color(0.25f, 1f, 0.45f))
             };
 
             Vector2[] placeholderPositions =
             {
                 new Vector2(-620f, 125f), new Vector2(-410f, 20f), new Vector2(-170f, 300f),
                 new Vector2(25f, 365f), new Vector2(390f, 245f), new Vector2(430f, -20f),
-                new Vector2(100f, -335f), new Vector2(-220f, -260f)
+                new Vector2(130f, -350f), new Vector2(-300f, -330f)
             };
             for (int i = 0; i < placeholderPositions.Length; i++)
             {

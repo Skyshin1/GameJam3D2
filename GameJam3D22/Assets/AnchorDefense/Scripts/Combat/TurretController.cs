@@ -14,6 +14,7 @@ namespace AnchorDefense
         private ProjectileService projectileService;
         private EnemyController currentTarget;
         private float cooldown;
+        private float zoneFireIntervalMultiplier = 1f;
 
         public void Initialize(
             TurretRuntimeStats turretStats,
@@ -31,6 +32,7 @@ namespace AnchorDefense
 
         public TurretHealth Health => health != null ? health : GetComponent<TurretHealth>();
         public TurretProjectileType ProjectileType => projectileType;
+        public float ZoneFireIntervalMultiplier => zoneFireIntervalMultiplier;
 
         public void ConfigureFirePoint(Transform projectileOrigin)
         {
@@ -50,6 +52,20 @@ namespace AnchorDefense
         public void ConfigureProjectileType(TurretProjectileType type)
         {
             projectileType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
+        }
+
+        public void SetZoneFireIntervalMultiplier(float multiplier)
+        {
+            float clamped = Mathf.Clamp(multiplier, 0.05f, 4f);
+            if (Mathf.Approximately(zoneFireIntervalMultiplier, clamped))
+            {
+                return;
+            }
+            zoneFireIntervalMultiplier = clamped;
+            if (runtimeStats != null)
+            {
+                cooldown = Mathf.Min(cooldown, runtimeStats.FireInterval * zoneFireIntervalMultiplier);
+            }
         }
 
         private void Update()
@@ -79,7 +95,7 @@ namespace AnchorDefense
             if (cooldown <= 0f)
             {
                 projectileService.Fire(firePoint.position, currentTarget, runtimeStats.Damage, projectileType);
-                cooldown = runtimeStats.FireInterval;
+                cooldown = runtimeStats.FireInterval * zoneFireIntervalMultiplier;
             }
         }
 

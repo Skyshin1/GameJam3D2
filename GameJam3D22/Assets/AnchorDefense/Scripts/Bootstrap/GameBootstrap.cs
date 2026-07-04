@@ -118,6 +118,10 @@ namespace AnchorDefense
                 poolRoot);
             hud.Initialize(core, spawner, registry, gameFlow);
             upgradeTree.Initialize(UpgradeSystem, gameFlow, inputController);
+            CubeZoneGridController zoneGrid = FindObjectOfType<CubeZoneGridController>(true);
+            zoneGrid?.Initialize(registry, TurretRegistry, core.transform);
+            CubeZoneAssignmentController zoneAssignment = FindObjectOfType<CubeZoneAssignmentController>(true);
+            zoneAssignment?.Initialize(zoneGrid);
 
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();

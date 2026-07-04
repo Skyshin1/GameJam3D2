@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11214723a5b34068b0246b3a65df27b0, type: 3}
+  m_Name: CubeZoneConfig
+  m_EditorClassIdentifier: 
+  <GridHalfExtent>k__BackingField: 10.5
+  <AvailableEffects>k__BackingField:
+  - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
+  - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
+  <DefaultZoneEffects>k__BackingField:
+  - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
+  - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
+  - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
+  - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
+  - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
+  - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
+  - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
+  - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}

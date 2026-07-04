@@ -65,6 +65,7 @@ namespace AnchorDefense.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             AnchorDefenseFrontendBuilder.RepairAfterGameplayRebuild();
+            AnchorDefenseCubeZoneBuilder.BuildAll();
             Debug.Log("Anchor Defense upgrade tree assets and scenes refreshed successfully.");
         }
 

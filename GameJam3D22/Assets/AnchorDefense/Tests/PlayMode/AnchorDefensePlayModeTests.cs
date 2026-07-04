@@ -78,6 +78,30 @@ namespace AnchorDefense.Tests
             Assert.That(bootstrap.TurretRegistry, Is.Not.Null);
             Assert.That(bootstrap.UpgradeSystem, Is.Not.Null);
 
+            CubeZoneGridController zoneGrid = Object.FindObjectOfType<CubeZoneGridController>();
+            Assert.That(zoneGrid, Is.Not.Null);
+            Assert.That(Object.FindObjectsOfType<CubeZoneVolume>(true).Length, Is.EqualTo(8));
+            Assert.That(Object.FindObjectOfType<CubeZoneAssignmentController>(true), Is.Not.Null);
+            Assert.That(zoneGrid.Config.AvailableEffects.Length, Is.EqualTo(2));
+            CubeZoneEffectDefinition blueZoneEffect = zoneGrid.GetAssignedEffect(0);
+            CubeZoneEffectDefinition redZoneEffect = zoneGrid.GetAssignedEffect(1);
+            Assert.That(blueZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.TurretFireRateBoost));
+            Assert.That(redZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.EnemySlowAndDamage));
+            zoneGrid.AssignEffect(0, redZoneEffect);
+            Assert.That(zoneGrid.GetAssignedEffect(0), Is.EqualTo(redZoneEffect));
+            zoneGrid.AssignEffect(0, blueZoneEffect);
+            yield return null;
+            TurretController[] zoneTurrets = Object.FindObjectsOfType<TurretController>();
+            for (int i = 0; i < zoneTurrets.Length; i++)
+            {
+                int zoneIndex = zoneGrid.GetZoneIndex(zoneTurrets[i].transform.position);
+                CubeZoneEffectDefinition effect = zoneGrid.GetAssignedEffect(zoneIndex);
+                float expectedMultiplier = effect != null && effect.EffectType == CubeZoneEffectType.TurretFireRateBoost
+                    ? effect.TurretFireIntervalMultiplier : 1f;
+                Assert.That(zoneTurrets[i].ZoneFireIntervalMultiplier,
+                    Is.EqualTo(expectedMultiplier).Within(0.001f));
+            }
+
             TurretController planarAimTurret = Object.FindObjectOfType<TurretController>();
             Vector3 ringNormal = planarAimTurret.transform.parent.up;
             planarAimTurret.ApplyPlanarVisualAim(planarAimTurret.transform.forward + ringNormal * 4f);
@@ -142,6 +166,10 @@ namespace AnchorDefense.Tests
                 }
             }
             Assert.That(killTarget, Is.Not.Null);
+            killTarget.transform.position = zoneGrid.transform.TransformPoint(new Vector3(3f, -3f, -3f));
+            yield return null;
+            Assert.That(killTarget.ZoneSpeedMultiplier, Is.EqualTo(redZoneEffect.EnemySpeedMultiplier).Within(0.001f));
+            Assert.That(killTarget.ZoneDamagePerSecond, Is.EqualTo(redZoneEffect.EnemyDamagePerSecond).Within(0.001f));
             SingleSpriteBillboardVisual billboardVisual = killTarget.GetComponentInChildren<SingleSpriteBillboardVisual>();
             Assert.That(billboardVisual, Is.Not.Null);
             Assert.That(billboardVisual.TargetRenderer, Is.Not.Null);

@@ -347,6 +347,7 @@ GameObject:
   - component: {fileID: 5544535483290941292}
   - component: {fileID: 6628768128912545290}
   - component: {fileID: 5422763217403357689}
+  - component: {fileID: -1840185538360298208}
   m_Layer: 0
   m_Name: Core Orbit B
   m_TagString: Untagged
@@ -419,6 +420,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-1840185538360298208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3722165550465771707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7a1a38789ee124dbdd5357686ce079, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localAxis: {x: 0, y: 1, z: 0}
+  degreesPerSecond: -6
 --- !u!1 &4169655872625789501
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,6 +730,7 @@ GameObject:
   - component: {fileID: 5795896987555760044}
   - component: {fileID: 8675027252649711735}
   - component: {fileID: 6489155401189808510}
+  - component: {fileID: 9187245602127115439}
   m_Layer: 0
   m_Name: Core Orbit A
   m_TagString: Untagged
@@ -787,3 +803,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9187245602127115439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7392241431079764065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7a1a38789ee124dbdd5357686ce079, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localAxis: {x: 0, y: 1, z: 0}
+  degreesPerSecond: 10

@@ -166,53 +166,73 @@ namespace AnchorDefense
         }
 
         private void FindDropTarget(Camera camera, Vector2 pointerPosition,
-            out int hintResult, out CubeZoneVolume swapResult)
+    out int hintResult, out CubeZoneVolume swapResult)
         {
             hintResult = -1;
             swapResult = null;
-            Ray ray = camera.ScreenPointToRay(pointerPosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 500f, 1 << ZoneRaycastLayer,
-                QueryTriggerInteraction.Collide);
-            float nearest = float.PositiveInfinity;
-            for (int i = 0; i < hits.Length; i++)
+
+            float bestScore = 1f;
+            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
+
+            // 1. 优先用屏幕空间判断空位提示，不再依赖射线是否被挡住
+            if (dropHintTransforms != null)
             {
-                int index = FindHintIndex(hits[i].collider.transform);
-                if (index >= 0 && hits[i].distance < nearest)
+                for (int i = 0; i < candidatePositions.Count && i < dropHintTransforms.Length; i++)
                 {
-                    nearest = hits[i].distance;
-                    hintResult = index;
-                    swapResult = null;
+                    Transform hint = dropHintTransforms[i];
+                    if (hint == null || !hint.gameObject.activeInHierarchy)
+                    {
+                        continue;
+                    }
+
+                    float score = GetScreenTargetScore(camera, pointerPosition, hint.position, cubeSize * 0.5f, 90f);
+                    if (score < bestScore)
+                    {
+                        bestScore = score;
+                        hintResult = i;
+                        swapResult = null;
+                    }
+                }
+            }
+
+            // 2. 再用屏幕空间判断是否拖到已有方块上，用于交换位置
+            for (int i = 0; i < cubeById.Length; i++)
+            {
+                CubeZoneVolume cube = cubeById[i];
+                if (cube == null || cube == selectedCube)
+                {
                     continue;
                 }
-                CubeZoneVolume hitCube = hits[i].collider.GetComponentInParent<CubeZoneVolume>();
-                if (hitCube != null && hitCube != selectedCube && hits[i].distance < nearest)
-                {
-                    nearest = hits[i].distance;
-                    hintResult = -1;
-                    swapResult = hitCube;
-                }
-            }
-            if (hintResult >= 0 || swapResult != null) return;
 
-            // 屏幕空间兜底：按虚影投影后的实际半径判断，而不是只认固定的中心小圆。
-            float bestNormalizedDistance = 1f;
-            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
-            for (int i = 0; i < candidatePositions.Count && i < dropHintTransforms.Length; i++)
-            {
-                Transform hint = dropHintTransforms[i];
-                Vector3 center = camera.WorldToScreenPoint(hint.position);
-                if (center.z <= 0f) continue;
-                Vector3 rightEdge = camera.WorldToScreenPoint(hint.position + camera.transform.right * cubeSize * 0.5f);
-                Vector3 upEdge = camera.WorldToScreenPoint(hint.position + camera.transform.up * cubeSize * 0.5f);
-                float radius = Mathf.Max(Vector2.Distance(center, rightEdge), Vector2.Distance(center, upEdge));
-                radius = Mathf.Max(80f, radius * dropSnapScreenPadding);
-                float normalized = Vector2.Distance(pointerPosition, center) / radius;
-                if (normalized < bestNormalizedDistance)
+                float score = GetScreenTargetScore(camera, pointerPosition, cube.transform.position, cubeSize * 0.5f, 85f);
+                if (score < bestScore)
                 {
-                    bestNormalizedDistance = normalized;
-                    hintResult = i;
+                    bestScore = score;
+                    hintResult = -1;
+                    swapResult = cube;
                 }
             }
+        }
+
+        private float GetScreenTargetScore(Camera camera, Vector2 pointerPosition,
+    Vector3 worldCenter, float worldRadius, float minScreenRadius)
+        {
+            Vector3 center = camera.WorldToScreenPoint(worldCenter);
+            if (center.z <= 0f)
+            {
+                return float.PositiveInfinity;
+            }
+
+            Vector3 rightEdge = camera.WorldToScreenPoint(worldCenter + camera.transform.right * worldRadius);
+            Vector3 upEdge = camera.WorldToScreenPoint(worldCenter + camera.transform.up * worldRadius);
+
+            float radius = Mathf.Max(
+                Vector2.Distance(center, rightEdge),
+                Vector2.Distance(center, upEdge));
+
+            radius = Mathf.Max(minScreenRadius, radius * dropSnapScreenPadding);
+
+            return Vector2.Distance(pointerPosition, center) / radius;
         }
 
         private int FindHintIndex(Transform hitTransform)

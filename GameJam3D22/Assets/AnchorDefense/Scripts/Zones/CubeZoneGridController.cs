@@ -13,8 +13,12 @@ namespace AnchorDefense
 
         private static readonly Vector3Int[] NeighborDirections =
         {
-            Vector3Int.right, Vector3Int.left, Vector3Int.up,
-            Vector3Int.down, new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)
+            Vector3Int.right,
+            Vector3Int.left,
+            Vector3Int.up,
+            Vector3Int.down,
+            new Vector3Int(0, 0, 1),
+            new Vector3Int(0, 0, -1)
         };
 
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -43,13 +47,19 @@ namespace AnchorDefense
 
         private readonly Dictionary<CubeZoneVolume, Coroutine> cubeMoveRoutines =
             new Dictionary<CubeZoneVolume, Coroutine>();
+
         private readonly Dictionary<GameObject, ZoneEffectVfxBinding> actorVfxBindings =
             new Dictionary<GameObject, ZoneEffectVfxBinding>();
 
         private MaterialPropertyBlock hintPropertyBlock;
         private EnemyRegistry enemyRegistry;
         private TurretRegistry turretRegistry;
+
         private CubeZoneVolume selectedCube;
+
+        // 关键新增：拖拽开始时锁定真正要移动的方块，避免 selectedCube 中途变化导致移动错对象。
+        private CubeZoneVolume draggedCube;
+
         private bool initialized;
         private bool isDragging;
         private bool isEditMode;
@@ -99,37 +109,55 @@ namespace AnchorDefense
                     cubeEffects[id] = config != null ? config.GetDefaultEffect(id) : null;
 
                     cube.ApplySize(config != null ? config.CubeSize : 10.5f);
-                    if (config != null) cube.ApplyInteractionColors(config.SelectedCubeColor, config.SwapTargetColor);
+
+                    if (config != null)
+                    {
+                        cube.ApplyInteractionColors(config.SelectedCubeColor, config.SwapTargetColor);
+                    }
+
                     cube.transform.localPosition = GetGridLocalPosition(cube.GridPosition);
                     cube.SetEffect(cubeEffects[id]);
                 }
             }
 
             SetHintsVisible(false);
+
             if (dropHintTransforms != null)
             {
                 float size = config != null ? config.CubeSize : 10.5f;
                 for (int i = 0; i < dropHintTransforms.Length; i++)
                 {
-                    if (dropHintTransforms[i] != null) dropHintTransforms[i].localScale = Vector3.one * size;
+                    if (dropHintTransforms[i] != null)
+                    {
+                        dropHintTransforms[i].localScale = Vector3.one * size;
+                    }
                 }
             }
+
             initialized = config != null && enemyRegistry != null && turretRegistry != null;
+
             GameSettingsService.Changed -= HandleSettingsChanged;
             GameSettingsService.Changed += HandleSettingsChanged;
+
             RefreshBorderVisibility();
             SelectCubeById(0);
         }
 
         public void SetEditMode(bool editing)
         {
-            if (isEditMode == editing) return;
+            if (isEditMode == editing)
+            {
+                return;
+            }
+
             isEditMode = editing;
+
             if (!editing)
             {
                 EndPointerInteraction();
                 SetHintsVisible(false);
             }
+
             RefreshBorderVisibility();
         }
 
@@ -159,28 +187,55 @@ namespace AnchorDefense
             AssignmentChanged?.Invoke(cubeId, effect);
         }
 
-        public void SelectCubeById(int cubeId) => SelectCube(GetCubeById(cubeId));
+        public void SelectCubeById(int cubeId)
+        {
+            SelectCube(GetCubeById(cubeId));
+        }
 
-        public void SelectCubeAtSlot(int cubeId) => SelectCubeById(cubeId);
+        public void SelectCubeAtSlot(int cubeId)
+        {
+            SelectCubeById(cubeId);
+        }
 
         public CubeZoneVolume FindCubeUnderPointer(Camera camera, Vector2 pointerPosition)
         {
-            if (camera == null) return null;
-            Ray ray = camera.ScreenPointToRay(pointerPosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 300f, 1 << ZoneRaycastLayer,
-                QueryTriggerInteraction.Collide);
-            CubeZoneVolume result = null;
-            float nearest = float.PositiveInfinity;
-            for (int i = 0; i < hits.Length; i++)
+            return FindClosestCubeByScreenPosition(camera, pointerPosition, 1f);
+        }
+
+        private CubeZoneVolume FindClosestCubeByScreenPosition(Camera camera, Vector2 pointerPosition, float maxScore)
+        {
+            if (camera == null)
             {
-                CubeZoneVolume cube = hits[i].collider.GetComponentInParent<CubeZoneVolume>();
-                if (cube != null && hits[i].distance < nearest)
+                return null;
+            }
+
+            float cubeSize = config != null ? config.CubeSize : 10.5f;
+            CubeZoneVolume bestCube = null;
+            float bestScore = maxScore;
+
+            for (int i = 0; i < cubeById.Length; i++)
+            {
+                CubeZoneVolume cube = cubeById[i];
+                if (cube == null)
                 {
-                    nearest = hits[i].distance;
-                    result = cube;
+                    continue;
+                }
+
+                float score = GetScreenTargetScore(
+                    camera,
+                    pointerPosition,
+                    cube.transform.position,
+                    cubeSize * 0.5f,
+                    85f);
+
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestCube = cube;
                 }
             }
-            return result;
+
+            return bestCube;
         }
 
         public bool TryBeginPointerInteraction(Camera camera, Vector2 pointerPosition)
@@ -190,32 +245,15 @@ namespace AnchorDefense
                 return false;
             }
 
-            Ray ray = camera.ScreenPointToRay(pointerPosition);
-            RaycastHit[] hits = Physics.RaycastAll(
-                ray,
-                300f,
-                1 << ZoneRaycastLayer,
-                QueryTriggerInteraction.Collide);
-
-            CubeZoneVolume cube = null;
-            float nearest = float.PositiveInfinity;
-
-            for (int i = 0; i < hits.Length; i++)
-            {
-                CubeZoneVolume hitCube = hits[i].collider.GetComponentInParent<CubeZoneVolume>();
-                if (hitCube != null && hits[i].distance < nearest)
-                {
-                    cube = hitCube;
-                    nearest = hits[i].distance;
-                }
-            }
-
+            CubeZoneVolume cube = FindClosestCubeByScreenPosition(camera, pointerPosition, 1f);
             if (cube == null)
             {
                 return false;
             }
 
+            draggedCube = cube;
             SelectCube(cube);
+
             isDragging = true;
             hoveredHintIndex = -1;
             hoveredSwapCube = null;
@@ -228,7 +266,7 @@ namespace AnchorDefense
 
         public void UpdatePointerInteraction(Camera camera, Vector2 pointerPosition)
         {
-            if (!isDragging || selectedCube == null || camera == null)
+            if (!isDragging || draggedCube == null || camera == null)
             {
                 return;
             }
@@ -253,20 +291,23 @@ namespace AnchorDefense
                 return;
             }
 
-            if (selectedCube != null && hoveredSwapCube != null)
+            CubeZoneVolume movingCube = draggedCube;
+
+            if (movingCube != null && hoveredSwapCube != null)
             {
-                SwapCubePositions(selectedCube, hoveredSwapCube);
+                SwapCubePositions(movingCube, hoveredSwapCube);
             }
-            else if (selectedCube != null &&
+            else if (movingCube != null &&
                      hoveredHintIndex >= 0 &&
                      hoveredHintIndex < candidatePositions.Count)
             {
-                MoveSelectedCube(candidatePositions[hoveredHintIndex]);
+                MoveCubeTo(movingCube, candidatePositions[hoveredHintIndex]);
             }
 
             hoveredSwapCube?.SetDropCandidate(false);
 
             isDragging = false;
+            draggedCube = null;
             hoveredHintIndex = -1;
             hoveredSwapCube = null;
 
@@ -278,6 +319,8 @@ namespace AnchorDefense
         {
             hintResult = -1;
             swapResult = null;
+
+            CubeZoneVolume movingCube = draggedCube != null ? draggedCube : selectedCube;
 
             float bestScore = 1f;
             float cubeSize = config != null ? config.CubeSize : 10.5f;
@@ -313,7 +356,7 @@ namespace AnchorDefense
             for (int i = 0; i < cubeById.Length; i++)
             {
                 CubeZoneVolume cube = cubeById[i];
-                if (cube == null || cube == selectedCube)
+                if (cube == null || cube == movingCube)
                 {
                     continue;
                 }
@@ -385,10 +428,12 @@ namespace AnchorDefense
             uniqueCandidates.Clear();
             candidatePositions.Clear();
 
+            CubeZoneVolume movingCube = draggedCube != null ? draggedCube : selectedCube;
+
             for (int i = 0; i < cubeById.Length; i++)
             {
                 CubeZoneVolume cube = cubeById[i];
-                if (cube != null && cube != selectedCube)
+                if (cube != null && cube != movingCube)
                 {
                     occupiedPositions.Add(cube.GridPosition);
                 }
@@ -399,7 +444,9 @@ namespace AnchorDefense
                 for (int i = 0; i < NeighborDirections.Length; i++)
                 {
                     Vector3Int candidate = occupied + NeighborDirections[i];
-                    if (IsInsideAllowedGrid(candidate) && !occupiedPositions.Contains(candidate))
+
+                    if (IsInsideAllowedGrid(candidate) &&
+                        !occupiedPositions.Contains(candidate))
                     {
                         uniqueCandidates.Add(candidate);
                     }
@@ -480,18 +527,18 @@ namespace AnchorDefense
             }
         }
 
-        private void MoveSelectedCube(Vector3Int targetPosition)
+        private void MoveCubeTo(CubeZoneVolume cube, Vector3Int targetPosition)
         {
-            if (selectedCube == null ||
+            if (cube == null ||
                 !IsInsideAllowedGrid(targetPosition) ||
-                IsOccupied(targetPosition, selectedCube) ||
-                !IsAdjacentToAnotherCube(targetPosition, selectedCube))
+                IsOccupied(targetPosition, cube) ||
+                !IsAdjacentToAnotherCube(targetPosition, cube))
             {
                 return;
             }
 
-            selectedCube.SetGridPosition(targetPosition);
-            AnimateCubeTo(selectedCube, GetGridLocalPosition(targetPosition));
+            cube.SetGridPosition(targetPosition);
+            AnimateCubeTo(cube, GetGridLocalPosition(targetPosition));
 
             LayoutChanged?.Invoke();
         }
@@ -699,8 +746,10 @@ namespace AnchorDefense
         {
             float cubeSize = config != null ? config.CubeSize : 10.5f;
 
-            return new Vector3(gridPosition.x * cubeSize,
-                gridPosition.y * cubeSize, gridPosition.z * cubeSize);
+            return new Vector3(
+                gridPosition.x * cubeSize,
+                gridPosition.y * cubeSize,
+                gridPosition.z * cubeSize);
         }
 
         private static bool IsInsideAllowedGrid(Vector3Int position)
@@ -712,13 +761,26 @@ namespace AnchorDefense
 
         private void ApplyActorVfx(GameObject actor, GameObject prefab)
         {
-            if (actor == null) return;
+            if (actor == null)
+            {
+                return;
+            }
+
             if (!actorVfxBindings.TryGetValue(actor, out ZoneEffectVfxBinding binding) || binding == null)
             {
                 binding = actor.GetComponent<ZoneEffectVfxBinding>();
-                if (binding == null && prefab != null) binding = actor.AddComponent<ZoneEffectVfxBinding>();
-                if (binding != null) actorVfxBindings[actor] = binding;
+
+                if (binding == null && prefab != null)
+                {
+                    binding = actor.AddComponent<ZoneEffectVfxBinding>();
+                }
+
+                if (binding != null)
+                {
+                    actorVfxBindings[actor] = binding;
+                }
             }
+
             binding?.SetPrefab(prefab);
         }
 
@@ -746,6 +808,7 @@ namespace AnchorDefense
         private void RefreshBorderVisibility()
         {
             bool visible = isEditMode || GameSettingsService.Current.showZoneBordersOutsideEdit;
+
             for (int i = 0; i < cubeById.Length; i++)
             {
                 cubeById[i]?.SetBorderVisible(visible);
@@ -755,6 +818,7 @@ namespace AnchorDefense
         private void OnDisable()
         {
             GameSettingsService.Changed -= HandleSettingsChanged;
+
             foreach (KeyValuePair<CubeZoneVolume, Coroutine> pair in cubeMoveRoutines)
             {
                 if (pair.Value != null)
@@ -764,11 +828,22 @@ namespace AnchorDefense
             }
 
             cubeMoveRoutines.Clear();
+
             foreach (KeyValuePair<GameObject, ZoneEffectVfxBinding> pair in actorVfxBindings)
             {
-                if (pair.Value != null) pair.Value.SetPrefab(null);
+                if (pair.Value != null)
+                {
+                    pair.Value.SetPrefab(null);
+                }
             }
+
             actorVfxBindings.Clear();
+
+            isDragging = false;
+            draggedCube = null;
+            hoveredHintIndex = -1;
+            hoveredSwapCube = null;
+            SetHintsVisible(false);
         }
     }
 }

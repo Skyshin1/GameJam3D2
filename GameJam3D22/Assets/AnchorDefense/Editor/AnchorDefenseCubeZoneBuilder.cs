@@ -142,6 +142,7 @@ namespace AnchorDefense.Editor
                 vfxAnchor.SetParent(cube.transform, false);
                 CubeZoneVolume volume = cube.GetComponent<CubeZoneVolume>();
                 volume.Configure(i, gridPosition, renderer, collider, vfxAnchor);
+                volume.ApplyInteractionColors(config.SelectedCubeColor, config.SwapTargetColor);
                 volume.SetEffect(config.GetDefaultEffect(i));
                 volumes.Add(volume);
             }

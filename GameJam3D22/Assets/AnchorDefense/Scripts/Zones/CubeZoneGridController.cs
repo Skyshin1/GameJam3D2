@@ -97,6 +97,7 @@ namespace AnchorDefense
                     cubeEffects[id] = config != null ? config.GetDefaultEffect(id) : null;
 
                     cube.ApplySize(config != null ? config.CubeSize : 10.5f);
+                    if (config != null) cube.ApplyInteractionColors(config.SelectedCubeColor, config.SwapTargetColor);
                     cube.transform.localPosition = GetGridLocalPosition(cube.GridPosition);
                     cube.SetEffect(cubeEffects[id]);
                 }
@@ -432,8 +433,8 @@ namespace AnchorDefense
                 }
 
                 Color color = i == hoveredHintIndex
-                    ? new Color(0.25f, 1f, 0.65f, 0.34f)
-                    : new Color(0.2f, 0.78f, 1f, 0.15f);
+                    ? (config != null ? config.HoveredHintColor : new Color(0.25f, 1f, 0.65f, 0.34f))
+                    : (config != null ? config.AvailableHintColor : new Color(0.2f, 0.78f, 1f, 0.15f));
 
                 renderer.GetPropertyBlock(hintPropertyBlock);
                 hintPropertyBlock.SetColor(BaseColorId, color);

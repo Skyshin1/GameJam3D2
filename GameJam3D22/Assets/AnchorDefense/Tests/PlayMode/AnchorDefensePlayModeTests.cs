@@ -78,6 +78,11 @@ namespace AnchorDefense.Tests
             Assert.That(bootstrap.TurretRegistry, Is.Not.Null);
             Assert.That(bootstrap.UpgradeSystem, Is.Not.Null);
 
+            TurretController planarAimTurret = Object.FindObjectOfType<TurretController>();
+            Vector3 ringNormal = planarAimTurret.transform.parent.up;
+            planarAimTurret.ApplyPlanarVisualAim(planarAimTurret.transform.forward + ringNormal * 4f);
+            Assert.That(Mathf.Abs(Vector3.Dot(planarAimTurret.transform.forward, ringNormal)), Is.LessThan(0.001f));
+
             RingInputController inputController = Object.FindObjectOfType<RingInputController>();
             Assert.That(inputController, Is.Not.Null);
             Camera gameplayCamera = Camera.main;

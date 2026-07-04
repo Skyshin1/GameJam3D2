@@ -66,8 +66,7 @@ namespace AnchorDefense
             Vector3 direction = currentTarget.transform.position - transform.position;
             if (direction.sqrMagnitude > 0.001f)
             {
-                directionalVisual?.SetWorldDirection(direction);
-                transform.rotation = Quaternion.LookRotation(direction.normalized, transform.parent.up);
+                ApplyPlanarVisualAim(direction);
             }
 
             if (cooldown <= 0f)
@@ -75,6 +74,20 @@ namespace AnchorDefense
                 projectileService.Fire(firePoint.position, currentTarget, runtimeStats.Damage);
                 cooldown = runtimeStats.FireInterval;
             }
+        }
+
+        public void ApplyPlanarVisualAim(Vector3 worldDirection)
+        {
+            Vector3 ringNormal = transform.parent != null ? transform.parent.up : Vector3.up;
+            Vector3 planarDirection = Vector3.ProjectOnPlane(worldDirection, ringNormal);
+            if (planarDirection.sqrMagnitude <= 0.001f)
+            {
+                return;
+            }
+
+            planarDirection.Normalize();
+            directionalVisual?.SetWorldDirection(planarDirection);
+            transform.rotation = Quaternion.LookRotation(planarDirection, ringNormal);
         }
 
         private bool IsTargetValid(EnemyController target)

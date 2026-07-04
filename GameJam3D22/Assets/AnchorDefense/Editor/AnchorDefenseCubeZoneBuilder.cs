@@ -136,20 +136,23 @@ namespace AnchorDefense.Editor
                 Transform vfxAnchor = new GameObject("Local VFX Anchor").transform;
                 vfxAnchor.SetParent(cube.transform, false);
                 CubeZoneVolume volume = cube.GetComponent<CubeZoneVolume>();
-                volume.Configure(i, i, renderer, collider, vfxAnchor);
+                Vector3Int gridPosition = new Vector3Int((i & 1) != 0 ? 1 : 0,
+                    (i & 2) != 0 ? 1 : 0, (i & 4) != 0 ? 1 : 0);
+                volume.Configure(i, gridPosition, renderer, collider, vfxAnchor);
                 volume.SetEffect(config.GetDefaultEffect(i));
                 volumes.Add(volume);
             }
 
-            var hints = new List<Transform>(3);
-            for (int i = 0; i < 3; i++)
+            var hints = new List<Transform>(48);
+            for (int i = 0; i < 48; i++)
             {
                 GameObject hint = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 hint.name = $"Adjacent Drop Silhouette {i + 1}";
                 hint.layer = CubeZoneGridController.ZoneRaycastLayer;
                 hint.transform.SetParent(root.transform, false);
                 hint.transform.localScale = Vector3.one * (cubeSize * 1.025f);
-                Object.DestroyImmediate(hint.GetComponent<Collider>());
+                BoxCollider hintCollider = hint.GetComponent<BoxCollider>();
+                hintCollider.isTrigger = true;
                 MeshRenderer renderer = hint.GetComponent<MeshRenderer>();
                 renderer.sharedMaterial = material;
                 renderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -196,7 +199,7 @@ namespace AnchorDefense.Editor
             title.text = "ANCHOR FIELD TOPOLOGY  /  场域立方体配置";
             Text hint = CreateText("Zone Hint", panel.transform, font, 18, TextAnchor.MiddleLeft, new Color(0.52f, 0.7f, 0.84f));
             SetRect(hint.rectTransform, new Vector2(0f, 1f), new Vector2(0.8f, 1f), new Vector2(34f, -112f), new Vector2(0f, -76f));
-            hint.text = "点击拓扑中的立方体查看配置；点击效果卡或拖到右侧槽位。场景中可拖动立方体与相邻位置交换。";
+            hint.text = "点击拓扑中的立方体查看配置；场景中拖动立方体，可吸附到任意其他立方体周围的空虚影位置。";
             Button closeButton = CreateButton("Close Zone Assignment", panel.transform, font, "返回技能树",
                 new Vector2(1f, 1f), new Vector2(-145f, -56f), new Vector2(190f, 46f), new Color(1f, 0.36f, 0.2f));
 
@@ -232,7 +235,7 @@ namespace AnchorDefense.Editor
             SetRect(topology.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(375f, 28f), new Vector2(1080f, -132f));
             Text topologyTitle = CreateText("Topology Title", topology.transform, font, 22, TextAnchor.MiddleCenter, TextColor);
             SetRect(topologyTitle.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(12f, -62f), new Vector2(-12f, -18f));
-            topologyTitle.text = "LIVE 2×2×2 FIELD  /  实时形态";
+            topologyTitle.text = "LIVE FIELD SHAPE  /  实时自由形态";
             Text axisHint = CreateText("Axis Hint", topology.transform, font, 16, TextAnchor.MiddleCenter, new Color(0.45f, 0.7f, 0.82f));
             SetRect(axisHint.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(12f, 18f), new Vector2(-12f, 52f));
             axisHint.text = "C 编号随立方体移动 · 发光边框表示当前选中";

@@ -9,7 +9,7 @@ namespace AnchorDefense
 
         [Header("Identity")]
         [SerializeField] private int cubeId;
-        [SerializeField] private int slotIndex;
+        [SerializeField] private Vector3Int gridPosition;
 
         [Header("Presentation")]
         [SerializeField] private Renderer zoneRenderer;
@@ -25,21 +25,26 @@ namespace AnchorDefense
         private bool isDropCandidate;
 
         public int CubeId => cubeId;
-        public int SlotIndex => slotIndex;
+        public Vector3Int GridPosition => gridPosition;
         public GameObject LocalVfxPrefab => localVfxPrefab;
 
-        public void Configure(int id, int slot, Renderer visual, BoxCollider bounds, Transform vfxAnchor)
+        public void Configure(int id, Vector3Int position, Renderer visual, BoxCollider bounds, Transform vfxAnchor)
         {
             cubeId = id;
-            slotIndex = slot;
+            gridPosition = position;
             zoneRenderer = visual;
             zoneCollider = bounds;
             localVfxAnchor = vfxAnchor;
         }
 
-        public void SetSlotIndex(int index)
+        public void SetGridPosition(Vector3Int position)
         {
-            slotIndex = index;
+            gridPosition = position;
+        }
+
+        public bool Contains(Vector3 worldPosition)
+        {
+            return zoneCollider != null && zoneCollider.bounds.Contains(worldPosition);
         }
 
         public void SetEffect(CubeZoneEffectDefinition effect)

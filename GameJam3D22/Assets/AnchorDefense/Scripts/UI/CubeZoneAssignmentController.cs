@@ -15,7 +15,7 @@ namespace AnchorDefense
 
         private CubeZoneGridController grid;
         private UpgradeSystem upgradeSystem;
-        private int selectedSlot;
+        private int selectedCubeId;
 
         public void Configure(Button open, Button close, GameObject panel,
             ZoneEffectDragSource[] sources, ZoneLayoutMarker[] markers,
@@ -56,29 +56,29 @@ namespace AnchorDefense
                 layoutMarkers[i]?.Bind(this);
             }
             selectedTarget?.Bind(this);
-            selectedSlot = grid.SelectedCube != null ? grid.SelectedCube.SlotIndex : 0;
+            selectedCubeId = grid.SelectedCube != null ? grid.SelectedCube.CubeId : 0;
             RefreshUnlocks();
             RefreshAll();
         }
 
-        public void SelectSlot(int slotIndex)
+        public void SelectSlot(int cubeId)
         {
-            selectedSlot = Mathf.Clamp(slotIndex, 0, CubeZoneConfig.ZoneCount - 1);
-            grid?.SelectCubeAtSlot(selectedSlot);
+            selectedCubeId = Mathf.Clamp(cubeId, 0, CubeZoneConfig.ZoneCount - 1);
+            grid?.SelectCubeById(selectedCubeId);
             RefreshSelection();
         }
 
-        public void Assign(int slotIndex, CubeZoneEffectDefinition effect)
+        public void Assign(int cubeId, CubeZoneEffectDefinition effect)
         {
             if (IsEffectUnlocked(effect))
             {
-                grid?.AssignEffect(slotIndex, effect);
+                grid?.AssignEffect(cubeId, effect);
             }
         }
 
         public void AssignSelected(CubeZoneEffectDefinition effect)
         {
-            Assign(selectedSlot, effect);
+            Assign(selectedCubeId, effect);
         }
 
         private void Awake()
@@ -120,7 +120,7 @@ namespace AnchorDefense
             {
                 return;
             }
-            selectedSlot = cube.SlotIndex;
+            selectedCubeId = cube.CubeId;
             RefreshSelection();
         }
 
@@ -151,9 +151,33 @@ namespace AnchorDefense
             }
             for (int i = 0; i < layoutMarkers.Length; i++)
             {
-                layoutMarkers[i]?.Refresh(grid.GetCubeAtSlot(i), grid.GetAssignedEffect(i), i == selectedSlot);
+                layoutMarkers[i]?.Refresh(grid.GetCubeById(i), grid.GetAssignedEffect(i), i == selectedCubeId);
             }
+            RefreshTopologyPositions();
             RefreshSelection();
+        }
+
+        private void RefreshTopologyPositions()
+        {
+            Vector2[] projected = new Vector2[CubeZoneConfig.ZoneCount];
+            Vector2 min = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
+            Vector2 max = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
+            for (int i = 0; i < projected.Length; i++)
+            {
+                CubeZoneVolume cube = grid.GetCubeById(i);
+                Vector3Int p = cube != null ? cube.GridPosition : Vector3Int.zero;
+                projected[i] = new Vector2((p.x - p.z) * 112f, p.y * 118f + (p.x + p.z) * 46f);
+                min = Vector2.Min(min, projected[i]);
+                max = Vector2.Max(max, projected[i]);
+            }
+            Vector2 size = max - min;
+            float scale = Mathf.Min(1f, Mathf.Min(500f / Mathf.Max(126f, size.x + 126f),
+                530f / Mathf.Max(126f, size.y + 126f)));
+            Vector2 center = (min + max) * 0.5f;
+            for (int i = 0; i < layoutMarkers.Length; i++)
+            {
+                layoutMarkers[i]?.SetTopologyPosition((projected[i] - center) * scale);
+            }
         }
 
         private void RefreshSelection()
@@ -162,20 +186,20 @@ namespace AnchorDefense
             {
                 return;
             }
-            CubeZoneVolume cube = grid.GetCubeAtSlot(selectedSlot);
-            CubeZoneEffectDefinition effect = grid.GetAssignedEffect(selectedSlot);
-            selectedTarget?.SetZoneIndex(selectedSlot);
+            CubeZoneVolume cube = grid.GetCubeById(selectedCubeId);
+            CubeZoneEffectDefinition effect = grid.GetAssignedEffect(selectedCubeId);
+            selectedTarget?.SetZoneIndex(selectedCubeId);
             selectedTarget?.Refresh(effect);
             if (selectedDetails != null)
             {
                 selectedDetails.text = cube == null
                     ? "未选中区域立方体"
-                    : $"立方体 C{cube.CubeId + 1:00}  /  当前格位 {selectedSlot + 1}\n" +
+                    : $"立方体 C{cube.CubeId + 1:00}  /  坐标 {cube.GridPosition}\n" +
                       (effect != null ? effect.Description : "尚未配置区域效果");
             }
             for (int i = 0; i < layoutMarkers.Length; i++)
             {
-                if (layoutMarkers[i] != null) layoutMarkers[i].SetSelected(i == selectedSlot);
+                if (layoutMarkers[i] != null) layoutMarkers[i].SetSelected(i == selectedCubeId);
             }
         }
     }

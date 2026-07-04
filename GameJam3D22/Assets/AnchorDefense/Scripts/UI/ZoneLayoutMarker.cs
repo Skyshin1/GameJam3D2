@@ -45,6 +45,12 @@ namespace AnchorDefense
             SetSelected(isSelected);
         }
 
+        public void SetTopologyPosition(Vector2 anchoredPosition)
+        {
+            RectTransform rect = transform as RectTransform;
+            if (rect != null) rect.anchoredPosition = anchoredPosition;
+        }
+
         public void SetSelected(bool value)
         {
             selected = value;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AnchorDefense
@@ -7,23 +8,35 @@ namespace AnchorDefense
     {
         public const int ZoneRaycastLayer = 2;
 
+        private static readonly Vector3Int[] NeighborDirections =
+        {
+            Vector3Int.right, Vector3Int.left, Vector3Int.up,
+            Vector3Int.down, new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1)
+        };
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int ColorId = Shader.PropertyToID("_Color");
+
         [SerializeField] private CubeZoneConfig config;
         [SerializeField] private CubeZoneVolume[] zoneVolumes;
         [Header("Drag Placement Hints")]
         [SerializeField] private Transform[] dropHintTransforms;
-        [SerializeField, Min(30f)] private float dropSnapScreenRadius = 150f;
+        [SerializeField, Min(1f)] private float dropSnapScreenPadding = 1.25f;
 
         private readonly CubeZoneEffectDefinition[] cubeEffects =
             new CubeZoneEffectDefinition[CubeZoneConfig.ZoneCount];
-        private readonly CubeZoneVolume[] slotToCube =
+        private readonly CubeZoneVolume[] cubeById =
             new CubeZoneVolume[CubeZoneConfig.ZoneCount];
-        private readonly int[] adjacentSlots = new int[3];
+        private readonly List<Vector3Int> candidatePositions = new List<Vector3Int>(48);
+        private readonly HashSet<Vector3Int> occupiedPositions = new HashSet<Vector3Int>();
+        private readonly HashSet<Vector3Int> uniqueCandidates = new HashSet<Vector3Int>();
+        private MaterialPropertyBlock hintPropertyBlock;
         private EnemyRegistry enemyRegistry;
         private TurretRegistry turretRegistry;
         private CubeZoneVolume selectedCube;
         private bool initialized;
         private bool isDragging;
-        private int hoveredDropSlot = -1;
+        private int hoveredHintIndex = -1;
+        private CubeZoneVolume hoveredSwapCube;
 
         public CubeZoneConfig Config => config;
         public CubeZoneVolume SelectedCube => selectedCube;
@@ -43,27 +56,19 @@ namespace AnchorDefense
         {
             enemyRegistry = enemies;
             turretRegistry = turrets;
-            if (core != null)
-            {
-                transform.position = core.position;
-            }
+            if (core != null) transform.position = core.position;
 
-            Array.Clear(slotToCube, 0, slotToCube.Length);
+            Array.Clear(cubeById, 0, cubeById.Length);
             if (zoneVolumes != null)
             {
                 for (int i = 0; i < zoneVolumes.Length; i++)
                 {
                     CubeZoneVolume cube = zoneVolumes[i];
-                    if (cube == null)
-                    {
-                        continue;
-                    }
-
-                    int slot = Mathf.Clamp(cube.SlotIndex, 0, CubeZoneConfig.ZoneCount - 1);
+                    if (cube == null) continue;
                     int id = Mathf.Clamp(cube.CubeId, 0, CubeZoneConfig.ZoneCount - 1);
-                    slotToCube[slot] = cube;
-                    cubeEffects[id] = config != null ? config.GetDefaultEffect(slot) : null;
-                    cube.transform.localPosition = GetSlotLocalPosition(slot);
+                    cubeById[id] = cube;
+                    cubeEffects[id] = config != null ? config.GetDefaultEffect(id) : null;
+                    cube.transform.localPosition = GetGridLocalPosition(cube.GridPosition);
                     cube.SetEffect(cubeEffects[id]);
                     cube.EnsureLocalVfx();
                 }
@@ -71,163 +76,274 @@ namespace AnchorDefense
 
             SetHintsVisible(false);
             initialized = config != null && enemyRegistry != null && turretRegistry != null;
-            SelectCubeAtSlot(0);
+            SelectCubeById(0);
         }
 
-        public CubeZoneVolume GetCubeAtSlot(int slotIndex)
+        public CubeZoneVolume GetCubeById(int cubeId)
         {
-            return slotIndex >= 0 && slotIndex < slotToCube.Length ? slotToCube[slotIndex] : null;
+            return cubeId >= 0 && cubeId < cubeById.Length ? cubeById[cubeId] : null;
         }
 
-        public CubeZoneEffectDefinition GetAssignedEffect(int slotIndex)
+        // 保留旧接口，避免已有 UI / 测试和后续外部脚本立即失效；参数现在代表稳定的 CubeId。
+        public CubeZoneVolume GetCubeAtSlot(int cubeId) => GetCubeById(cubeId);
+
+        public CubeZoneEffectDefinition GetAssignedEffect(int cubeId)
         {
-            CubeZoneVolume cube = GetCubeAtSlot(slotIndex);
-            return cube != null ? cubeEffects[cube.CubeId] : null;
+            return cubeId >= 0 && cubeId < cubeEffects.Length ? cubeEffects[cubeId] : null;
         }
 
-        public void AssignEffect(int slotIndex, CubeZoneEffectDefinition effect)
+        public void AssignEffect(int cubeId, CubeZoneEffectDefinition effect)
         {
-            CubeZoneVolume cube = GetCubeAtSlot(slotIndex);
-            if (cube == null)
-            {
-                return;
-            }
-
-            cubeEffects[cube.CubeId] = effect;
+            CubeZoneVolume cube = GetCubeById(cubeId);
+            if (cube == null) return;
+            cubeEffects[cubeId] = effect;
             cube.SetEffect(effect);
-            AssignmentChanged?.Invoke(slotIndex, effect);
+            AssignmentChanged?.Invoke(cubeId, effect);
         }
 
-        public void SelectCubeAtSlot(int slotIndex)
-        {
-            SelectCube(GetCubeAtSlot(slotIndex));
-        }
+        public void SelectCubeById(int cubeId) => SelectCube(GetCubeById(cubeId));
+        public void SelectCubeAtSlot(int cubeId) => SelectCubeById(cubeId);
 
         public bool TryBeginPointerInteraction(Camera camera, Vector2 pointerPosition)
         {
-            if (camera == null)
-            {
-                return false;
-            }
-
+            if (camera == null) return false;
             Ray ray = camera.ScreenPointToRay(pointerPosition);
-            if (!Physics.Raycast(ray, out RaycastHit hit, 200f, 1 << ZoneRaycastLayer,
-                    QueryTriggerInteraction.Collide))
+            RaycastHit[] hits = Physics.RaycastAll(ray, 300f, 1 << ZoneRaycastLayer,
+                QueryTriggerInteraction.Collide);
+            CubeZoneVolume cube = null;
+            float nearest = float.PositiveInfinity;
+            for (int i = 0; i < hits.Length; i++)
             {
-                return false;
+                CubeZoneVolume hitCube = hits[i].collider.GetComponentInParent<CubeZoneVolume>();
+                if (hitCube != null && hits[i].distance < nearest)
+                {
+                    cube = hitCube;
+                    nearest = hits[i].distance;
+                }
             }
-
-            CubeZoneVolume cube = hit.collider.GetComponentInParent<CubeZoneVolume>();
-            if (cube == null)
-            {
-                return false;
-            }
+            if (cube == null) return false;
 
             SelectCube(cube);
             isDragging = true;
-            hoveredDropSlot = -1;
-            ShowAdjacentHints(cube.SlotIndex);
+            hoveredHintIndex = -1;
+            hoveredSwapCube = null;
+            BuildEmptyNeighborCandidates();
+            ShowCandidateHints();
             return true;
         }
 
         public void UpdatePointerInteraction(Camera camera, Vector2 pointerPosition)
         {
-            if (!isDragging || selectedCube == null || camera == null)
-            {
-                return;
-            }
+            if (!isDragging || selectedCube == null || camera == null) return;
 
-            int previous = hoveredDropSlot;
-            hoveredDropSlot = -1;
-            float closest = dropSnapScreenRadius;
-            BuildAdjacentSlots(selectedCube.SlotIndex);
-            for (int i = 0; i < adjacentSlots.Length; i++)
+            int previousHint = hoveredHintIndex;
+            CubeZoneVolume previousSwap = hoveredSwapCube;
+            FindDropTarget(camera, pointerPosition, out hoveredHintIndex, out hoveredSwapCube);
+            if (previousHint != hoveredHintIndex || previousSwap != hoveredSwapCube)
             {
-                int slot = adjacentSlots[i];
-                Vector3 screen = camera.WorldToScreenPoint(transform.TransformPoint(GetSlotLocalPosition(slot)));
-                if (screen.z <= 0f)
-                {
-                    continue;
-                }
-
-                float distance = Vector2.Distance(pointerPosition, new Vector2(screen.x, screen.y));
-                if (distance < closest)
-                {
-                    closest = distance;
-                    hoveredDropSlot = slot;
-                }
-            }
-
-            if (previous != hoveredDropSlot)
-            {
-                RefreshCandidateHighlights();
+                previousSwap?.SetDropCandidate(false);
+                hoveredSwapCube?.SetDropCandidate(true);
+                RefreshHintVisuals();
             }
         }
 
         public void EndPointerInteraction()
         {
-            if (!isDragging)
+            if (!isDragging) return;
+            if (selectedCube != null && hoveredSwapCube != null)
             {
-                return;
+                SwapCubePositions(selectedCube, hoveredSwapCube);
             }
-
-            if (selectedCube != null && hoveredDropSlot >= 0)
+            else if (selectedCube != null && hoveredHintIndex >= 0 && hoveredHintIndex < candidatePositions.Count)
             {
-                SwapSlots(selectedCube.SlotIndex, hoveredDropSlot);
+                MoveSelectedCube(candidatePositions[hoveredHintIndex]);
             }
-
+            hoveredSwapCube?.SetDropCandidate(false);
             isDragging = false;
-            hoveredDropSlot = -1;
-            ClearCandidateHighlights();
+            hoveredHintIndex = -1;
+            hoveredSwapCube = null;
             SetHintsVisible(false);
+        }
+
+        private void FindDropTarget(Camera camera, Vector2 pointerPosition,
+            out int hintResult, out CubeZoneVolume swapResult)
+        {
+            hintResult = -1;
+            swapResult = null;
+            Ray ray = camera.ScreenPointToRay(pointerPosition);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 500f, 1 << ZoneRaycastLayer,
+                QueryTriggerInteraction.Collide);
+            float nearest = float.PositiveInfinity;
+            for (int i = 0; i < hits.Length; i++)
+            {
+                int index = FindHintIndex(hits[i].collider.transform);
+                if (index >= 0 && hits[i].distance < nearest)
+                {
+                    nearest = hits[i].distance;
+                    hintResult = index;
+                    swapResult = null;
+                    continue;
+                }
+                CubeZoneVolume hitCube = hits[i].collider.GetComponentInParent<CubeZoneVolume>();
+                if (hitCube != null && hitCube != selectedCube && hits[i].distance < nearest)
+                {
+                    nearest = hits[i].distance;
+                    hintResult = -1;
+                    swapResult = hitCube;
+                }
+            }
+            if (hintResult >= 0 || swapResult != null) return;
+
+            // 屏幕空间兜底：按虚影投影后的实际半径判断，而不是只认固定的中心小圆。
+            float bestNormalizedDistance = 1f;
+            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
+            for (int i = 0; i < candidatePositions.Count && i < dropHintTransforms.Length; i++)
+            {
+                Transform hint = dropHintTransforms[i];
+                Vector3 center = camera.WorldToScreenPoint(hint.position);
+                if (center.z <= 0f) continue;
+                Vector3 rightEdge = camera.WorldToScreenPoint(hint.position + camera.transform.right * cubeSize * 0.5f);
+                Vector3 upEdge = camera.WorldToScreenPoint(hint.position + camera.transform.up * cubeSize * 0.5f);
+                float radius = Mathf.Max(Vector2.Distance(center, rightEdge), Vector2.Distance(center, upEdge));
+                radius = Mathf.Max(80f, radius * dropSnapScreenPadding);
+                float normalized = Vector2.Distance(pointerPosition, center) / radius;
+                if (normalized < bestNormalizedDistance)
+                {
+                    bestNormalizedDistance = normalized;
+                    hintResult = i;
+                }
+            }
+        }
+
+        private int FindHintIndex(Transform hitTransform)
+        {
+            if (dropHintTransforms == null) return -1;
+            for (int i = 0; i < candidatePositions.Count && i < dropHintTransforms.Length; i++)
+            {
+                Transform hint = dropHintTransforms[i];
+                if (hint != null && hint.gameObject.activeInHierarchy &&
+                    (hitTransform == hint || hitTransform.IsChildOf(hint))) return i;
+            }
+            return -1;
+        }
+
+        private void BuildEmptyNeighborCandidates()
+        {
+            occupiedPositions.Clear();
+            uniqueCandidates.Clear();
+            candidatePositions.Clear();
+            for (int i = 0; i < cubeById.Length; i++)
+            {
+                CubeZoneVolume cube = cubeById[i];
+                if (cube != null && cube != selectedCube) occupiedPositions.Add(cube.GridPosition);
+            }
+            foreach (Vector3Int occupied in occupiedPositions)
+            {
+                for (int i = 0; i < NeighborDirections.Length; i++)
+                {
+                    Vector3Int candidate = occupied + NeighborDirections[i];
+                    if (!occupiedPositions.Contains(candidate)) uniqueCandidates.Add(candidate);
+                }
+            }
+            candidatePositions.AddRange(uniqueCandidates);
+            candidatePositions.Sort(CompareGridPositions);
+        }
+
+        private static int CompareGridPositions(Vector3Int a, Vector3Int b)
+        {
+            int y = a.y.CompareTo(b.y);
+            if (y != 0) return y;
+            int z = a.z.CompareTo(b.z);
+            return z != 0 ? z : a.x.CompareTo(b.x);
+        }
+
+        private void ShowCandidateHints()
+        {
+            if (dropHintTransforms == null) return;
+            for (int i = 0; i < dropHintTransforms.Length; i++)
+            {
+                Transform hint = dropHintTransforms[i];
+                if (hint == null) continue;
+                bool active = i < candidatePositions.Count;
+                hint.gameObject.SetActive(active);
+                if (active) hint.localPosition = GetGridLocalPosition(candidatePositions[i]);
+            }
+            RefreshHintVisuals();
+        }
+
+        private void RefreshHintVisuals()
+        {
+            if (dropHintTransforms == null) return;
+            hintPropertyBlock ??= new MaterialPropertyBlock();
+            for (int i = 0; i < candidatePositions.Count && i < dropHintTransforms.Length; i++)
+            {
+                Renderer renderer = dropHintTransforms[i] != null
+                    ? dropHintTransforms[i].GetComponent<Renderer>() : null;
+                if (renderer == null) continue;
+                Color color = i == hoveredHintIndex
+                    ? new Color(0.25f, 1f, 0.65f, 0.34f)
+                    : new Color(0.2f, 0.78f, 1f, 0.15f);
+                renderer.GetPropertyBlock(hintPropertyBlock);
+                hintPropertyBlock.SetColor(BaseColorId, color);
+                hintPropertyBlock.SetColor(ColorId, color);
+                renderer.SetPropertyBlock(hintPropertyBlock);
+            }
+        }
+
+        private void MoveSelectedCube(Vector3Int targetPosition)
+        {
+            if (selectedCube == null || IsOccupied(targetPosition, selectedCube) ||
+                !IsAdjacentToAnotherCube(targetPosition, selectedCube)) return;
+            selectedCube.SetGridPosition(targetPosition);
+            selectedCube.transform.localPosition = GetGridLocalPosition(targetPosition);
+            LayoutChanged?.Invoke();
+        }
+
+        private void SwapCubePositions(CubeZoneVolume first, CubeZoneVolume second)
+        {
+            if (first == null || second == null || first == second) return;
+            Vector3Int firstPosition = first.GridPosition;
+            Vector3Int secondPosition = second.GridPosition;
+            first.SetGridPosition(secondPosition);
+            second.SetGridPosition(firstPosition);
+            first.transform.localPosition = GetGridLocalPosition(secondPosition);
+            second.transform.localPosition = GetGridLocalPosition(firstPosition);
+            LayoutChanged?.Invoke();
+        }
+
+        private bool IsOccupied(Vector3Int position, CubeZoneVolume ignored)
+        {
+            for (int i = 0; i < cubeById.Length; i++)
+            {
+                CubeZoneVolume cube = cubeById[i];
+                if (cube != null && cube != ignored && cube.GridPosition == position) return true;
+            }
+            return false;
+        }
+
+        private bool IsAdjacentToAnotherCube(Vector3Int position, CubeZoneVolume ignored)
+        {
+            for (int i = 0; i < NeighborDirections.Length; i++)
+            {
+                if (IsOccupied(position + NeighborDirections[i], ignored)) return true;
+            }
+            return false;
         }
 
         private void SelectCube(CubeZoneVolume cube)
         {
-            if (selectedCube == cube)
+            if (selectedCube != cube)
             {
-                SelectionChanged?.Invoke(selectedCube);
-                return;
+                selectedCube?.SetSelected(false);
+                selectedCube = cube;
+                selectedCube?.SetSelected(true);
             }
-
-            selectedCube?.SetSelected(false);
-            selectedCube = cube;
-            selectedCube?.SetSelected(true);
             SelectionChanged?.Invoke(selectedCube);
-        }
-
-        private void SwapSlots(int firstSlot, int secondSlot)
-        {
-            if (firstSlot == secondSlot || firstSlot < 0 || secondSlot < 0)
-            {
-                return;
-            }
-
-            CubeZoneVolume first = slotToCube[firstSlot];
-            CubeZoneVolume second = slotToCube[secondSlot];
-            if (first == null || second == null)
-            {
-                return;
-            }
-
-            slotToCube[firstSlot] = second;
-            slotToCube[secondSlot] = first;
-            first.SetSlotIndex(secondSlot);
-            second.SetSlotIndex(firstSlot);
-            first.transform.localPosition = GetSlotLocalPosition(secondSlot);
-            second.transform.localPosition = GetSlotLocalPosition(firstSlot);
-            LayoutChanged?.Invoke();
-            AssignmentChanged?.Invoke(firstSlot, GetAssignedEffect(firstSlot));
-            AssignmentChanged?.Invoke(secondSlot, GetAssignedEffect(secondSlot));
         }
 
         private void Update()
         {
-            if (!initialized)
-            {
-                return;
-            }
-
+            if (!initialized) return;
             ApplyTurretEffects();
             ApplyEnemyEffects();
         }
@@ -238,19 +354,13 @@ namespace AnchorDefense
             for (int i = 0; i < turrets.Count; i++)
             {
                 TurretHealth health = turrets[i];
-                if (health == null)
-                {
-                    continue;
-                }
-
+                if (health == null) continue;
                 CubeZoneEffectDefinition effect = GetEffectAtPosition(health.transform.position);
-                float intervalMultiplier = effect != null && effect.EffectType == CubeZoneEffectType.TurretFireRateBoost
-                    ? effect.TurretFireIntervalMultiplier : 1f;
-                float damageMultiplier = effect != null && effect.EffectType == CubeZoneEffectType.TurretDamageBoost
-                    ? effect.TurretDamageMultiplier : 1f;
                 TurretController turret = health.GetComponent<TurretController>();
-                turret?.SetZoneFireIntervalMultiplier(intervalMultiplier);
-                turret?.SetZoneDamageMultiplier(damageMultiplier);
+                turret?.SetZoneFireIntervalMultiplier(effect != null && effect.EffectType == CubeZoneEffectType.TurretFireRateBoost
+                    ? effect.TurretFireIntervalMultiplier : 1f);
+                turret?.SetZoneDamageMultiplier(effect != null && effect.EffectType == CubeZoneEffectType.TurretDamageBoost
+                    ? effect.TurretDamageMultiplier : 1f);
             }
         }
 
@@ -260,121 +370,43 @@ namespace AnchorDefense
             for (int i = 0; i < enemies.Count; i++)
             {
                 EnemyController enemy = enemies[i];
-                if (enemy == null || !enemy.IsAlive)
-                {
-                    continue;
-                }
-
+                if (enemy == null || !enemy.IsAlive) continue;
                 CubeZoneEffectDefinition effect = GetEffectAtPosition(enemy.transform.position);
                 if (effect != null && effect.EffectType == CubeZoneEffectType.EnemySlowAndDamage)
-                {
                     enemy.SetZoneEffect(effect.EnemySpeedMultiplier, effect.EnemyDamagePerSecond);
-                }
-                else
-                {
-                    enemy.SetZoneEffect(1f, 0f);
-                }
+                else enemy.SetZoneEffect(1f, 0f);
             }
         }
 
         private CubeZoneEffectDefinition GetEffectAtPosition(Vector3 worldPosition)
         {
-            int index = GetZoneIndex(worldPosition);
-            return index >= 0 ? GetAssignedEffect(index) : null;
+            int cubeId = GetZoneIndex(worldPosition);
+            return cubeId >= 0 ? GetAssignedEffect(cubeId) : null;
         }
 
         public int GetZoneIndex(Vector3 worldPosition)
         {
-            if (config == null)
+            for (int i = 0; i < cubeById.Length; i++)
             {
-                return -1;
+                if (cubeById[i] != null && cubeById[i].Contains(worldPosition)) return cubeById[i].CubeId;
             }
-
-            Vector3 local = transform.InverseTransformPoint(worldPosition);
-            float extent = config.GridHalfExtent;
-            if (Mathf.Abs(local.x) > extent || Mathf.Abs(local.y) > extent || Mathf.Abs(local.z) > extent)
-            {
-                return -1;
-            }
-
-            int index = local.x >= 0f ? 1 : 0;
-            if (local.y >= 0f) index |= 2;
-            if (local.z >= 0f) index |= 4;
-            return index;
+            return -1;
         }
 
-        private Vector3 GetSlotLocalPosition(int slot)
+        private Vector3 GetGridLocalPosition(Vector3Int gridPosition)
         {
-            float offset = config != null ? config.GridHalfExtent * 0.5f : 5.25f;
-            return new Vector3((slot & 1) != 0 ? offset : -offset,
-                (slot & 2) != 0 ? offset : -offset,
-                (slot & 4) != 0 ? offset : -offset);
-        }
-
-        private void BuildAdjacentSlots(int slot)
-        {
-            adjacentSlots[0] = slot ^ 1;
-            adjacentSlots[1] = slot ^ 2;
-            adjacentSlots[2] = slot ^ 4;
-        }
-
-        private void ShowAdjacentHints(int slot)
-        {
-            BuildAdjacentSlots(slot);
-            if (dropHintTransforms == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < dropHintTransforms.Length; i++)
-            {
-                Transform hint = dropHintTransforms[i];
-                if (hint == null)
-                {
-                    continue;
-                }
-
-                bool active = i < adjacentSlots.Length;
-                hint.gameObject.SetActive(active);
-                if (active)
-                {
-                    hint.localPosition = GetSlotLocalPosition(adjacentSlots[i]);
-                }
-            }
-
-            RefreshCandidateHighlights();
-        }
-
-        private void RefreshCandidateHighlights()
-        {
-            ClearCandidateHighlights();
-            if (hoveredDropSlot >= 0)
-            {
-                GetCubeAtSlot(hoveredDropSlot)?.SetDropCandidate(true);
-            }
-        }
-
-        private void ClearCandidateHighlights()
-        {
-            for (int i = 0; i < slotToCube.Length; i++)
-            {
-                slotToCube[i]?.SetDropCandidate(false);
-            }
+            float cubeSize = config != null ? config.GridHalfExtent : 10.5f;
+            return new Vector3((gridPosition.x - 0.5f) * cubeSize,
+                (gridPosition.y - 0.5f) * cubeSize,
+                (gridPosition.z - 0.5f) * cubeSize);
         }
 
         private void SetHintsVisible(bool visible)
         {
-            if (dropHintTransforms == null)
-            {
-                return;
-            }
-
+            if (dropHintTransforms == null) return;
             for (int i = 0; i < dropHintTransforms.Length; i++)
             {
-                if (dropHintTransforms[i] != null)
-                {
-                    dropHintTransforms[i].gameObject.SetActive(visible);
-                }
+                if (dropHintTransforms[i] != null) dropHintTransforms[i].gameObject.SetActive(visible);
             }
         }
     }

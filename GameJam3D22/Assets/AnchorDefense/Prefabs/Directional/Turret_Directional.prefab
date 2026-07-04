@@ -301,6 +301,7 @@ MonoBehaviour:
   firePoint: {fileID: 8870415337993617806}
   directionalVisual: {fileID: 203458085163961055}
   health: {fileID: 8214131442339493363}
+  projectileType: 0
 --- !u!65 &772900740469924264
 BoxCollider:
   m_ObjectHideFlags: 0

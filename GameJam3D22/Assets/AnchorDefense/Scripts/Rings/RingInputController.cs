@@ -29,6 +29,7 @@ namespace AnchorDefense
         private Camera gameplayCamera;
         private Transform orbitTarget;
         private OrbitRingController selectedRing;
+        private CubeZoneGridController cubeZoneGrid;
         private GameInputController input;
 
         private Vector2 previousRingPointerPosition;
@@ -58,6 +59,7 @@ namespace AnchorDefense
             gameplayCamera = targetCamera;
             orbitTarget = target;
             input = inputController;
+            cubeZoneGrid = FindObjectOfType<CubeZoneGridController>(true);
 
             fixedCameraPosition = gameplayCamera.transform.position;
             fixedCameraRotation = gameplayCamera.transform.rotation;
@@ -141,15 +143,27 @@ namespace AnchorDefense
                     return;
                 }
 
-                SelectRingUnderPointer(pointerPosition);
-
                 previousRingPointerPosition = pointerPosition;
-                isRingDragging = selectedRing != null;
+                if (SelectRingUnderPointer(pointerPosition))
+                {
+                    isRingDragging = selectedRing != null;
+                }
+                else
+                {
+                    cubeZoneGrid?.TryBeginPointerInteraction(gameplayCamera, pointerPosition);
+                }
             }
 
             if (input.PrimaryPress.WasReleasedThisFrame())
             {
                 isRingDragging = false;
+                cubeZoneGrid?.EndPointerInteraction();
+            }
+
+            if (input.PrimaryPress.IsPressed() && cubeZoneGrid != null && cubeZoneGrid.IsDragging)
+            {
+                cubeZoneGrid.UpdatePointerInteraction(gameplayCamera, pointerPosition);
+                return;
             }
 
             if (input.PrimaryPress.IsPressed() && isRingDragging && selectedRing != null)
@@ -302,20 +316,27 @@ namespace AnchorDefense
             }
         }
 
-        private void SelectRingUnderPointer(Vector2 pointerPosition)
+        private bool SelectRingUnderPointer(Vector2 pointerPosition)
         {
             Ray ray = gameplayCamera.ScreenPointToRay(pointerPosition);
 
             OrbitRingController nextSelection = null;
-
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            float nearestDistance = float.PositiveInfinity;
+            RaycastHit[] hits = Physics.RaycastAll(ray, 100f, Physics.DefaultRaycastLayers,
+                QueryTriggerInteraction.Collide);
+            for (int i = 0; i < hits.Length; i++)
             {
-                nextSelection = hit.collider.GetComponentInParent<OrbitRingController>();
+                OrbitRingController ring = hits[i].collider.GetComponentInParent<OrbitRingController>();
+                if (ring != null && hits[i].distance < nearestDistance)
+                {
+                    nearestDistance = hits[i].distance;
+                    nextSelection = ring;
+                }
             }
 
             if (selectedRing == nextSelection)
             {
-                return;
+                return nextSelection != null;
             }
 
             selectedRing?.SetSelected(false);
@@ -323,6 +344,7 @@ namespace AnchorDefense
             selectedRing = nextSelection;
 
             selectedRing?.SetSelected(true);
+            return nextSelection != null;
         }
 
         private static bool IsPointerOverUi()

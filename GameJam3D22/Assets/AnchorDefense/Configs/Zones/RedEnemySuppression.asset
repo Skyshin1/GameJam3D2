@@ -20,5 +20,7 @@ MonoBehaviour:
   <ZoneColor>k__BackingField: {r: 1, g: 0.08, b: 0.12, a: 0.12}
   <EffectType>k__BackingField: 2
   <TurretFireIntervalMultiplier>k__BackingField: 1
+  <TurretDamageMultiplier>k__BackingField: 1
   <EnemySpeedMultiplier>k__BackingField: 0.65
   <EnemyDamagePerSecond>k__BackingField: 4
+  <UnlockRequirement>k__BackingField: {fileID: 0}

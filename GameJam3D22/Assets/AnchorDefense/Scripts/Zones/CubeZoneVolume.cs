@@ -7,29 +7,97 @@ namespace AnchorDefense
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
 
-        [SerializeField] private int zoneIndex;
+        [Header("Identity")]
+        [SerializeField] private int cubeId;
+        [SerializeField] private int slotIndex;
+
+        [Header("Presentation")]
         [SerializeField] private Renderer zoneRenderer;
         [SerializeField] private BoxCollider zoneCollider;
+        [SerializeField] private Transform localVfxAnchor;
+        [Tooltip("放在这里的预制体只属于这个区域立方体，并会随该立方体一起移动。")]
+        [SerializeField] private GameObject localVfxPrefab;
+
         private MaterialPropertyBlock propertyBlock;
+        private CubeZoneEffectDefinition currentEffect;
+        private GameObject localVfxInstance;
+        private bool isSelected;
+        private bool isDropCandidate;
 
-        public int ZoneIndex => zoneIndex;
+        public int CubeId => cubeId;
+        public int SlotIndex => slotIndex;
+        public GameObject LocalVfxPrefab => localVfxPrefab;
 
-        public void Configure(int index, Renderer visual, BoxCollider bounds)
+        public void Configure(int id, int slot, Renderer visual, BoxCollider bounds, Transform vfxAnchor)
         {
-            zoneIndex = index;
+            cubeId = id;
+            slotIndex = slot;
             zoneRenderer = visual;
             zoneCollider = bounds;
+            localVfxAnchor = vfxAnchor;
+        }
+
+        public void SetSlotIndex(int index)
+        {
+            slotIndex = index;
         }
 
         public void SetEffect(CubeZoneEffectDefinition effect)
+        {
+            currentEffect = effect;
+            RefreshVisual();
+        }
+
+        public void SetSelected(bool selected)
+        {
+            isSelected = selected;
+            RefreshVisual();
+        }
+
+        public void SetDropCandidate(bool candidate)
+        {
+            isDropCandidate = candidate;
+            RefreshVisual();
+        }
+
+        public void EnsureLocalVfx()
+        {
+            if (localVfxPrefab == null || localVfxInstance != null || localVfxAnchor == null)
+            {
+                return;
+            }
+
+            localVfxInstance = Instantiate(localVfxPrefab, localVfxAnchor);
+            localVfxInstance.name = localVfxPrefab.name + " (Zone Local VFX)";
+            localVfxInstance.transform.localPosition = Vector3.zero;
+            localVfxInstance.transform.localRotation = Quaternion.identity;
+            localVfxInstance.transform.localScale = Vector3.one;
+        }
+
+        private void RefreshVisual()
         {
             if (zoneRenderer == null)
             {
                 return;
             }
-            propertyBlock = propertyBlock ?? new MaterialPropertyBlock();
+
+            propertyBlock ??= new MaterialPropertyBlock();
             zoneRenderer.GetPropertyBlock(propertyBlock);
-            Color color = effect != null ? effect.ZoneColor : new Color(0.2f, 0.25f, 0.3f, 0.035f);
+            Color color = currentEffect != null
+                ? currentEffect.ZoneColor
+                : new Color(0.2f, 0.25f, 0.3f, 0.035f);
+
+            if (isSelected)
+            {
+                color = Color.Lerp(color, Color.white, 0.38f);
+                color.a = Mathf.Max(color.a, 0.26f);
+            }
+            else if (isDropCandidate)
+            {
+                color = Color.Lerp(color, new Color(0.3f, 1f, 0.9f), 0.3f);
+                color.a = Mathf.Max(color.a, 0.2f);
+            }
+
             propertyBlock.SetColor(BaseColorId, color);
             propertyBlock.SetColor(ColorId, color);
             zoneRenderer.SetPropertyBlock(propertyBlock);

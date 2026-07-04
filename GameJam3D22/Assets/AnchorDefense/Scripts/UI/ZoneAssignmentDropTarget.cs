@@ -27,6 +27,11 @@ namespace AnchorDefense
             controller = owner;
         }
 
+        public void SetZoneIndex(int index)
+        {
+            zoneIndex = index;
+        }
+
         public void Refresh(CubeZoneEffectDefinition effect)
         {
             if (background != null)
@@ -40,7 +45,7 @@ namespace AnchorDefense
             }
             if (label != null)
             {
-                label.text = $"区域 {zoneIndex + 1}\n" + (effect != null ? effect.DisplayName : "未配置");
+                label.text = $"当前立方体位置 {zoneIndex + 1}\n" + (effect != null ? effect.DisplayName : "未配置");
             }
         }
 

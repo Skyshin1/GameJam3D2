@@ -16,6 +16,7 @@ MonoBehaviour:
   <AvailableEffects>k__BackingField:
   - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
   - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
+  - {fileID: 11400000, guid: 38678cf482df124469e1f3b1576990f3, type: 2}
   <DefaultZoneEffects>k__BackingField:
   - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
   - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}

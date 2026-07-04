@@ -80,13 +80,21 @@ namespace AnchorDefense.Tests
 
             CubeZoneGridController zoneGrid = Object.FindObjectOfType<CubeZoneGridController>();
             Assert.That(zoneGrid, Is.Not.Null);
-            Assert.That(Object.FindObjectsOfType<CubeZoneVolume>(true).Length, Is.EqualTo(8));
+            CubeZoneVolume[] zoneVolumes = Object.FindObjectsOfType<CubeZoneVolume>(true);
+            Assert.That(zoneVolumes.Length, Is.EqualTo(8));
+            for (int i = 0; i < zoneVolumes.Length; i++)
+            {
+                Assert.That(zoneVolumes[i].gameObject.layer, Is.EqualTo(CubeZoneGridController.ZoneRaycastLayer));
+            }
             Assert.That(Object.FindObjectOfType<CubeZoneAssignmentController>(true), Is.Not.Null);
-            Assert.That(zoneGrid.Config.AvailableEffects.Length, Is.EqualTo(2));
+            Assert.That(zoneGrid.Config.AvailableEffects.Length, Is.EqualTo(3));
             CubeZoneEffectDefinition blueZoneEffect = zoneGrid.GetAssignedEffect(0);
             CubeZoneEffectDefinition redZoneEffect = zoneGrid.GetAssignedEffect(1);
+            CubeZoneEffectDefinition greenZoneEffect = zoneGrid.Config.AvailableEffects[2];
             Assert.That(blueZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.TurretFireRateBoost));
             Assert.That(redZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.EnemySlowAndDamage));
+            Assert.That(greenZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.TurretDamageBoost));
+            Assert.That(greenZoneEffect.UnlockRequirement, Is.Not.Null);
             zoneGrid.AssignEffect(0, redZoneEffect);
             Assert.That(zoneGrid.GetAssignedEffect(0), Is.EqualTo(redZoneEffect));
             zoneGrid.AssignEffect(0, blueZoneEffect);

@@ -26,5 +26,6 @@ MonoBehaviour:
   <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: 0196049df4a741044998d846ef3591a2,
     type: 2}
   <ZoneVfxPrefab>k__BackingField: {fileID: 0}
-  <TurretVfxPrefab>k__BackingField: {fileID: 0}
+  <TurretVfxPrefab>k__BackingField: {fileID: 6064416128017296509, guid: 8d560e122b1cfe940b1b026c45cf500c,
+    type: 3}
   <EnemyVfxPrefab>k__BackingField: {fileID: 0}

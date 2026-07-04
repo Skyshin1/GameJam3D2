@@ -246,6 +246,43 @@ namespace AnchorDefense.Editor
                 return;
             }
 
+            TurretSlot[] existingSlots = turretRoot.GetComponentsInChildren<TurretSlot>(true);
+            if (existingSlots.Length > 0)
+            {
+                var initialSlots = new List<TurretSlot>();
+                var upgradeSlots = new List<TurretSlot>();
+                for (int i = 0; i < existingSlots.Length; i++)
+                {
+                    if (existingSlots[i].StartsUnlocked)
+                    {
+                        initialSlots.Add(existingSlots[i]);
+                    }
+                    else
+                    {
+                        upgradeSlots.Add(existingSlots[i]);
+                    }
+                }
+
+                float slotRadius = initialSlots.Count > 0 ? initialSlots[0].transform.localPosition.magnitude : GetRingRadius(ringId);
+                float[] slotAngles = { 30f, 210f };
+                for (int i = upgradeSlots.Count; i < slotAngles.Length; i++)
+                {
+                    GameObject slotObject = new GameObject($"Upgrade Turret Slot {i + 1:00}");
+                    slotObject.transform.SetParent(turretRoot, false);
+                    float angle = slotAngles[i] * Mathf.Deg2Rad;
+                    Vector3 position = new Vector3(Mathf.Cos(angle) * slotRadius, 0f, Mathf.Sin(angle) * slotRadius);
+                    slotObject.transform.localPosition = position;
+                    slotObject.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
+                    TurretSlot slot = slotObject.AddComponent<TurretSlot>();
+                    slot.Configure(turretPrefab.GetComponent<TurretController>(), false);
+                    upgradeSlots.Add(slot);
+                }
+                ring.ConfigureTurretSlotAssets(ringId, initialSlots.ToArray(), upgradeSlots.ToArray());
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                PrefabUtility.UnloadPrefabContents(root);
+                return;
+            }
+
             var initialTurrets = new List<TurretController>();
             var upgradeTurrets = new List<TurretController>();
             TurretController[] existing = turretRoot.GetComponentsInChildren<TurretController>(true);

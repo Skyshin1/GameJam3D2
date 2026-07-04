@@ -2,6 +2,18 @@ using UnityEngine;
 
 namespace AnchorDefense
 {
+    [System.Serializable]
+    public sealed class EnemySpawnEntry
+    {
+        [SerializeField] private EnemyConfig enemy;
+        [SerializeField, Min(0f)] private float spawnWeight = 1f;
+        [SerializeField, Min(0)] private int prewarmCount = 16;
+
+        public EnemyConfig Enemy => enemy;
+        public float SpawnWeight => spawnWeight;
+        public int PrewarmCount => prewarmCount;
+    }
+
     [CreateAssetMenu(menuName = "Anchor Defense/Endless Mode Config", fileName = "EndlessModeConfig")]
     public sealed class EndlessModeConfig : ScriptableObject
     {
@@ -21,6 +33,28 @@ namespace AnchorDefense
         [field: SerializeField, Min(1)] public int MaxAliveEnemies { get; private set; } = 350;
         [field: SerializeField, Min(0)] public int EnemyPrewarmCount { get; private set; } = 70;
         [field: SerializeField, Min(0)] public int ProjectilePrewarmCount { get; private set; } = 90;
+
+        [field: Header("Enemy Roster")]
+        [field: SerializeField] public EnemySpawnEntry[] EnemyTypes { get; private set; }
+
+        public bool HasEnemyRoster
+        {
+            get
+            {
+                if (EnemyTypes == null)
+                {
+                    return false;
+                }
+                for (int i = 0; i < EnemyTypes.Length; i++)
+                {
+                    if (EnemyTypes[i] != null && EnemyTypes[i].Enemy != null && EnemyTypes[i].SpawnWeight > 0f)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
 
         public float GetSpawnInterval(float elapsedSeconds)
         {

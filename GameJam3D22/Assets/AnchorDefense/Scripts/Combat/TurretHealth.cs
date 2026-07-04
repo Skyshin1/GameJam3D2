@@ -6,15 +6,19 @@ namespace AnchorDefense
     public sealed class TurretHealth : MonoBehaviour, IDamageable
     {
         private TurretRuntimeStats runtimeStats;
+        private Action<Vector3> hitFeedback;
+        private float disabledRemaining;
 
         public float CurrentHealth { get; private set; }
         public float MaxHealth { get; private set; }
         public bool IsAlive { get; private set; }
+        public float DisabledRemaining => disabledRemaining;
 
         public event Action<float, float> HealthChanged;
         public event Action Died;
+        public event Action Recovered;
 
-        public void Initialize(TurretRuntimeStats stats)
+        public void Initialize(TurretRuntimeStats stats, Action<Vector3> onHitFeedback = null)
         {
             if (runtimeStats != null)
             {
@@ -22,9 +26,11 @@ namespace AnchorDefense
             }
 
             runtimeStats = stats;
+            hitFeedback = onHitFeedback;
             MaxHealth = runtimeStats != null ? runtimeStats.MaxHealth : 1f;
             CurrentHealth = MaxHealth;
             IsAlive = true;
+            disabledRemaining = 0f;
             if (runtimeStats != null)
             {
                 runtimeStats.Changed += HandleStatsChanged;
@@ -40,6 +46,7 @@ namespace AnchorDefense
             }
 
             CurrentHealth = Mathf.Max(0f, CurrentHealth - damage.Amount);
+            hitFeedback?.Invoke(damage.HitPoint);
             HealthChanged?.Invoke(CurrentHealth, MaxHealth);
             if (CurrentHealth > 0f)
             {
@@ -47,7 +54,28 @@ namespace AnchorDefense
             }
 
             IsAlive = false;
+            disabledRemaining = runtimeStats != null ? runtimeStats.DisableDuration : 10f;
             Died?.Invoke();
+        }
+
+        private void Update()
+        {
+            if (IsAlive || disabledRemaining <= 0f)
+            {
+                return;
+            }
+
+            disabledRemaining -= Time.deltaTime;
+            if (disabledRemaining > 0f)
+            {
+                return;
+            }
+
+            disabledRemaining = 0f;
+            CurrentHealth = MaxHealth;
+            IsAlive = true;
+            HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+            Recovered?.Invoke();
         }
 
         private void OnDestroy()

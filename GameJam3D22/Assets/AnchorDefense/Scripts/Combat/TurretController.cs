@@ -17,15 +17,18 @@ namespace AnchorDefense
         public void Initialize(
             TurretRuntimeStats turretStats,
             EnemyRegistry enemyRegistry,
-            ProjectileService projectiles)
+            ProjectileService projectiles,
+            TurretHitVfxService hitVfx = null)
         {
             runtimeStats = turretStats;
             registry = enemyRegistry;
             projectileService = projectiles;
             health = health != null ? health : GetComponent<TurretHealth>();
-            health?.Initialize(runtimeStats);
+            health?.Initialize(runtimeStats, hitVfx != null ? hitVfx.SpawnHit : null);
             cooldown = Random.Range(0f, runtimeStats.FireInterval);
         }
+
+        public TurretHealth Health => health != null ? health : GetComponent<TurretHealth>();
 
         public void ConfigureFirePoint(Transform projectileOrigin)
         {

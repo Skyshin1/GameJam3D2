@@ -59,6 +59,7 @@ namespace AnchorDefense.Tests
             Assert.That(bootstrap, Is.Not.Null);
             Assert.That(Object.FindObjectsOfType<OrbitRingController>().Length, Is.EqualTo(3));
             Assert.That(Object.FindObjectsOfType<TurretController>().Length, Is.EqualTo(18));
+            Assert.That(Object.FindObjectsOfType<TurretSlot>(true).Length, Is.EqualTo(24));
             Assert.That(Object.FindObjectOfType<CoreHealth>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<HudController>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<UpgradeTreeController>(true), Is.Not.Null);
@@ -74,6 +75,7 @@ namespace AnchorDefense.Tests
             gameplaySettings.Close();
             Assert.That(bootstrap.KillWallet, Is.Not.Null);
             Assert.That(bootstrap.TurretStats, Is.Not.Null);
+            Assert.That(bootstrap.TurretRegistry, Is.Not.Null);
             Assert.That(bootstrap.UpgradeSystem, Is.Not.Null);
 
             RingInputController inputController = Object.FindObjectOfType<RingInputController>();
@@ -94,6 +96,21 @@ namespace AnchorDefense.Tests
 
             EndlessEnemySpawner spawner = Object.FindObjectOfType<EndlessEnemySpawner>();
             Assert.That(spawner, Is.Not.Null);
+            Assert.That(spawner.EnemyTypeCount, Is.EqualTo(2));
+            Assert.That(spawner.HasRangedEnemyType, Is.True);
+            EnemyConfig rangedEnemy = null;
+            for (int i = 0; i < spawner.EnemyTypeCount; i++)
+            {
+                EnemyConfig candidate = spawner.GetEnemyTypeConfig(i);
+                if (candidate != null && candidate.AttackMode == EnemyAttackMode.RangedTurret)
+                {
+                    rangedEnemy = candidate;
+                    break;
+                }
+            }
+            Assert.That(rangedEnemy, Is.Not.Null);
+            Assert.That(rangedEnemy.ProjectilePrefab, Is.Not.Null);
+            yield return VerifyEnemyProjectileDamagesTurret(bootstrap, rangedEnemy);
             float timeout = Time.realtimeSinceStartup + 5f;
             while (spawner.TotalSpawned == 0 && Time.realtimeSinceStartup < timeout)
             {
@@ -126,6 +143,46 @@ namespace AnchorDefense.Tests
 
             VerifyUpgradeProgression(bootstrap);
             Assert.That(Object.FindObjectsOfType<TurretController>().Length, Is.EqualTo(24));
+
+            TurretHealth disabledTurret = Object.FindObjectOfType<TurretHealth>();
+            disabledTurret.TakeDamage(new DamageInfo(disabledTurret.MaxHealth + 1f, disabledTurret.transform.position, bootstrap.gameObject));
+            Assert.That(disabledTurret.IsAlive, Is.False);
+            Assert.That(disabledTurret.DisabledRemaining, Is.GreaterThan(9.9f));
+            spawner.enabled = false;
+            Time.timeScale = 20f;
+            float recoveryTimeout = Time.realtimeSinceStartup + 1.5f;
+            while (!disabledTurret.IsAlive && Time.realtimeSinceStartup < recoveryTimeout)
+            {
+                yield return null;
+            }
+            Time.timeScale = 1f;
+            Assert.That(disabledTurret.IsAlive, Is.True);
+            Assert.That(disabledTurret.CurrentHealth, Is.EqualTo(disabledTurret.MaxHealth).Within(0.01f));
+        }
+
+        private static IEnumerator VerifyEnemyProjectileDamagesTurret(GameBootstrap bootstrap, EnemyConfig rangedEnemy)
+        {
+            TurretHealth target = bootstrap.TurretRegistry.FindNearestOperational(Vector3.zero);
+            Assert.That(target, Is.Not.Null);
+            float healthBefore = target.CurrentHealth;
+            EnemyProjectileController projectile = Object.Instantiate(rangedEnemy.ProjectilePrefab);
+            Vector3 origin = target.transform.position - target.transform.forward * 2f;
+            bool released = false;
+            projectile.Launch(origin, target.transform.position - origin, rangedEnemy.ProjectileDamage,
+                20f, rangedEnemy.ProjectileHitRadius, 2f, bootstrap.TurretRegistry,
+                item =>
+                {
+                    released = true;
+                    item.gameObject.SetActive(false);
+                });
+            float timeout = Time.realtimeSinceStartup + 1f;
+            while (!released && Time.realtimeSinceStartup < timeout)
+            {
+                yield return null;
+            }
+            Assert.That(released, Is.True);
+            Assert.That(target.CurrentHealth, Is.LessThan(healthBefore));
+            Object.Destroy(projectile.gameObject);
         }
 
         private static void VerifyDropdownReadability()
@@ -205,6 +262,7 @@ namespace AnchorDefense.Tests
             TurretHealth turretHealth = Object.FindObjectOfType<TurretHealth>();
             Assert.That(turretHealth, Is.Not.Null);
             Assert.That(turretHealth.MaxHealth, Is.EqualTo(bootstrap.TurretStats.MaxHealth).Within(0.01f));
+            Assert.That(bootstrap.TurretStats.DisableDuration, Is.EqualTo(10f).Within(0.01f));
         }
     }
 }

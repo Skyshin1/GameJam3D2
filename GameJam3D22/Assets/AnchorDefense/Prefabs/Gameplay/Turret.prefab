@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4037634080355454245}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 7050066569384042258}
   - component: {fileID: 7318726884195780138}
   - component: {fileID: 8928160722550502462}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Right Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 3316561693930505521}
   - component: {fileID: 4546975792119165550}
   - component: {fileID: 2891190884341415722}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1652923229887962191}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: MuzzlePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +365,7 @@ GameObject:
   - component: {fileID: 149042168200955987}
   - component: {fileID: 8175965765806830540}
   - component: {fileID: 3511757603338628155}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Energy Core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,7 +448,7 @@ GameObject:
   - component: {fileID: 1076885803413839411}
   - component: {fileID: 6635582303171773356}
   - component: {fileID: 5683152934134740644}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ArcticFox_LOD1_Mat_ArcticFox_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -531,7 +531,7 @@ GameObject:
   - component: {fileID: 5713355398106654367}
   - component: {fileID: 8204647140171867089}
   - component: {fileID: 1856662643997109423}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -614,7 +614,7 @@ GameObject:
   - component: {fileID: 5946134744284701460}
   - component: {fileID: 9019235061314337569}
   - component: {fileID: 7080449662187891243}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Left Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -697,7 +697,7 @@ GameObject:
   - component: {fileID: 3903725783170849172}
   - component: {fileID: 4593092415690510596}
   - component: {fileID: 5887650947040916172}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Housing
   m_TagString: Untagged
   m_Icon: {fileID: 0}

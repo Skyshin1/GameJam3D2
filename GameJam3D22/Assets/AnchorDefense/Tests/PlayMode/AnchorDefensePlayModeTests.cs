@@ -78,6 +78,38 @@ namespace AnchorDefense.Tests
             Assert.That(bootstrap.TurretRegistry, Is.Not.Null);
             Assert.That(bootstrap.UpgradeSystem, Is.Not.Null);
 
+            CubeZoneGridController zoneGrid = Object.FindObjectOfType<CubeZoneGridController>();
+            Assert.That(zoneGrid, Is.Not.Null);
+            CubeZoneVolume[] zoneVolumes = Object.FindObjectsOfType<CubeZoneVolume>(true);
+            Assert.That(zoneVolumes.Length, Is.EqualTo(8));
+            for (int i = 0; i < zoneVolumes.Length; i++)
+            {
+                Assert.That(zoneVolumes[i].gameObject.layer, Is.EqualTo(CubeZoneGridController.ZoneRaycastLayer));
+            }
+            Assert.That(Object.FindObjectOfType<CubeZoneAssignmentController>(true), Is.Not.Null);
+            Assert.That(zoneGrid.Config.AvailableEffects.Length, Is.EqualTo(3));
+            CubeZoneEffectDefinition blueZoneEffect = zoneGrid.GetAssignedEffect(0);
+            CubeZoneEffectDefinition redZoneEffect = zoneGrid.GetAssignedEffect(1);
+            CubeZoneEffectDefinition greenZoneEffect = zoneGrid.Config.AvailableEffects[2];
+            Assert.That(blueZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.TurretFireRateBoost));
+            Assert.That(redZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.EnemySlowAndDamage));
+            Assert.That(greenZoneEffect.EffectType, Is.EqualTo(CubeZoneEffectType.TurretDamageBoost));
+            Assert.That(greenZoneEffect.UnlockRequirement, Is.Not.Null);
+            zoneGrid.AssignEffect(0, redZoneEffect);
+            Assert.That(zoneGrid.GetAssignedEffect(0), Is.EqualTo(redZoneEffect));
+            zoneGrid.AssignEffect(0, blueZoneEffect);
+            yield return null;
+            TurretController[] zoneTurrets = Object.FindObjectsOfType<TurretController>();
+            for (int i = 0; i < zoneTurrets.Length; i++)
+            {
+                int zoneIndex = zoneGrid.GetZoneIndex(zoneTurrets[i].transform.position);
+                CubeZoneEffectDefinition effect = zoneGrid.GetAssignedEffect(zoneIndex);
+                float expectedMultiplier = effect != null && effect.EffectType == CubeZoneEffectType.TurretFireRateBoost
+                    ? effect.TurretFireIntervalMultiplier : 1f;
+                Assert.That(zoneTurrets[i].ZoneFireIntervalMultiplier,
+                    Is.EqualTo(expectedMultiplier).Within(0.001f));
+            }
+
             TurretController planarAimTurret = Object.FindObjectOfType<TurretController>();
             Vector3 ringNormal = planarAimTurret.transform.parent.up;
             planarAimTurret.ApplyPlanarVisualAim(planarAimTurret.transform.forward + ringNormal * 4f);
@@ -142,11 +174,39 @@ namespace AnchorDefense.Tests
                 }
             }
             Assert.That(killTarget, Is.Not.Null);
+            killTarget.transform.position = zoneGrid.transform.TransformPoint(new Vector3(3f, -3f, -3f));
+            yield return null;
+            Assert.That(killTarget.ZoneSpeedMultiplier, Is.EqualTo(redZoneEffect.EnemySpeedMultiplier).Within(0.001f));
+            Assert.That(killTarget.ZoneDamagePerSecond, Is.EqualTo(redZoneEffect.EnemyDamagePerSecond).Within(0.001f));
             SingleSpriteBillboardVisual billboardVisual = killTarget.GetComponentInChildren<SingleSpriteBillboardVisual>();
             Assert.That(billboardVisual, Is.Not.Null);
             Assert.That(billboardVisual.TargetRenderer, Is.Not.Null);
             yield return null;
             Assert.That(Vector3.Dot(billboardVisual.transform.forward, Camera.main.transform.forward), Is.GreaterThan(0.999f));
+
+            TurretController[] firingTurrets = Object.FindObjectsOfType<TurretController>();
+            for (int i = 0; i < firingTurrets.Length; i++)
+            {
+                firingTurrets[i].enabled = false;
+            }
+            ProjectileService fusionService = bootstrap.ProjectileService;
+            Assert.That(fusionService, Is.Not.Null);
+            int fusionCountBefore = fusionService.SuccessfulFusionCount;
+            Vector3 fusionOrigin = killTarget.transform.position + Camera.main.transform.up * 4f;
+            fusionService.Fire(fusionOrigin, killTarget, 1f, TurretProjectileType.A);
+            fusionService.Fire(fusionOrigin, killTarget, 1f, TurretProjectileType.B);
+            float fusionTimeout = Time.realtimeSinceStartup + 1f;
+            while (fusionService.SuccessfulFusionCount == fusionCountBefore &&
+                   Time.realtimeSinceStartup < fusionTimeout)
+            {
+                yield return null;
+            }
+            Assert.That(fusionService.SuccessfulFusionCount, Is.EqualTo(fusionCountBefore + 1));
+            Assert.That(fusionService.LastFusedDamage, Is.EqualTo(2.7f).Within(0.01f));
+            for (int i = 0; i < firingTurrets.Length; i++)
+            {
+                firingTurrets[i].enabled = true;
+            }
             int killsBeforeDamage = bootstrap.KillWallet.TotalKills;
             killTarget.TakeDamage(new DamageInfo(100000f, killTarget.transform.position, bootstrap.gameObject));
             Assert.That(bootstrap.KillWallet.TotalKills, Is.EqualTo(killsBeforeDamage + 1));

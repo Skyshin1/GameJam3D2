@@ -16,6 +16,7 @@ MonoBehaviour:
   <Damage>k__BackingField: 10
   <FireInterval>k__BackingField: 0.72
   <MaxHealth>k__BackingField: 100
+  <DisableDuration>k__BackingField: 10
   <ProjectileSpeed>k__BackingField: 12
   <ProjectileLifetime>k__BackingField: 3
   <ProjectileHitRadius>k__BackingField: 0.25
@@ -26,3 +27,14 @@ MonoBehaviour:
     type: 3}
   <MuzzleEffectPrefab>k__BackingField: {fileID: 6781274380043829145, guid: f54e99f82cc0fe541bd7be097c271cdd,
     type: 3}
+  <HitEffectPrefab>k__BackingField: {fileID: 0}
+  <HitEffectColor>k__BackingField: {r: 1, g: 0.35, b: 0.08, a: 1}
+  <ProjectileBPrefab>k__BackingField: {fileID: 0}
+  <FusedProjectilePrefab>k__BackingField: {fileID: 0}
+  <FusionRadius>k__BackingField: 0.75
+  <FusionDamageMultiplier>k__BackingField: 1.35
+  <FusedSpeedMultiplier>k__BackingField: 1.1
+  <FusedHitRadiusMultiplier>k__BackingField: 1.5
+  <ProjectileBColor>k__BackingField: {r: 1, g: 0.4, b: 0.9, a: 1}
+  <FusedProjectileColor>k__BackingField: {r: 1, g: 0.78, b: 0.18, a: 1}
+  <FusionEffectPrefab>k__BackingField: {fileID: 0}

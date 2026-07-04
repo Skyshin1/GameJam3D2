@@ -1,7 +1,11 @@
 {
   "name": "AnchorDefense.Runtime",
   "rootNamespace": "AnchorDefense",
-  "references": [],
+  "references": [
+    "Unity.InputSystem",
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.RenderPipelines.Universal.Runtime"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

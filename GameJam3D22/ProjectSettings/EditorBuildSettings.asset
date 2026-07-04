@@ -6,12 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/AnchorDefense/Scenes/MainMenu.unity
+    guid: 9d9454df978cee643b958d7fc07ce35c
+  - enabled: 1
+    path: Assets/AnchorDefense/Scenes/Loading.unity
+    guid: f1f24cf1ab00bf744beb285b403947ce
+  - enabled: 1
     path: Assets/AnchorDefense/Scenes/Gameplay.unity
     guid: 97b7fe8ab214e80479c6a6ab97e28883
-  - enabled: 1
-    path: Assets/AnchorDefense/Scenes/Gameplay_DirectionalSprites.unity
-    guid: 74fecf92787697941aca90ed5965d5a2
-  - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects: {}

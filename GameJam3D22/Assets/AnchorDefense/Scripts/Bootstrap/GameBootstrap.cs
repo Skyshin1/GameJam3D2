@@ -20,6 +20,7 @@ namespace AnchorDefense
         [SerializeField] private RingInputController ringInput;
         [SerializeField] private HudController hud;
         [SerializeField] private UpgradeTreeController upgradeTree;
+        [SerializeField] private GameInputController inputController;
         [SerializeField] private Transform poolRoot;
 
         private bool initialized;
@@ -60,6 +61,11 @@ namespace AnchorDefense
             upgradeTree = treeView;
         }
 
+        public void ConfigureInput(GameInputController gameplayInput)
+        {
+            inputController = gameplayInput;
+        }
+
         private void Awake()
         {
             if (!ValidateReferences())
@@ -96,7 +102,7 @@ namespace AnchorDefense
                 turrets[i].Initialize(TurretStats, registry, projectileService);
             }
 
-            ringInput.Initialize(gameplayCamera, core.transform);
+            ringInput.Initialize(gameplayCamera, core.transform, inputController);
             spawner.Initialize(
                 endlessModeConfig,
                 enemyConfig,
@@ -107,7 +113,7 @@ namespace AnchorDefense
                 KillWallet,
                 poolRoot);
             hud.Initialize(core, spawner, registry, gameFlow);
-            upgradeTree.Initialize(UpgradeSystem, gameFlow);
+            upgradeTree.Initialize(UpgradeSystem, gameFlow, inputController);
 
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();
@@ -127,6 +133,7 @@ namespace AnchorDefense
         {
             bool sceneReferencesValid = gameplayCamera != null && core != null && gameFlow != null &&
                                         spawner != null && ringInput != null && hud != null && upgradeTree != null &&
+                                        inputController != null &&
                                         poolRoot != null;
             bool configReferencesValid = coreConfig != null && enemyConfig != null &&
                                          turretConfig != null && endlessModeConfig != null && upgradeTreeConfig != null;

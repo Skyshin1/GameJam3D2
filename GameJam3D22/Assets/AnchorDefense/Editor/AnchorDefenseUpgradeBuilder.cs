@@ -64,6 +64,7 @@ namespace AnchorDefense.Editor
             AddUpgradeSystemToScene(DirectionalScenePath, config);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            AnchorDefenseFrontendBuilder.RepairAfterGameplayRebuild();
             Debug.Log("Anchor Defense upgrade tree assets and scenes refreshed successfully.");
         }
 

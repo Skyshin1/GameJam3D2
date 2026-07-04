@@ -2,7 +2,8 @@
   "name": "AnchorDefense.PlayModeTests",
   "rootNamespace": "AnchorDefense.Tests",
   "references": [
-    "AnchorDefense.Runtime"
+    "AnchorDefense.Runtime",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

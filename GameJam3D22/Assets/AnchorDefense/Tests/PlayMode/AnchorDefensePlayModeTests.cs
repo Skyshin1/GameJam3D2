@@ -3,24 +3,49 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 namespace AnchorDefense.Tests
 {
     public sealed class AnchorDefensePlayModeTests
     {
         [UnityTest]
-        public IEnumerator ExistingThreeDimensionalVersionBootsAndSpawnsEnemies()
+        public IEnumerator MainMenuLoadsThreeDimensionalGameplayThroughLoadingScreen()
         {
-            yield return VerifyPlayableLoop("Gameplay", false);
+            AsyncOperation menuLoad = SceneManager.LoadSceneAsync("MainMenu");
+            while (!menuLoad.isDone)
+            {
+                yield return null;
+            }
+
+            Assert.That(Object.FindObjectOfType<MainMenuController>(), Is.Not.Null);
+            SettingsMenuController menuSettings = Object.FindObjectOfType<SettingsMenuController>(true);
+            Assert.That(menuSettings, Is.Not.Null);
+            Assert.That(Object.FindObjectOfType<InputSystemUIInputModule>(), Is.Not.Null);
+            menuSettings.Open();
+            VerifyDropdownReadability();
+            VerifySteppedSliders();
+            menuSettings.Close();
+
+            SceneLoadRequest.TargetScene = "Gameplay";
+            SceneManager.LoadScene("Loading");
+            float timeout = Time.realtimeSinceStartup + 8f;
+            while (SceneManager.GetActiveScene().name != "Gameplay" && Time.realtimeSinceStartup < timeout)
+            {
+                yield return null;
+            }
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("Gameplay"));
+            Assert.That(Object.FindObjectOfType<GameBootstrap>(), Is.Not.Null);
         }
 
         [UnityTest]
-        public IEnumerator DirectionalSpriteVersionBootsAndSpawnsEnemies()
+        public IEnumerator ThreeDimensionalGameplayBootsSpawnsAndUpgrades()
         {
-            yield return VerifyPlayableLoop("Gameplay_DirectionalSprites", true);
+            yield return VerifyPlayableLoop("Gameplay");
         }
 
-        private static IEnumerator VerifyPlayableLoop(string sceneName, bool expectDirectionalSprites)
+        private static IEnumerator VerifyPlayableLoop(string sceneName)
         {
             AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName);
             Assert.That(loadOperation, Is.Not.Null);
@@ -37,6 +62,16 @@ namespace AnchorDefense.Tests
             Assert.That(Object.FindObjectOfType<CoreHealth>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<HudController>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<UpgradeTreeController>(true), Is.Not.Null);
+            Assert.That(Object.FindObjectOfType<GameInputController>(), Is.Not.Null);
+            Assert.That(Object.FindObjectOfType<SceneSettingsApplier>(), Is.Not.Null);
+            Assert.That(Object.FindObjectOfType<PauseMenuController>(true), Is.Not.Null);
+            SettingsMenuController gameplaySettings = Object.FindObjectOfType<SettingsMenuController>(true);
+            Assert.That(gameplaySettings, Is.Not.Null);
+            Assert.That(Object.FindObjectOfType<InputSystemUIInputModule>(), Is.Not.Null);
+            gameplaySettings.Open();
+            VerifyDropdownReadability();
+            VerifySteppedSliders();
+            gameplaySettings.Close();
             Assert.That(bootstrap.KillWallet, Is.Not.Null);
             Assert.That(bootstrap.TurretStats, Is.Not.Null);
             Assert.That(bootstrap.UpgradeSystem, Is.Not.Null);
@@ -55,15 +90,7 @@ namespace AnchorDefense.Tests
             inputController.SetCameraOrbitMode(CameraOrbitMode.Disabled);
             Assert.That(Vector3.Distance(gameplayCamera.transform.position, fixedCameraPosition), Is.LessThan(0.001f));
 
-            int directionalVisualCount = Object.FindObjectsOfType<DirectionalSpriteRenderer>().Length;
-            if (expectDirectionalSprites)
-            {
-                Assert.That(directionalVisualCount, Is.GreaterThanOrEqualTo(18));
-            }
-            else
-            {
-                Assert.That(directionalVisualCount, Is.EqualTo(0));
-            }
+            Assert.That(Object.FindObjectsOfType<DirectionalSpriteRenderer>().Length, Is.EqualTo(0));
 
             EndlessEnemySpawner spawner = Object.FindObjectOfType<EndlessEnemySpawner>();
             Assert.That(spawner, Is.Not.Null);
@@ -99,6 +126,43 @@ namespace AnchorDefense.Tests
 
             VerifyUpgradeProgression(bootstrap);
             Assert.That(Object.FindObjectsOfType<TurretController>().Length, Is.EqualTo(24));
+        }
+
+        private static void VerifyDropdownReadability()
+        {
+            Dropdown[] dropdowns = Object.FindObjectsOfType<Dropdown>(true);
+            Assert.That(dropdowns.Length, Is.GreaterThanOrEqualTo(5));
+            for (int i = 0; i < dropdowns.Length; i++)
+            {
+                Dropdown dropdown = dropdowns[i];
+                Assert.That(dropdown.options.Count, Is.GreaterThan(0), dropdown.name);
+                Assert.That(dropdown.template, Is.Not.Null, dropdown.name);
+                Assert.That(dropdown.itemText, Is.Not.Null, dropdown.name);
+                Assert.That(dropdown.captionText.verticalOverflow, Is.EqualTo(VerticalWrapMode.Overflow), dropdown.name);
+                Assert.That(dropdown.itemText.verticalOverflow, Is.EqualTo(VerticalWrapMode.Overflow), dropdown.name);
+                Image background = dropdown.template.GetComponent<Image>();
+                Assert.That(background, Is.Not.Null, dropdown.name);
+                float backgroundLuminance = background.color.grayscale;
+                float textLuminance = dropdown.itemText.color.grayscale;
+                Assert.That(textLuminance - backgroundLuminance, Is.GreaterThan(0.35f), dropdown.name);
+            }
+        }
+
+        private static void VerifySteppedSliders()
+        {
+            Slider[] sliders = Object.FindObjectsOfType<Slider>(true);
+            Assert.That(sliders.Length, Is.GreaterThanOrEqualTo(6));
+            for (int i = 0; i < sliders.Length; i++)
+            {
+                SliderStepQuantizer quantizer = sliders[i].GetComponent<SliderStepQuantizer>();
+                Assert.That(quantizer, Is.Not.Null, sliders[i].name);
+                Assert.That(quantizer.IntervalCount, Is.EqualTo(10), sliders[i].name);
+                float original = sliders[i].value;
+                quantizer.SetValueWithoutNotify(Mathf.Lerp(sliders[i].minValue, sliders[i].maxValue, 0.36f));
+                float normalized = Mathf.InverseLerp(sliders[i].minValue, sliders[i].maxValue, sliders[i].value);
+                Assert.That(normalized, Is.EqualTo(0.4f).Within(0.001f), sliders[i].name);
+                quantizer.SetValueWithoutNotify(original);
+            }
         }
 
         private static void VerifyUpgradeProgression(GameBootstrap bootstrap)

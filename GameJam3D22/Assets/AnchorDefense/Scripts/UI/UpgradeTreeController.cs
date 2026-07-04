@@ -25,14 +25,21 @@ namespace AnchorDefense
 
         private UpgradeSystem system;
         private GameFlowController gameFlow;
+        private GameInputController input;
         private UpgradeNodeView selectedView;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
-        public void Initialize(UpgradeSystem upgradeSystem, GameFlowController flow)
+        public void CloseFromExternal()
+        {
+            SetPanelOpen(false, true);
+        }
+
+        public void Initialize(UpgradeSystem upgradeSystem, GameFlowController flow, GameInputController inputController)
         {
             system = upgradeSystem;
             gameFlow = flow;
+            input = inputController;
             system.Changed += Refresh;
             gameFlow.StateChanged += HandleGameStateChanged;
             openButton.onClick.AddListener(TogglePanel);
@@ -85,7 +92,7 @@ namespace AnchorDefense
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.U))
+            if (input != null && input.ToggleUpgrade.WasPressedThisFrame())
             {
                 TogglePanel();
             }

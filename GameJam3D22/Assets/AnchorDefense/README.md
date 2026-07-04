@@ -55,3 +55,11 @@ Play Mode 冒烟测试位于 `Assets/AnchorDefense/Tests/PlayMode`。
 - 当前包含三条轨道扩容、全体炮台伤害、射击间隔和最大生命升级。
 - 节点配置位于 `Assets/AnchorDefense/Configs/Upgrades`，界面 Prefab 位于 `Assets/AnchorDefense/Prefabs/UI/UpgradeTreeUI.prefab`。
 - 使用 `Tools > Anchor Defense > Build or Refresh Upgrade Tree` 可重新生成或修复相关资产和场景引用。
+
+## 开始菜单、设置与 Input System
+
+- 正式流程为 `MainMenu → Loading → Gameplay`，当前只将 3D Gameplay 接入构建列表。
+- 开始菜单设置按显示、图像、声音、控制分类，可调整分辨率、显示模式、亮度、垂直同步、帧率、三档 URP 画质、FXAA/SMAA、主音量/音乐/音效和操作灵敏度。
+- Gameplay 输入已迁移至 `Assets/AnchorDefense/Input/AnchorDefenseInputActions.inputactions`，支持轨道操作、相机环绕、相机模式、升级树和暂停键重绑定。
+- 设置和键位覆盖会通过 PlayerPrefs 持久化；按 `Esc` 打开暂停菜单。
+- 使用 `Tools > Anchor Defense > Build Frontend and Input System` 可重新生成菜单、加载界面并修复场景引用。

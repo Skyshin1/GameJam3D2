@@ -32,5 +32,5 @@ MonoBehaviour:
   <HitFlashDuration>k__BackingField: 0.1
   <HitEffectPrefab>k__BackingField: {fileID: -6159039040866376367, guid: 5eff8f0e0d3965a44ac5515a2b0aa180,
     type: 3}
-  <DeathEffectPrefab>k__BackingField: {fileID: 1485718088780051649, guid: 3f5cd603e6c4fc249b2bfcce88cdc0c0,
+  <DeathEffectPrefab>k__BackingField: {fileID: 5660198245418926790, guid: 009079b785f659a4b90ae3917a06e3e3,
     type: 3}

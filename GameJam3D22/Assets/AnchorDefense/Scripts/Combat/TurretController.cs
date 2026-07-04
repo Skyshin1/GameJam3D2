@@ -8,7 +8,14 @@ namespace AnchorDefense
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         [SerializeField] private TurretHealth health;
         [SerializeField] private TurretProjectileType projectileType = TurretProjectileType.A;
+        [SerializeField] private AudioSource fireAudioSource;
+        [SerializeField] private AudioClip fireClip;
+        [SerializeField, Range(0f, 1f)] private float fireVolume = 0.55f;
+        [SerializeField, Min(0.01f)] private float fireSoundWindowSeconds = 0.12f;
+        [SerializeField, Min(1)] private int maxFireSoundsPerWindow = 3;
 
+        private static float fireSoundWindowStart = float.NegativeInfinity;
+        private static int fireSoundsInWindow;
         private TurretRuntimeStats runtimeStats;
         private EnemyRegistry registry;
         private ProjectileService projectileService;
@@ -55,6 +62,16 @@ namespace AnchorDefense
         {
             projectileType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
         }
+
+public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume = 0.55f, float windowSeconds = 0.12f, int maxSoundsPerWindow = 3)
+        {
+            fireAudioSource = source;
+            fireClip = clip;
+            fireVolume = Mathf.Clamp01(volume);
+            fireSoundWindowSeconds = Mathf.Max(0.01f, windowSeconds);
+            maxFireSoundsPerWindow = Mathf.Max(1, maxSoundsPerWindow);
+        }
+
 
         public void SetZoneFireIntervalMultiplier(float multiplier)
         {
@@ -103,6 +120,7 @@ namespace AnchorDefense
             {
                 projectileService.Fire(firePoint.position, currentTarget,
                     runtimeStats.Damage * zoneDamageMultiplier, projectileType);
+                PlayFireSound();
                 cooldown = runtimeStats.FireInterval * zoneFireIntervalMultiplier;
             }
         }
@@ -151,5 +169,51 @@ namespace AnchorDefense
 
             return nearest;
         }
-    }
+    
+
+public static void ResetFireSoundLimiter()
+        {
+            fireSoundWindowStart = float.NegativeInfinity;
+            fireSoundsInWindow = 0;
+        }
+
+
+public static bool ShouldPlayFireSound(float realtime, float windowSeconds, int maxSoundsPerWindow)
+        {
+            float safeWindow = Mathf.Max(0.01f, windowSeconds);
+            int safeMax = Mathf.Max(1, maxSoundsPerWindow);
+            if (realtime - fireSoundWindowStart >= safeWindow)
+            {
+                fireSoundWindowStart = realtime;
+                fireSoundsInWindow = 0;
+            }
+            if (fireSoundsInWindow >= safeMax)
+            {
+                return false;
+            }
+
+            fireSoundsInWindow++;
+            return true;
+        }
+
+
+private void PlayFireSound()
+        {
+            if (fireClip == null)
+            {
+                return;
+            }
+            if (fireAudioSource == null)
+            {
+                fireAudioSource = GetComponent<AudioSource>();
+            }
+            if (fireAudioSource == null || !ShouldPlayFireSound(Time.unscaledTime, fireSoundWindowSeconds, maxFireSoundsPerWindow))
+            {
+                return;
+            }
+
+            fireAudioSource.pitch = Random.Range(0.96f, 1.04f);
+            fireAudioSource.PlayOneShot(fireClip, fireVolume);
+        }
+}
 }

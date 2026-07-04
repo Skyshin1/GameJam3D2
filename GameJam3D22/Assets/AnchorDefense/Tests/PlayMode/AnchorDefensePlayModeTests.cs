@@ -10,6 +10,29 @@ namespace AnchorDefense.Tests
 {
     public sealed class AnchorDefensePlayModeTests
     {
+        [Test]
+        public void HoverSoundGlobalCooldownSuppressesImmediateRepeatedEntries()
+        {
+            UiHoverSoundPlayer.ResetHoverSoundCooldown();
+
+            Assert.That(UiHoverSoundPlayer.ShouldPlayHoverSound(10f, 0.15f), Is.True);
+            Assert.That(UiHoverSoundPlayer.ShouldPlayHoverSound(10.05f, 0.15f), Is.False);
+            Assert.That(UiHoverSoundPlayer.ShouldPlayHoverSound(10.16f, 0.15f), Is.True);
+        }
+
+[Test]
+        public void TurretFireSoundLimiterCapsShortBurstOverlap()
+        {
+            TurretController.ResetFireSoundLimiter();
+
+            Assert.That(TurretController.ShouldPlayFireSound(20f, 0.12f, 3), Is.True);
+            Assert.That(TurretController.ShouldPlayFireSound(20.01f, 0.12f, 3), Is.True);
+            Assert.That(TurretController.ShouldPlayFireSound(20.02f, 0.12f, 3), Is.True);
+            Assert.That(TurretController.ShouldPlayFireSound(20.03f, 0.12f, 3), Is.False);
+            Assert.That(TurretController.ShouldPlayFireSound(20.13f, 0.12f, 3), Is.True);
+        }
+
+
         [UnityTest]
         public IEnumerator MainMenuLoadsThreeDimensionalGameplayThroughLoadingScreen()
         {

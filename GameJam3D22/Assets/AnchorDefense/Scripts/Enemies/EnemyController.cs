@@ -7,7 +7,7 @@ namespace AnchorDefense
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
-
+        public const float DefaultAttackSoundVolume = 0.25f;
         private MaterialPropertyBlock propertyBlock;
         private EnemyConfig config;
         private CoreHealth core;
@@ -26,7 +26,14 @@ namespace AnchorDefense
         private float zoneDamagePerSecond;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         [SerializeField] private SingleSpriteBillboardVisual singleSpriteVisual;
+        [SerializeField] private AudioSource attackAudioSource;
+        [SerializeField] private AudioClip attackClip;
+        [SerializeField, Range(0f, 1f)] private float attackVolume = DefaultAttackSoundVolume;
+        [SerializeField, Min(0.01f)] private float attackSoundWindowSeconds = 0.18f;
+        [SerializeField, Min(1)] private int maxAttackSoundsPerWindow = 2;
 
+        private static float attackSoundWindowStart = float.NegativeInfinity;
+        private static int attackSoundsInWindow;
         public bool IsAlive => isAlive;
         public int SpawnVersion { get; private set; }
         public float ZoneSpeedMultiplier => zoneSpeedMultiplier;
@@ -48,6 +55,16 @@ namespace AnchorDefense
         {
             singleSpriteVisual = visual;
         }
+
+public void ConfigureAttackAudio(AudioSource source, AudioClip clip, float volume = DefaultAttackSoundVolume, float windowSeconds = 0.18f, int maxSoundsPerWindow = 2)
+        {
+            attackAudioSource = source;
+            attackClip = clip;
+            attackVolume = Mathf.Clamp01(volume);
+            attackSoundWindowSeconds = Mathf.Max(0.01f, windowSeconds);
+            maxAttackSoundsPerWindow = Mathf.Max(1, maxSoundsPerWindow);
+        }
+
 
         public void Initialize(
             EnemyConfig enemyConfig,
@@ -189,6 +206,7 @@ namespace AnchorDefense
             if (fireCooldown <= 0f)
             {
                 enemyProjectiles?.Fire(transform.position + fireDirection * 0.65f, fireDirection);
+                PlayAttackSound();
                 fireCooldown = config.FireInterval;
             }
         }
@@ -202,6 +220,7 @@ namespace AnchorDefense
 
             isAlive = false;
             core.ApplyDamage(config.CoreDamage);
+            PlayAttackSound();
             releaseAction?.Invoke(this);
         }
 
@@ -230,5 +249,51 @@ namespace AnchorDefense
             propertyBlock.SetColor(ColorId, color);
             cachedRenderer.SetPropertyBlock(propertyBlock);
         }
-    }
+    
+
+public static void ResetAttackSoundLimiter()
+        {
+            attackSoundWindowStart = float.NegativeInfinity;
+            attackSoundsInWindow = 0;
+        }
+
+
+public static bool ShouldPlayAttackSound(float realtime, float windowSeconds, int maxSoundsPerWindow)
+        {
+            float safeWindow = Mathf.Max(0.01f, windowSeconds);
+            int safeMax = Mathf.Max(1, maxSoundsPerWindow);
+            if (realtime - attackSoundWindowStart >= safeWindow)
+            {
+                attackSoundWindowStart = realtime;
+                attackSoundsInWindow = 0;
+            }
+            if (attackSoundsInWindow >= safeMax)
+            {
+                return false;
+            }
+
+            attackSoundsInWindow++;
+            return true;
+        }
+
+
+private void PlayAttackSound()
+        {
+            if (attackClip == null)
+            {
+                return;
+            }
+            if (attackAudioSource == null)
+            {
+                attackAudioSource = GetComponent<AudioSource>();
+            }
+            if (attackAudioSource == null || !ShouldPlayAttackSound(Time.unscaledTime, attackSoundWindowSeconds, maxAttackSoundsPerWindow))
+            {
+                return;
+            }
+
+            attackAudioSource.pitch = UnityEngine.Random.Range(0.94f, 1.02f);
+            attackAudioSource.PlayOneShot(attackClip, attackVolume);
+        }
+}
 }

@@ -25,12 +25,41 @@ namespace AnchorDefense.Tests
         {
             TurretController.ResetFireSoundLimiter();
 
-            Assert.That(TurretController.ShouldPlayFireSound(20f, 0.12f, 3), Is.True);
-            Assert.That(TurretController.ShouldPlayFireSound(20.01f, 0.12f, 3), Is.True);
-            Assert.That(TurretController.ShouldPlayFireSound(20.02f, 0.12f, 3), Is.True);
-            Assert.That(TurretController.ShouldPlayFireSound(20.03f, 0.12f, 3), Is.False);
-            Assert.That(TurretController.ShouldPlayFireSound(20.13f, 0.12f, 3), Is.True);
+            Assert.That(TurretController.TryGetFireSoundVolumeScale(20f, 0.2f, 3, 0.6f, out float firstScale), Is.True);
+            Assert.That(firstScale, Is.EqualTo(1f).Within(0.001f));
+            Assert.That(TurretController.TryGetFireSoundVolumeScale(20.01f, 0.2f, 3, 0.6f, out float secondScale), Is.True);
+            Assert.That(secondScale, Is.EqualTo(0.6f).Within(0.001f));
+            Assert.That(TurretController.TryGetFireSoundVolumeScale(20.02f, 0.2f, 3, 0.6f, out float thirdScale), Is.True);
+            Assert.That(thirdScale, Is.EqualTo(0.36f).Within(0.001f));
+            Assert.That(TurretController.TryGetFireSoundVolumeScale(20.03f, 0.2f, 3, 0.6f, out _), Is.False);
+            Assert.That(TurretController.TryGetFireSoundVolumeScale(20.21f, 0.2f, 3, 0.6f, out float nextScale), Is.True);
+            Assert.That(nextScale, Is.EqualTo(1f).Within(0.001f));
         }
+
+[Test]
+        public void EnemyAttackSoundLimiterKeepsAttackAudioLight()
+        {
+            EnemyController.ResetAttackSoundLimiter();
+
+            Assert.That(EnemyController.DefaultAttackSoundVolume, Is.EqualTo(0.25f).Within(0.001f));
+            Assert.That(EnemyController.ShouldPlayAttackSound(30f, 0.18f, 2), Is.True);
+            Assert.That(EnemyController.ShouldPlayAttackSound(30.01f, 0.18f, 2), Is.True);
+            Assert.That(EnemyController.ShouldPlayAttackSound(30.02f, 0.18f, 2), Is.False);
+            Assert.That(EnemyController.ShouldPlayAttackSound(30.19f, 0.18f, 2), Is.True);
+        }
+
+
+[Test]
+        public void SlowSelfRotatorDefaultsToGentleLocalYaw()
+        {
+            var rotator = new GameObject("Rotator").AddComponent<SlowSelfRotator>();
+
+            Assert.That(rotator.DegreesPerSecond, Is.EqualTo(6f).Within(0.001f));
+            Assert.That(rotator.LocalAxis, Is.EqualTo(Vector3.up));
+
+            Object.DestroyImmediate(rotator.gameObject);
+        }
+
 
 
         [UnityTest]

@@ -10,9 +10,11 @@ namespace AnchorDefense
         [SerializeField] private TurretProjectileType projectileType = TurretProjectileType.A;
         [SerializeField] private AudioSource fireAudioSource;
         [SerializeField] private AudioClip fireClip;
-        [SerializeField, Range(0f, 1f)] private float fireVolume = 0.55f;
-        [SerializeField, Min(0.01f)] private float fireSoundWindowSeconds = 0.12f;
+        [SerializeField, Range(0f, 1f)] private float fireVolume = 0.4f;
+        [SerializeField, Min(0.01f)] private float fireSoundWindowSeconds = 0.2f;
         [SerializeField, Min(1)] private int maxFireSoundsPerWindow = 3;
+        [SerializeField, Range(0f, 1f)] private float fireSoundRepeatVolumeMultiplier = 0.6f;
+[SerializeField, Min(1)] private int maxFireSoundsPerWindow = 3;
 
         private static float fireSoundWindowStart = float.NegativeInfinity;
         private static int fireSoundsInWindow;
@@ -63,13 +65,14 @@ namespace AnchorDefense
             projectileType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
         }
 
-public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume = 0.55f, float windowSeconds = 0.12f, int maxSoundsPerWindow = 3)
+public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume = 0.4f, float windowSeconds = 0.2f, int maxSoundsPerWindow = 3, float repeatVolumeMultiplier = 0.6f)
         {
             fireAudioSource = source;
             fireClip = clip;
             fireVolume = Mathf.Clamp01(volume);
             fireSoundWindowSeconds = Mathf.Max(0.01f, windowSeconds);
             maxFireSoundsPerWindow = Mathf.Max(1, maxSoundsPerWindow);
+            fireSoundRepeatVolumeMultiplier = Mathf.Clamp01(repeatVolumeMultiplier);
         }
 
 
@@ -180,8 +183,14 @@ public static void ResetFireSoundLimiter()
 
 public static bool ShouldPlayFireSound(float realtime, float windowSeconds, int maxSoundsPerWindow)
         {
+            return TryGetFireSoundVolumeScale(realtime, windowSeconds, maxSoundsPerWindow, 1f, out _);
+        }
+
+public static bool TryGetFireSoundVolumeScale(float realtime, float windowSeconds, int maxSoundsPerWindow, float repeatVolumeMultiplier, out float volumeScale)
+        {
             float safeWindow = Mathf.Max(0.01f, windowSeconds);
             int safeMax = Mathf.Max(1, maxSoundsPerWindow);
+            float safeMultiplier = Mathf.Clamp01(repeatVolumeMultiplier);
             if (realtime - fireSoundWindowStart >= safeWindow)
             {
                 fireSoundWindowStart = realtime;
@@ -189,12 +198,15 @@ public static bool ShouldPlayFireSound(float realtime, float windowSeconds, int 
             }
             if (fireSoundsInWindow >= safeMax)
             {
+                volumeScale = 0f;
                 return false;
             }
 
+            volumeScale = Mathf.Pow(safeMultiplier, fireSoundsInWindow);
             fireSoundsInWindow++;
             return true;
         }
+
 
 
 private void PlayFireSound()
@@ -207,13 +219,13 @@ private void PlayFireSound()
             {
                 fireAudioSource = GetComponent<AudioSource>();
             }
-            if (fireAudioSource == null || !ShouldPlayFireSound(Time.unscaledTime, fireSoundWindowSeconds, maxFireSoundsPerWindow))
+            if (fireAudioSource == null || !TryGetFireSoundVolumeScale(Time.unscaledTime, fireSoundWindowSeconds, maxFireSoundsPerWindow, fireSoundRepeatVolumeMultiplier, out float volumeScale))
             {
                 return;
             }
 
             fireAudioSource.pitch = Random.Range(0.96f, 1.04f);
-            fireAudioSource.PlayOneShot(fireClip, fireVolume);
+            fireAudioSource.PlayOneShot(fireClip, fireVolume * volumeScale);
         }
 }
 }

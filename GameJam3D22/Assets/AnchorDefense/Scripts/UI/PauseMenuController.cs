@@ -14,6 +14,7 @@ namespace AnchorDefense
         [SerializeField] private GameInputController input;
         [SerializeField] private GameFlowController gameFlow;
         [SerializeField] private UpgradeTreeController upgradeTree;
+        [SerializeField] private CubeZoneEditModeController zoneEditor;
 
         public bool IsPaused => panelRoot != null && panelRoot.activeSelf;
 
@@ -41,6 +42,11 @@ namespace AnchorDefense
             upgradeTree = tree;
         }
 
+        public void ConfigureZoneEditor(CubeZoneEditModeController editor)
+        {
+            zoneEditor = editor;
+        }
+
         private void Awake()
         {
             resumeButton.onClick.AddListener(Resume);
@@ -61,6 +67,12 @@ namespace AnchorDefense
             if (settingsMenu != null && settingsMenu.IsOpen)
             {
                 settingsMenu.Close();
+                return;
+            }
+
+            if (zoneEditor != null && zoneEditor.IsEditing)
+            {
+                zoneEditor.ExitFromExternal();
                 return;
             }
 

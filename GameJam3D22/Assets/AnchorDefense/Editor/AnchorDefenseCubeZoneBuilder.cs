@@ -20,6 +20,8 @@ namespace AnchorDefense.Editor
         private const string MaterialPath = Root + "/Art/Materials/M_CubeZoneVolume.mat";
         private const string GridPrefabPath = Root + "/Prefabs/Zones/CubeZoneGrid.prefab";
         private const string UpgradeUiPath = Root + "/Prefabs/UI/UpgradeTreeUI.prefab";
+        private const string PreviewRenderTexturePath = Root + "/Art/UI/RT_CubeZonePreview.renderTexture";
+        private const string PreviewMaterialPath = Root + "/Art/Materials/M_CubeZonePreview.mat";
         private const string GameplayScenePath = Root + "/Scenes/Gameplay.unity";
 
         private static readonly Color DarkPanel = new Color(0.015f, 0.03f, 0.065f, 0.985f);
@@ -31,10 +33,13 @@ namespace AnchorDefense.Editor
         {
             EnsureFolder(Root + "/Configs", "Zones");
             EnsureFolder(Root + "/Prefabs", "Zones");
+            EnsureFolder(Root + "/Art", "UI");
             CubeZoneConfig config = CreateConfigAssets();
             Material material = CreateZoneMaterial();
+            Material previewMaterial = CreatePreviewMaterial();
+            RenderTexture previewTexture = CreatePreviewRenderTexture();
             GameObject gridPrefab = CreateGridPrefab(config, material);
-            PatchUpgradeUi(config);
+            PatchUpgradeUi(config, previewMaterial, previewTexture);
             PatchGameplayScene(gridPrefab);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -110,6 +115,37 @@ namespace AnchorDefense.Editor
             return material;
         }
 
+        private static Material CreatePreviewMaterial()
+        {
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(PreviewMaterialPath);
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
+            if (material == null)
+            {
+                material = new Material(shader) { name = "M_CubeZonePreview" };
+                AssetDatabase.CreateAsset(material, PreviewMaterialPath);
+            }
+            else if (shader != null) material.shader = shader;
+            if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", Color.white);
+            if (material.HasProperty("_Color")) material.SetColor("_Color", Color.white);
+            EditorUtility.SetDirty(material);
+            return material;
+        }
+
+        private static RenderTexture CreatePreviewRenderTexture()
+        {
+            RenderTexture texture = AssetDatabase.LoadAssetAtPath<RenderTexture>(PreviewRenderTexturePath);
+            if (texture == null)
+            {
+                texture = new RenderTexture(768, 768, 24, RenderTextureFormat.ARGB32)
+                {
+                    name = "RT_CubeZonePreview",
+                    antiAliasing = 4
+                };
+                AssetDatabase.CreateAsset(texture, PreviewRenderTexturePath);
+            }
+            return texture;
+        }
+
         private static GameObject CreateGridPrefab(CubeZoneConfig config, Material material)
         {
             GameObject root = new GameObject("CubeZoneGrid", typeof(CubeZoneGridController));
@@ -170,7 +206,8 @@ namespace AnchorDefense.Editor
             return prefab;
         }
 
-        private static void PatchUpgradeUi(CubeZoneConfig config)
+        private static void PatchUpgradeUi(CubeZoneConfig config, Material previewMaterial,
+            RenderTexture previewTexture)
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>(UpgradeUiPath) == null)
             {
@@ -186,10 +223,18 @@ namespace AnchorDefense.Editor
 
             CubeZoneAssignmentController oldController = root.GetComponent<CubeZoneAssignmentController>();
             if (oldController != null) Object.DestroyImmediate(oldController);
+            CubeZoneEditModeController oldEditController = root.GetComponent<CubeZoneEditModeController>();
+            if (oldEditController != null) Object.DestroyImmediate(oldEditController);
             Transform oldOpen = frame.Find("Zone Assignment");
             if (oldOpen != null) Object.DestroyImmediate(oldOpen.gameObject);
             Transform oldPanel = frame.Find("Zone Assignment Panel");
             if (oldPanel != null) Object.DestroyImmediate(oldPanel.gameObject);
+            Transform oldEditButton = root.transform.Find("Field Weaving Mode");
+            if (oldEditButton != null) Object.DestroyImmediate(oldEditButton.gameObject);
+            Transform oldEditBanner = root.transform.Find("Field Weaving Banner");
+            if (oldEditBanner != null) Object.DestroyImmediate(oldEditBanner.gameObject);
+            Transform oldSidebar = root.transform.Find("Field Weaving Sidebar");
+            if (oldSidebar != null) Object.DestroyImmediate(oldSidebar.gameObject);
 
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             Button openButton = CreateButton("Zone Assignment", frame, font, "区域配置",
@@ -242,34 +287,10 @@ namespace AnchorDefense.Editor
             topologyTitle.text = "LIVE FIELD SHAPE  /  实时自由形态";
             Text axisHint = CreateText("Axis Hint", topology.transform, font, 16, TextAnchor.MiddleCenter, new Color(0.45f, 0.7f, 0.82f));
             SetRect(axisHint.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(12f, 18f), new Vector2(-12f, 52f));
-            axisHint.text = "C 编号随立方体移动 · 发光边框表示当前选中";
-
-            var markers = new List<ZoneLayoutMarker>(CubeZoneConfig.ZoneCount);
-            for (int slot = 0; slot < CubeZoneConfig.ZoneCount; slot++)
-            {
-                bool right = (slot & 1) != 0;
-                bool top = (slot & 2) != 0;
-                bool front = (slot & 4) != 0;
-                Image markerImage = CreateImage($"Topology Slot {slot + 1}", topology.transform,
-                    new Color(0.08f, 0.15f, 0.22f, 0.92f));
-                RectTransform rect = markerImage.rectTransform;
-                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-                rect.sizeDelta = new Vector2(126f, 126f);
-                rect.anchoredPosition = new Vector2(
-                    (right ? 100f : -100f) + (front ? 68f : -68f),
-                    (top ? 105f : -105f) + (front ? -52f : 52f));
-                Button button = markerImage.gameObject.AddComponent<Button>();
-                button.targetGraphic = markerImage;
-                Outline outline = markerImage.gameObject.AddComponent<Outline>();
-                outline.effectColor = new Color(0.1f, 0.4f, 0.55f, 0.7f);
-                outline.effectDistance = new Vector2(2f, -2f);
-                Text markerLabel = CreateText("Cube Identity", markerImage.transform, font, 23,
-                    TextAnchor.MiddleCenter, Color.white);
-                SetRect(markerLabel.rectTransform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-                ZoneLayoutMarker marker = markerImage.gameObject.AddComponent<ZoneLayoutMarker>();
-                marker.Configure(slot, markerImage, markerLabel, outline);
-                markers.Add(marker);
-            }
+            axisHint.text = "拖动旋转观察 · 点击真实方块选择 · 分布与 Gameplay 完全同步";
+            CubeZoneSpatialPreviewController spatialPreview = CreateSpatialPreview(
+                topology.transform, previewMaterial, previewTexture);
+            var markers = new List<ZoneLayoutMarker>(0);
 
             Image detailsPanel = CreateImage("Selected Cube Configuration", panel.transform,
                 new Color(0.025f, 0.06f, 0.11f, 0.98f));
@@ -303,8 +324,96 @@ namespace AnchorDefense.Editor
 
             CubeZoneAssignmentController controller = root.AddComponent<CubeZoneAssignmentController>();
             controller.Configure(openButton, closeButton, panel.gameObject, sources.ToArray(), markers.ToArray(),
-                selectedTarget, selectedDetails);
-            panel.gameObject.SetActive(false);
+                selectedTarget, selectedDetails, spatialPreview);
+
+            Button editButton = CreateButton("Field Weaving Mode", root.transform, font, "锚域编织",
+                new Vector2(0f, 1f), new Vector2(174f, -225f), new Vector2(284f, 52f),
+                new Color(0.08f, 0.52f, 0.66f, 0.96f));
+            Transform upgradePanel = root.transform.Find("Upgrade Tree Panel");
+            if (upgradePanel != null) editButton.transform.SetSiblingIndex(upgradePanel.GetSiblingIndex());
+
+            Image editBanner = CreateImage("Field Weaving Banner", root.transform,
+                new Color(0.012f, 0.035f, 0.07f, 0.96f));
+            SetRect(editBanner.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(-460f, -145f), new Vector2(460f, -28f));
+            Text editTitle = CreateText("Edit Mode Title", editBanner.transform, font, 25,
+                TextAnchor.MiddleLeft, Cyan);
+            SetRect(editTitle.rectTransform, Vector2.zero, Vector2.one,
+                new Vector2(28f, 48f), new Vector2(-220f, -12f));
+            editTitle.text = "ANCHOR FIELD WEAVING  /  锚域编织模式";
+            Text editHint = CreateText("Edit Mode Hint", editBanner.transform, font, 17,
+                TextAnchor.MiddleLeft, new Color(0.65f, 0.82f, 0.9f));
+            SetRect(editHint.rectTransform, Vector2.zero, Vector2.one,
+                new Vector2(30f, 10f), new Vector2(-220f, -58f));
+            editHint.text = "游戏已暂停 · 拖动方块调整位置 · 从右侧拖动碎片到立方体以改写效果";
+            Button finishEdit = CreateButton("Finish Field Weaving", editBanner.transform, font, "完成编织",
+                new Vector2(1f, 0.5f), new Vector2(-118f, 0f), new Vector2(190f, 54f),
+                new Color(0.18f, 0.8f, 0.58f, 1f));
+
+            Image sidebar = CreateImage("Field Weaving Sidebar", root.transform,
+                new Color(0.01f, 0.03f, 0.065f, 0.97f));
+            SetRect(sidebar.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 1f),
+                new Vector2(-370f, 28f), new Vector2(-24f, -170f));
+            Text sidebarTitle = CreateText("Fragment Sidebar Title", sidebar.transform, font, 22,
+                TextAnchor.MiddleCenter, TextColor);
+            SetRect(sidebarTitle.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f),
+                new Vector2(16f, -64f), new Vector2(-16f, -16f));
+            sidebarTitle.text = "FIELD FRAGMENTS  /  场域碎片";
+
+            var worldSources = new List<ZoneEffectWorldDragSource>();
+            for (int i = 0; i < effects.Length; i++)
+            {
+                CubeZoneEffectDefinition effect = effects[i];
+                Image card = CreateImage("World Fragment " + effect.DisplayName, sidebar.transform,
+                    effect.ZoneColor * new Color(1f, 1f, 1f, 5f));
+                RectTransform cardRect = card.rectTransform;
+                cardRect.anchorMin = cardRect.anchorMax = new Vector2(0.5f, 1f);
+                cardRect.sizeDelta = new Vector2(300f, 82f);
+                cardRect.anchoredPosition = new Vector2(0f, -112f - i * 98f);
+                CanvasGroup group = card.gameObject.AddComponent<CanvasGroup>();
+                Image fragmentIcon = CreateImage("Fragment Icon", card.transform,
+                    effect.Icon != null ? Color.white : effect.ZoneColor);
+                SetRect(fragmentIcon.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f),
+                    new Vector2(12f, 12f), new Vector2(78f, -12f));
+                fragmentIcon.sprite = effect.Icon;
+                Text fragmentLabel = CreateText("Fragment Name", card.transform, font, 17,
+                    TextAnchor.MiddleLeft, Color.white);
+                SetRect(fragmentLabel.rectTransform, Vector2.zero, Vector2.one,
+                    new Vector2(92f, 8f), new Vector2(-10f, -8f));
+                ZoneEffectWorldDragSource source = card.gameObject.AddComponent<ZoneEffectWorldDragSource>();
+                source.Configure(effect, fragmentIcon, fragmentLabel, group);
+                worldSources.Add(source);
+            }
+
+            Image tooltip = CreateImage("Fragment Tooltip", sidebar.transform,
+                new Color(0.025f, 0.075f, 0.12f, 0.99f));
+            SetRect(tooltip.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(16f, 18f), new Vector2(-16f, 220f));
+            Text tooltipTitle = CreateText("Tooltip Title", tooltip.transform, font, 20,
+                TextAnchor.UpperLeft, Cyan);
+            SetRect(tooltipTitle.rectTransform, new Vector2(0f, 0.68f), new Vector2(1f, 1f),
+                new Vector2(16f, 0f), new Vector2(-16f, -10f));
+            Text tooltipBody = CreateText("Tooltip Description", tooltip.transform, font, 16,
+                TextAnchor.UpperLeft, new Color(0.76f, 0.88f, 0.94f));
+            SetRect(tooltipBody.rectTransform, new Vector2(0f, 0.24f), new Vector2(1f, 0.72f),
+                new Vector2(16f, 0f), new Vector2(-16f, 0f));
+            tooltipBody.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipBody.verticalOverflow = VerticalWrapMode.Truncate;
+            Text tooltipStatus = CreateText("Tooltip Status", tooltip.transform, font, 15,
+                TextAnchor.MiddleLeft, Color.white);
+            SetRect(tooltipStatus.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0.24f),
+                new Vector2(16f, 0f), new Vector2(-16f, 0f));
+
+            CubeZoneEditModeController editController = root.AddComponent<CubeZoneEditModeController>();
+            editController.Configure(editButton, finishEdit, editBanner.gameObject,
+                sidebar.gameObject, worldSources.ToArray(), tooltip.gameObject,
+                tooltipTitle, tooltipBody, tooltipStatus);
+            Object.DestroyImmediate(controller);
+            Object.DestroyImmediate(openButton.gameObject);
+            Object.DestroyImmediate(panel.gameObject);
+            editBanner.gameObject.SetActive(false);
+            sidebar.gameObject.SetActive(false);
+            tooltip.gameObject.SetActive(false);
             PrefabUtility.SaveAsPrefabAsset(root, UpgradeUiPath);
             PrefabUtility.UnloadPrefabContents(root);
         }
@@ -322,6 +431,80 @@ namespace AnchorDefense.Editor
             }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, GameplayScenePath);
+        }
+
+        private static CubeZoneSpatialPreviewController CreateSpatialPreview(
+            Transform parent, Material material, RenderTexture renderTexture)
+        {
+            GameObject displayObject = new GameObject("Rotatable Spatial Preview",
+                typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+            displayObject.transform.SetParent(parent, false);
+            RawImage display = displayObject.GetComponent<RawImage>();
+            display.texture = renderTexture;
+            display.color = Color.white;
+            RectTransform displayRect = display.rectTransform;
+            displayRect.anchorMin = displayRect.anchorMax = new Vector2(0.5f, 0.5f);
+            displayRect.sizeDelta = new Vector2(570f, 570f);
+            displayRect.anchoredPosition = new Vector2(0f, -5f);
+
+            GameObject world = new GameObject("Spatial Preview World");
+            world.transform.SetParent(parent, false);
+            world.transform.localPosition = new Vector3(0f, 0f, 1000f);
+
+            GameObject model = new GameObject("Actual Cube Layout");
+            model.transform.SetParent(world.transform, false);
+
+            GameObject cameraObject = new GameObject("Spatial Preview Camera", typeof(Camera));
+            cameraObject.transform.SetParent(world.transform, false);
+            cameraObject.transform.localPosition = new Vector3(4.6f, 3.8f, -6.2f);
+            cameraObject.transform.LookAt(model.transform.position, Vector3.up);
+            Camera previewCamera = cameraObject.GetComponent<Camera>();
+            previewCamera.clearFlags = CameraClearFlags.SolidColor;
+            previewCamera.backgroundColor = new Color(0.006f, 0.018f, 0.035f, 1f);
+            previewCamera.orthographic = true;
+            previewCamera.orthographicSize = 3.2f;
+            previewCamera.nearClipPlane = 0.1f;
+            previewCamera.farClipPlane = 50f;
+            previewCamera.cullingMask = 1 << 31;
+            previewCamera.targetTexture = renderTexture;
+
+            var cubeTransforms = new Transform[CubeZoneConfig.ZoneCount];
+            var cubeRenderers = new Renderer[CubeZoneConfig.ZoneCount];
+            var labels = new TextMesh[CubeZoneConfig.ZoneCount];
+            for (int i = 0; i < CubeZoneConfig.ZoneCount; i++)
+            {
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = $"Preview Cube C{i + 1:00}";
+                cube.layer = 31;
+                cube.transform.SetParent(model.transform, false);
+                cube.transform.localScale = Vector3.one * 0.9f;
+                Renderer renderer = cube.GetComponent<Renderer>();
+                renderer.sharedMaterial = material;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+
+                GameObject labelObject = new GameObject("Identity Label", typeof(TextMesh));
+                labelObject.layer = 31;
+                labelObject.transform.SetParent(cube.transform, false);
+                TextMesh label = labelObject.GetComponent<TextMesh>();
+                label.text = $"C{i + 1:00}";
+                label.anchor = TextAnchor.MiddleCenter;
+                label.alignment = TextAlignment.Center;
+                label.fontSize = 48;
+                label.characterSize = 0.08f;
+                label.color = Color.white;
+                labelObject.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.Off;
+
+                cubeTransforms[i] = cube.transform;
+                cubeRenderers[i] = renderer;
+                labels[i] = label;
+            }
+
+            CubeZoneSpatialPreviewController controller =
+                displayObject.AddComponent<CubeZoneSpatialPreviewController>();
+            controller.Configure(display, previewCamera, model.transform,
+                cubeTransforms, cubeRenderers, labels);
+            return controller;
         }
 
         private static T CreateOrLoad<T>(string path) where T : ScriptableObject

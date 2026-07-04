@@ -78,7 +78,8 @@ namespace AnchorDefense
                 musicVolume = 0.8f,
                 soundEffectsVolume = 1f,
                 ringDragSensitivity = 1f,
-                cameraOrbitSensitivity = 1f
+                cameraOrbitSensitivity = 1f,
+                showZoneBordersOutsideEdit = false
             };
         }
 

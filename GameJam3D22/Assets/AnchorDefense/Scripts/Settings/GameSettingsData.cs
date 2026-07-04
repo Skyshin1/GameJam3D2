@@ -26,6 +26,7 @@ namespace AnchorDefense
         public float soundEffectsVolume = 1f;
         public float ringDragSensitivity = 1f;
         public float cameraOrbitSensitivity = 1f;
+        public bool showZoneBordersOutsideEdit;
 
         public GameSettingsData Clone()
         {

@@ -397,6 +397,20 @@ namespace AnchorDefense.Editor
             Image treeArea = CreateImage("Protocol Map", frame.transform, new Color(0.015f, 0.035f, 0.07f, 0.72f));
             SetRect(treeArea.rectTransform, new Vector2(0f, 0f), new Vector2(0.7f, 1f), new Vector2(28f, 32f), new Vector2(-10f, -112f));
             AddOutline(treeArea.gameObject, new Color(0.08f, 0.25f, 0.38f, 0.8f), new Vector2(2f, -2f));
+            treeArea.gameObject.AddComponent<RectMask2D>();
+            RectTransform treeContent = CreateRect("Draggable Protocol Canvas", treeArea.transform);
+            treeContent.anchorMin = treeContent.anchorMax = new Vector2(0.5f, 0.5f);
+            treeContent.pivot = new Vector2(0.5f, 0.5f);
+            treeContent.sizeDelta = new Vector2(1500f, 1450f);
+            treeContent.anchoredPosition = Vector2.zero;
+            ScrollRect protocolScroll = treeArea.gameObject.AddComponent<ScrollRect>();
+            protocolScroll.viewport = treeArea.rectTransform;
+            protocolScroll.content = treeContent;
+            protocolScroll.horizontal = true;
+            protocolScroll.vertical = true;
+            protocolScroll.movementType = ScrollRect.MovementType.Clamped;
+            protocolScroll.inertia = true;
+            protocolScroll.decelerationRate = 0.12f;
 
             UpgradeNodeDefinition inner = config.FindNode("ring.inner.capacity");
             UpgradeNodeDefinition middle = config.FindNode("ring.middle.capacity");
@@ -406,46 +420,65 @@ namespace AnchorDefense.Editor
             UpgradeNodeDefinition health = config.FindNode("turret.health.01");
             UpgradeNodeDefinition zoneDamageFragment = config.FindNode("zone.fragment.damage");
 
-            Vector2 hub = new Vector2(0f, -25f);
-            Vector2 innerPos = new Vector2(-230f, 115f);
-            Vector2 middlePos = new Vector2(-420f, 215f);
-            Vector2 outerPos = new Vector2(-575f, 325f);
-            Vector2 damagePos = new Vector2(15f, 210f);
-            Vector2 intervalPos = new Vector2(200f, 325f);
-            Vector2 healthPos = new Vector2(245f, -190f);
-            Vector2 zoneDamagePos = new Vector2(-40f, -300f);
+            Vector2 turretHub = new Vector2(0f, 330f);
+            Vector2 innerPos = new Vector2(-230f, 420f);
+            Vector2 middlePos = new Vector2(-420f, 500f);
+            Vector2 outerPos = new Vector2(-590f, 585f);
+            Vector2 damagePos = new Vector2(95f, 480f);
+            Vector2 intervalPos = new Vector2(285f, 585f);
+            Vector2 healthPos = new Vector2(330f, 285f);
+            Vector2 zoneHub = new Vector2(0f, -315f);
+            Vector2 zoneDamagePos = new Vector2(0f, -510f);
 
-            CreateLine(treeArea.transform, hub, innerPos, Cyan, 4f);
-            CreateLine(treeArea.transform, innerPos, middlePos, Violet, 4f);
-            CreateLine(treeArea.transform, middlePos, outerPos, Orange, 4f);
-            CreateLine(treeArea.transform, hub, damagePos, Gold, 4f);
-            CreateLine(treeArea.transform, damagePos, intervalPos, Mint, 4f);
-            CreateLine(treeArea.transform, hub, healthPos, Mint, 4f);
-            CreateLine(treeArea.transform, hub, zoneDamagePos, new Color(0.25f, 1f, 0.45f), 4f);
+            CreateSectionLabel(treeContent, font, "TURRET ANCHOR PROTOCOLS  /  炮塔与轨道升级", new Vector2(0f, 665f), Cyan);
+            CreateSectionLabel(treeContent, font, "CUBE FIELD FRAGMENTS  /  立方体区块功能解锁", new Vector2(0f, -85f), new Color(0.28f, 1f, 0.55f));
+            Image divider = CreateImage("Protocol Branch Divider", treeContent, new Color(0.12f, 0.35f, 0.46f, 0.8f));
+            RectTransform dividerRect = divider.rectTransform;
+            dividerRect.anchorMin = dividerRect.anchorMax = new Vector2(0.5f, 0.5f);
+            dividerRect.sizeDelta = new Vector2(1320f, 3f);
+            dividerRect.anchoredPosition = new Vector2(0f, -5f);
+
+            CreateLine(treeContent, turretHub, innerPos, Cyan, 4f);
+            CreateLine(treeContent, innerPos, middlePos, Violet, 4f);
+            CreateLine(treeContent, middlePos, outerPos, Orange, 4f);
+            CreateLine(treeContent, turretHub, damagePos, Gold, 4f);
+            CreateLine(treeContent, damagePos, intervalPos, Mint, 4f);
+            CreateLine(treeContent, turretHub, healthPos, Mint, 4f);
+            CreateLine(treeContent, zoneHub, zoneDamagePos, new Color(0.25f, 1f, 0.45f), 4f);
 
             var views = new List<UpgradeNodeView>
             {
-                CreateNode(treeArea.transform, font, innerPos, inner, Cyan),
-                CreateNode(treeArea.transform, font, middlePos, middle, Violet),
-                CreateNode(treeArea.transform, font, outerPos, outer, Orange),
-                CreateNode(treeArea.transform, font, damagePos, damage, Gold),
-                CreateNode(treeArea.transform, font, intervalPos, interval, Mint),
-                CreateNode(treeArea.transform, font, healthPos, health, Mint),
-                CreateNode(treeArea.transform, font, zoneDamagePos, zoneDamageFragment, new Color(0.25f, 1f, 0.45f))
+                CreateNode(treeContent, font, innerPos, inner, Cyan),
+                CreateNode(treeContent, font, middlePos, middle, Violet),
+                CreateNode(treeContent, font, outerPos, outer, Orange),
+                CreateNode(treeContent, font, damagePos, damage, Gold),
+                CreateNode(treeContent, font, intervalPos, interval, Mint),
+                CreateNode(treeContent, font, healthPos, health, Mint),
+                CreateNode(treeContent, font, zoneDamagePos, zoneDamageFragment, new Color(0.25f, 1f, 0.45f))
             };
 
-            Vector2[] placeholderPositions =
+            Vector2[] turretPlaceholderPositions =
             {
-                new Vector2(-620f, 125f), new Vector2(-410f, 20f), new Vector2(-170f, 300f),
-                new Vector2(25f, 365f), new Vector2(390f, 245f), new Vector2(430f, -20f),
-                new Vector2(130f, -350f), new Vector2(-300f, -330f)
+                new Vector2(-640f, 350f), new Vector2(-340f, 270f), new Vector2(-120f, 590f),
+                new Vector2(470f, 500f), new Vector2(520f, 240f)
             };
-            for (int i = 0; i < placeholderPositions.Length; i++)
+            for (int i = 0; i < turretPlaceholderPositions.Length; i++)
             {
-                CreateLine(treeArea.transform, hub, placeholderPositions[i], new Color(0.12f, 0.2f, 0.3f, 0.7f), 2f);
-                views.Add(CreateNode(treeArea.transform, font, placeholderPositions[i], null, new Color(0.2f, 0.3f, 0.42f)));
+                CreateLine(treeContent, turretHub, turretPlaceholderPositions[i], new Color(0.12f, 0.2f, 0.3f, 0.7f), 2f);
+                views.Add(CreateNode(treeContent, font, turretPlaceholderPositions[i], null, new Color(0.2f, 0.3f, 0.42f)));
             }
-            CreateAnchorHub(treeArea.transform, font, hub);
+            Vector2[] fieldPlaceholderPositions =
+            {
+                new Vector2(-330f, -430f), new Vector2(330f, -430f),
+                new Vector2(-230f, -610f), new Vector2(230f, -610f)
+            };
+            for (int i = 0; i < fieldPlaceholderPositions.Length; i++)
+            {
+                CreateLine(treeContent, zoneHub, fieldPlaceholderPositions[i], new Color(0.1f, 0.3f, 0.24f, 0.75f), 2f);
+                views.Add(CreateNode(treeContent, font, fieldPlaceholderPositions[i], null, new Color(0.16f, 0.34f, 0.3f)));
+            }
+            CreateAnchorHub(treeContent, font, turretHub, "TURRET\nCORE", Cyan);
+            CreateAnchorHub(treeContent, font, zoneHub, "FIELD\nCORE", new Color(0.25f, 1f, 0.55f));
 
             Image details = CreateImage("Node Details", frame.transform, new Color(0.025f, 0.055f, 0.1f, 0.96f));
             SetRect(details.rectTransform, new Vector2(0.7f, 0f), new Vector2(1f, 1f), new Vector2(12f, 32f), new Vector2(-28f, -112f));
@@ -476,7 +509,7 @@ namespace AnchorDefense.Editor
 
             Text footer = CreateText("Footer Hint", frame.transform, font, 17, TextAnchor.MiddleLeft, new Color(0.42f, 0.6f, 0.76f));
             SetRect(footer.rectTransform, new Vector2(0f, 0f), new Vector2(0.7f, 0f), new Vector2(42f, 4f), new Vector2(-12f, 29f));
-            footer.text = "U  打开/关闭升级树    ·    击杀敌人获得协议点    ·    漏入核心的敌人不计入击杀";
+            footer.text = "拖动左侧画布浏览上下协议区    ·    U 打开/关闭    ·    击杀敌人获得协议点";
 
             UpgradeTreeController controller = canvasObject.GetComponent<UpgradeTreeController>();
             controller.ConfigureView(
@@ -533,7 +566,8 @@ namespace AnchorDefense.Editor
             return view;
         }
 
-        private static void CreateAnchorHub(Transform parent, Font font, Vector2 position)
+        private static void CreateAnchorHub(Transform parent, Font font, Vector2 position,
+            string labelText, Color accent)
         {
             Image outer = CreateImage("Anchor Core", parent, new Color(0.08f, 0.3f, 0.42f, 1f));
             RectTransform rect = outer.rectTransform;
@@ -541,13 +575,24 @@ namespace AnchorDefense.Editor
             rect.sizeDelta = new Vector2(156f, 156f);
             rect.anchoredPosition = position;
             rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
-            AddOutline(outer.gameObject, Cyan, new Vector2(4f, -4f));
+            AddOutline(outer.gameObject, accent, new Vector2(4f, -4f));
             Image inner = CreateImage("Core Plate", outer.transform, new Color(0.025f, 0.08f, 0.13f, 1f));
             SetRect(inner.rectTransform, new Vector2(0.12f, 0.12f), new Vector2(0.88f, 0.88f), Vector2.zero, Vector2.zero);
             Text label = CreateText("Core Label", inner.transform, font, 20, TextAnchor.MiddleCenter, new Color(0.78f, 0.96f, 1f));
             Stretch(label.rectTransform, 4f);
             label.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -45f);
-            label.text = "ANCHOR\nCORE";
+            label.text = labelText;
+        }
+
+        private static void CreateSectionLabel(Transform parent, Font font, string text,
+            Vector2 position, Color color)
+        {
+            Text label = CreateText(text, parent, font, 22, TextAnchor.MiddleCenter, color);
+            RectTransform rect = label.rectTransform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(760f, 48f);
+            rect.anchoredPosition = position;
+            label.text = text;
         }
 
         private static void CreateLine(Transform parent, Vector2 start, Vector2 end, Color color, float width)
@@ -620,6 +665,13 @@ namespace AnchorDefense.Editor
             Image image = imageObject.GetComponent<Image>();
             image.color = color;
             return image;
+        }
+
+        private static RectTransform CreateRect(string objectName, Transform parent)
+        {
+            GameObject root = new GameObject(objectName, typeof(RectTransform));
+            root.transform.SetParent(parent, false);
+            return root.GetComponent<RectTransform>();
         }
 
         private static void AddOutline(GameObject target, Color color, Vector2 distance)

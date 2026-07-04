@@ -214,6 +214,8 @@ namespace AnchorDefense.Editor
             CreateRowLabel(panels[0].transform, font, "垂直同步", 338f);
             Dropdown frameRate = CreateDropdown("Frame Rate", panels[0].transform, font, 416f);
             CreateRowLabel(panels[0].transform, font, "帧率上限", 416f);
+            Toggle showZoneBorders = CreateToggle("Show Zone Borders Outside Edit", panels[0].transform, font, 494f);
+            CreateRowLabel(panels[0].transform, font, "非编辑状态显示区域边框", 494f);
 
             Dropdown quality = CreateDropdown("Quality", panels[1].transform, font, 104f);
             CreateRowLabel(panels[1].transform, font, "图像质量", 104f);
@@ -257,7 +259,7 @@ namespace AnchorDefense.Editor
 
             controller.ConfigureView(
                 overlay.gameObject, closeButton, apply, resetDefaults, resetBindings, tabButtons, panels,
-                resolution, screenMode, brightness, brightnessValue, verticalSync, frameRate,
+                resolution, screenMode, brightness, brightnessValue, verticalSync, showZoneBorders, frameRate,
                 quality, antiAliasing, master, masterValue, music, musicValue, sfx, sfxValue,
                 ringSensitivity, ringValue, cameraSensitivity, cameraValue, inputActions, rebindRows);
             overlay.gameObject.SetActive(false);

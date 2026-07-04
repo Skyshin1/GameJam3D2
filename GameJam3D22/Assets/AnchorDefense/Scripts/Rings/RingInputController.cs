@@ -144,13 +144,13 @@ namespace AnchorDefense
                 }
 
                 previousRingPointerPosition = pointerPosition;
-                if (SelectRingUnderPointer(pointerPosition))
+                if (cubeZoneGrid != null && cubeZoneGrid.IsEditMode)
+                {
+                    cubeZoneGrid.TryBeginPointerInteraction(gameplayCamera, pointerPosition);
+                }
+                else if (SelectRingUnderPointer(pointerPosition))
                 {
                     isRingDragging = selectedRing != null;
-                }
-                else
-                {
-                    cubeZoneGrid?.TryBeginPointerInteraction(gameplayCamera, pointerPosition);
                 }
             }
 

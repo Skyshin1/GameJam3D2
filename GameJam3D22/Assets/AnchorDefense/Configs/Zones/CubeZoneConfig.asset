@@ -15,7 +15,8 @@ MonoBehaviour:
   <CubeSize>k__BackingField: 10.5
   <SelectedCubeColor>k__BackingField: {r: 1, g: 1, b: 1, a: 0.05}
   <SwapTargetColor>k__BackingField: {r: 0.3, g: 1, b: 0.9, a: 0.2}
-  <AvailableHintColor>k__BackingField: {r: 0.2, g: 0.78, b: 1, a: 0.15}
+  <AvailableHintColor>k__BackingField: {r: 0.32637152, g: 0.41906303, b: 0.46540874,
+    a: 0.050980393}
   <HoveredHintColor>k__BackingField: {r: 0.25, g: 1, b: 0.65, a: 0.34}
   <AvailableEffects>k__BackingField:
   - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}

@@ -22,6 +22,7 @@ namespace AnchorDefense
         [SerializeField] private Slider brightnessSlider;
         [SerializeField] private Text brightnessValue;
         [SerializeField] private Toggle verticalSyncToggle;
+        [SerializeField] private Toggle showZoneBordersToggle;
         [SerializeField] private Dropdown frameRateDropdown;
 
         [Header("Graphics")]
@@ -62,6 +63,7 @@ namespace AnchorDefense
             Slider brightness,
             Text brightnessLabel,
             Toggle verticalSync,
+            Toggle showZoneBorders,
             Dropdown frameRatesView,
             Dropdown quality,
             Dropdown antiAliasing,
@@ -90,6 +92,7 @@ namespace AnchorDefense
             brightnessSlider = brightness;
             brightnessValue = brightnessLabel;
             verticalSyncToggle = verticalSync;
+            showZoneBordersToggle = showZoneBorders;
             frameRateDropdown = frameRatesView;
             qualityDropdown = quality;
             antiAliasingDropdown = antiAliasing;
@@ -204,6 +207,7 @@ namespace AnchorDefense
             screenModeDropdown.value = GetScreenModeIndex((FullScreenMode)settings.fullScreenMode);
             SetSteppedValue(brightnessSlider, settings.brightness);
             verticalSyncToggle.SetIsOnWithoutNotify(settings.verticalSync);
+            showZoneBordersToggle.SetIsOnWithoutNotify(settings.showZoneBordersOutsideEdit);
             frameRateDropdown.value = GetFrameRateIndex(settings.frameRateLimit);
             qualityDropdown.value = settings.qualityLevel;
             antiAliasingDropdown.value = (int)settings.antiAliasing;
@@ -240,6 +244,7 @@ namespace AnchorDefense
             settings.fullScreenMode = (int)GetScreenMode(screenModeDropdown.value);
             settings.brightness = brightnessSlider.value;
             settings.verticalSync = verticalSyncToggle.isOn;
+            settings.showZoneBordersOutsideEdit = showZoneBordersToggle.isOn;
             settings.frameRateLimit = frameRates[Mathf.Clamp(frameRateDropdown.value, 0, frameRates.Length - 1)];
             settings.qualityLevel = qualityDropdown.value;
             settings.antiAliasing = (AntiAliasingSetting)antiAliasingDropdown.value;

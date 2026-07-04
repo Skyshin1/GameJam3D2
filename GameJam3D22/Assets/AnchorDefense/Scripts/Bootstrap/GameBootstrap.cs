@@ -122,6 +122,10 @@ namespace AnchorDefense
             zoneGrid?.Initialize(registry, TurretRegistry, core.transform);
             CubeZoneAssignmentController zoneAssignment = FindObjectOfType<CubeZoneAssignmentController>(true);
             zoneAssignment?.Initialize(zoneGrid, UpgradeSystem);
+            CubeZoneEditModeController zoneEditor = FindObjectOfType<CubeZoneEditModeController>(true);
+            zoneEditor?.Initialize(zoneGrid, gameFlow, upgradeTree, UpgradeSystem);
+            upgradeTree.ConfigureZoneEditor(zoneEditor);
+            FindObjectOfType<PauseMenuController>(true)?.ConfigureZoneEditor(zoneEditor);
 
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();

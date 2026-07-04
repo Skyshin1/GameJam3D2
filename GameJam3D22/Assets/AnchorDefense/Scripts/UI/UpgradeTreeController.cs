@@ -34,12 +34,18 @@ namespace AnchorDefense
         private GameFlowController gameFlow;
         private GameInputController input;
         private UpgradeNodeView selectedView;
+        private CubeZoneEditModeController zoneEditor;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
         public void CloseFromExternal()
         {
             SetPanelOpen(false, true);
+        }
+
+        public void ConfigureZoneEditor(CubeZoneEditModeController editor)
+        {
+            zoneEditor = editor;
         }
 
         public void Initialize(UpgradeSystem upgradeSystem, GameFlowController flow, GameInputController inputController)
@@ -145,7 +151,12 @@ namespace AnchorDefense
                 return;
             }
 
-            SetPanelOpen(!IsOpen, true);
+            bool opening = !IsOpen;
+            if (opening && zoneEditor != null && zoneEditor.IsEditing)
+            {
+                zoneEditor.ExitFromExternal();
+            }
+            SetPanelOpen(opening, true);
         }
 
         private void ClosePanel()

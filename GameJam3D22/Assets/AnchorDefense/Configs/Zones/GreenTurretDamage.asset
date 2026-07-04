@@ -17,7 +17,7 @@ MonoBehaviour:
   <Description>k__BackingField: "\u533A\u57DF\u5185\u70AE\u5854\u9020\u6210\u7684\u4F24\u5BB3\u63D0\u9AD8
     50%\u3002\u9700\u8981\u5148\u89E3\u9501\u7FE0\u7EFF\u706B\u63A7\u788E\u7247\u3002"
   <Icon>k__BackingField: {fileID: 0}
-  <ZoneColor>k__BackingField: {r: 0.08, g: 1, b: 0.32, a: 0.12}
+  <ZoneColor>k__BackingField: {r: 0.08, g: 1, b: 0.32, a: 0.019607844}
   <EffectType>k__BackingField: 3
   <TurretFireIntervalMultiplier>k__BackingField: 1
   <TurretDamageMultiplier>k__BackingField: 1.5

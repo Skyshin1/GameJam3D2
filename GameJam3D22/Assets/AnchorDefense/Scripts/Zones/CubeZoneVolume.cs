@@ -61,6 +61,11 @@ namespace AnchorDefense
             RefreshVisual();
         }
 
+        public void SetBorderVisible(bool visible)
+        {
+            if (zoneRenderer != null) zoneRenderer.enabled = visible;
+        }
+
         public void SetEffect(CubeZoneEffectDefinition effect)
         {
             currentEffect = effect;

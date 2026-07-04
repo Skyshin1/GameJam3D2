@@ -12,6 +12,7 @@ namespace AnchorDefense
         [SerializeField] private ZoneLayoutMarker[] layoutMarkers;
         [SerializeField] private ZoneAssignmentDropTarget selectedTarget;
         [SerializeField] private Text selectedDetails;
+        [SerializeField] private CubeZoneSpatialPreviewController spatialPreview;
 
         private CubeZoneGridController grid;
         private UpgradeSystem upgradeSystem;
@@ -19,7 +20,8 @@ namespace AnchorDefense
 
         public void Configure(Button open, Button close, GameObject panel,
             ZoneEffectDragSource[] sources, ZoneLayoutMarker[] markers,
-            ZoneAssignmentDropTarget target, Text details)
+            ZoneAssignmentDropTarget target, Text details,
+            CubeZoneSpatialPreviewController preview = null)
         {
             openButton = open;
             closeButton = close;
@@ -28,6 +30,7 @@ namespace AnchorDefense
             layoutMarkers = markers;
             selectedTarget = target;
             selectedDetails = details;
+            spatialPreview = preview;
         }
 
         public void Initialize(CubeZoneGridController zoneGrid, UpgradeSystem upgrades)
@@ -56,6 +59,7 @@ namespace AnchorDefense
                 layoutMarkers[i]?.Bind(this);
             }
             selectedTarget?.Bind(this);
+            spatialPreview?.Initialize(grid, this);
             selectedCubeId = grid.SelectedCube != null ? grid.SelectedCube.CubeId : 0;
             RefreshUnlocks();
             RefreshAll();
@@ -154,6 +158,7 @@ namespace AnchorDefense
                 layoutMarkers[i]?.Refresh(grid.GetCubeById(i), grid.GetAssignedEffect(i), i == selectedCubeId);
             }
             RefreshTopologyPositions();
+            spatialPreview?.Refresh();
             RefreshSelection();
         }
 
@@ -178,6 +183,7 @@ namespace AnchorDefense
             {
                 layoutMarkers[i]?.SetTopologyPosition((projected[i] - center) * scale);
             }
+            spatialPreview?.SetSelectedCube(selectedCubeId);
         }
 
         private void RefreshSelection()

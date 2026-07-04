@@ -28,6 +28,7 @@ namespace AnchorDefense
         public KillResourceWallet KillWallet { get; private set; }
         public TurretRuntimeStats TurretStats { get; private set; }
         public TurretRegistry TurretRegistry { get; private set; }
+        public ProjectileService ProjectileService { get; private set; }
         public UpgradeSystem UpgradeSystem { get; private set; }
 
         public void Configure(
@@ -91,7 +92,7 @@ namespace AnchorDefense
                 upgradeTreeConfig,
                 KillWallet,
                 new UpgradeContext(TurretStats, rings));
-            ProjectileService projectileService = new ProjectileService(
+            ProjectileService = new ProjectileService(
                 turretConfig,
                 poolRoot,
                 endlessModeConfig.ProjectilePrewarmCount);
@@ -101,7 +102,7 @@ namespace AnchorDefense
             TurretController[] turrets = FindObjectsOfType<TurretController>(true);
             for (int i = 0; i < turrets.Length; i++)
             {
-                turrets[i].Initialize(TurretStats, registry, projectileService, turretHitVfx);
+                turrets[i].Initialize(TurretStats, registry, ProjectileService, turretHitVfx);
                 TurretRegistry.Register(turrets[i].Health);
             }
 

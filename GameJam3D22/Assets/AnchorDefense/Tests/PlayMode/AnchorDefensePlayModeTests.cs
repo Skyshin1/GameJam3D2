@@ -147,6 +147,30 @@ namespace AnchorDefense.Tests
             Assert.That(billboardVisual.TargetRenderer, Is.Not.Null);
             yield return null;
             Assert.That(Vector3.Dot(billboardVisual.transform.forward, Camera.main.transform.forward), Is.GreaterThan(0.999f));
+
+            TurretController[] firingTurrets = Object.FindObjectsOfType<TurretController>();
+            for (int i = 0; i < firingTurrets.Length; i++)
+            {
+                firingTurrets[i].enabled = false;
+            }
+            ProjectileService fusionService = bootstrap.ProjectileService;
+            Assert.That(fusionService, Is.Not.Null);
+            int fusionCountBefore = fusionService.SuccessfulFusionCount;
+            Vector3 fusionOrigin = killTarget.transform.position + Camera.main.transform.up * 4f;
+            fusionService.Fire(fusionOrigin, killTarget, 1f, TurretProjectileType.A);
+            fusionService.Fire(fusionOrigin, killTarget, 1f, TurretProjectileType.B);
+            float fusionTimeout = Time.realtimeSinceStartup + 1f;
+            while (fusionService.SuccessfulFusionCount == fusionCountBefore &&
+                   Time.realtimeSinceStartup < fusionTimeout)
+            {
+                yield return null;
+            }
+            Assert.That(fusionService.SuccessfulFusionCount, Is.EqualTo(fusionCountBefore + 1));
+            Assert.That(fusionService.LastFusedDamage, Is.EqualTo(2.7f).Within(0.01f));
+            for (int i = 0; i < firingTurrets.Length; i++)
+            {
+                firingTurrets[i].enabled = true;
+            }
             int killsBeforeDamage = bootstrap.KillWallet.TotalKills;
             killTarget.TakeDamage(new DamageInfo(100000f, killTarget.transform.position, bootstrap.gameObject));
             Assert.That(bootstrap.KillWallet.TotalKills, Is.EqualTo(killsBeforeDamage + 1));

@@ -87,6 +87,7 @@ namespace AnchorDefense.Editor
             AnchorDefenseUpgradeBuilder.RepairAfterGameplayRebuild();
             AnchorDefenseCombatVarietyBuilder.BuildAll();
             AnchorDefenseSingleSpriteEnemyBuilder.BuildAll();
+            AnchorDefenseProjectileFusionBuilder.BuildAll();
             Debug.Log("Anchor Defense editable assets and Gameplay scene rebuilt successfully.");
         }
 

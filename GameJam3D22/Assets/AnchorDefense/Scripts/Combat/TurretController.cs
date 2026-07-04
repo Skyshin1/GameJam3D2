@@ -7,6 +7,7 @@ namespace AnchorDefense
         [SerializeField] private Transform firePoint;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         [SerializeField] private TurretHealth health;
+        [SerializeField] private TurretProjectileType projectileType = TurretProjectileType.A;
 
         private TurretRuntimeStats runtimeStats;
         private EnemyRegistry registry;
@@ -29,6 +30,7 @@ namespace AnchorDefense
         }
 
         public TurretHealth Health => health != null ? health : GetComponent<TurretHealth>();
+        public TurretProjectileType ProjectileType => projectileType;
 
         public void ConfigureFirePoint(Transform projectileOrigin)
         {
@@ -43,6 +45,11 @@ namespace AnchorDefense
         public void ConfigureHealth(TurretHealth turretHealth)
         {
             health = turretHealth;
+        }
+
+        public void ConfigureProjectileType(TurretProjectileType type)
+        {
+            projectileType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
         }
 
         private void Update()
@@ -71,7 +78,7 @@ namespace AnchorDefense
 
             if (cooldown <= 0f)
             {
-                projectileService.Fire(firePoint.position, currentTarget, runtimeStats.Damage);
+                projectileService.Fire(firePoint.position, currentTarget, runtimeStats.Damage, projectileType);
                 cooldown = runtimeStats.FireInterval;
             }
         }

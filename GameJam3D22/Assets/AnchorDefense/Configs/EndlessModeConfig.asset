@@ -25,3 +25,10 @@ MonoBehaviour:
   <MaxAliveEnemies>k__BackingField: 350
   <EnemyPrewarmCount>k__BackingField: 70
   <ProjectilePrewarmCount>k__BackingField: 90
+  <EnemyTypes>k__BackingField:
+  - enemy: {fileID: 11400000, guid: 1f365d736b385034ab564d892820ec0d, type: 2}
+    spawnWeight: 75
+    prewarmCount: 52
+  - enemy: {fileID: 11400000, guid: de9bd65ea5067bc47aec10ecd9fe51e5, type: 2}
+    spawnWeight: 25
+    prewarmCount: 18

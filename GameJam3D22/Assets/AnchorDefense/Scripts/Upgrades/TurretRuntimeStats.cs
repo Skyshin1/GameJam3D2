@@ -26,6 +26,7 @@ namespace AnchorDefense
         public float Damage => baseConfig.Damage * damageMultiplier;
         public float FireInterval => Mathf.Max(0.03f, baseConfig.FireInterval * fireIntervalMultiplier);
         public float MaxHealth => Mathf.Max(1f, baseConfig.MaxHealth * maxHealthMultiplier);
+        public float DisableDuration => Mathf.Max(0.1f, baseConfig.DisableDuration);
 
         public event Action Changed;
 

@@ -54,9 +54,9 @@ namespace AnchorDefense.Editor
             GameObject turretPrefab = CreateTurretPrefab(turretMaterial, turretAccentMaterial);
             GameObject corePrefab = CreateCorePrefab(coreMaterial, coreAccentMaterial, coreOrbitMesh);
 
-            GameObject innerRingPrefab = CreateRingPrefab("OrbitRing_Inner", GameplayPrefabs + "/OrbitRing_Inner.prefab", 4.7f, innerRingMesh, ringInnerMaterial, turretPrefab, new Color(0.08f, 0.62f, 0.9f));
-            GameObject middleRingPrefab = CreateRingPrefab("OrbitRing_Middle", GameplayPrefabs + "/OrbitRing_Middle.prefab", 6.1f, middleRingMesh, ringMiddleMaterial, turretPrefab, new Color(0.55f, 0.16f, 0.86f));
-            GameObject outerRingPrefab = CreateRingPrefab("OrbitRing_Outer", GameplayPrefabs + "/OrbitRing_Outer.prefab", 7.5f, outerRingMesh, ringOuterMaterial, turretPrefab, new Color(0.9f, 0.36f, 0.06f));
+            GameObject innerRingPrefab = CreateRingPrefab("OrbitRing_Inner", GameplayPrefabs + "/OrbitRing_Inner.prefab", OrbitRingId.Inner, 4.7f, innerRingMesh, ringInnerMaterial, turretPrefab, new Color(0.08f, 0.62f, 0.9f));
+            GameObject middleRingPrefab = CreateRingPrefab("OrbitRing_Middle", GameplayPrefabs + "/OrbitRing_Middle.prefab", OrbitRingId.Middle, 6.1f, middleRingMesh, ringMiddleMaterial, turretPrefab, new Color(0.55f, 0.16f, 0.86f));
+            GameObject outerRingPrefab = CreateRingPrefab("OrbitRing_Outer", GameplayPrefabs + "/OrbitRing_Outer.prefab", OrbitRingId.Outer, 7.5f, outerRingMesh, ringOuterMaterial, turretPrefab, new Color(0.9f, 0.36f, 0.06f));
             GameObject starFieldPrefab = CreateStarFieldPrefab(particleMaterial);
             GameObject hudPrefab = CreateHudPrefab();
 
@@ -85,6 +85,7 @@ namespace AnchorDefense.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             AnchorDefenseUpgradeBuilder.RepairAfterGameplayRebuild();
+            AnchorDefenseCombatVarietyBuilder.BuildAll();
             Debug.Log("Anchor Defense editable assets and Gameplay scene rebuilt successfully.");
         }
 
@@ -340,7 +341,7 @@ namespace AnchorDefense.Editor
             return prefab;
         }
 
-        private static GameObject CreateRingPrefab(string objectName, string path, float radius, Mesh mesh, Material material, GameObject turretPrefab, Color color)
+        private static GameObject CreateRingPrefab(string objectName, string path, OrbitRingId ringId, float radius, Mesh mesh, Material material, GameObject turretPrefab, Color color)
         {
             GameObject root = new GameObject(objectName);
             OrbitRingController controller = root.AddComponent<OrbitRingController>();
@@ -380,18 +381,22 @@ namespace AnchorDefense.Editor
 
             GameObject turretsRoot = new GameObject("Turrets");
             turretsRoot.transform.SetParent(root.transform, false);
+            var turretSlots = new List<TurretSlot>();
             for (int i = 0; i < 6; i++)
             {
                 float angle = i * Mathf.PI * 2f / 6f;
                 Vector3 position = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
-                GameObject turret = (GameObject)PrefabUtility.InstantiatePrefab(turretPrefab);
-                turret.name = $"Turret {i + 1:00}";
-                turret.transform.SetParent(turretsRoot.transform, false);
-                turret.transform.localPosition = position;
-                turret.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
+                GameObject slotObject = new GameObject($"Turret Slot {i + 1:00}");
+                slotObject.transform.SetParent(turretsRoot.transform, false);
+                slotObject.transform.localPosition = position;
+                slotObject.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
+                TurretSlot slot = slotObject.AddComponent<TurretSlot>();
+                slot.Configure(turretPrefab.GetComponent<TurretController>(), true);
+                turretSlots.Add(slot);
             }
 
             controller.Configure(selectionRenderers.ToArray(), color, Color.Lerp(color, Color.white, 0.65f));
+            controller.ConfigureTurretSlotAssets(ringId, turretSlots.ToArray(), new TurretSlot[0]);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;

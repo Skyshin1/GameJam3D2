@@ -303,18 +303,24 @@ namespace AnchorDefense.Editor
 
             GameObject turretsRoot = new GameObject("Turrets");
             turretsRoot.transform.SetParent(root.transform, false);
+            var turretSlots = new List<TurretSlot>();
             for (int i = 0; i < 6; i++)
             {
                 float angle = i * Mathf.PI * 2f / 6f;
                 Vector3 position = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
-                GameObject turret = (GameObject)PrefabUtility.InstantiatePrefab(turretPrefab);
-                turret.name = $"Directional Turret {i + 1:00}";
-                turret.transform.SetParent(turretsRoot.transform, false);
-                turret.transform.localPosition = position;
-                turret.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
+                GameObject slotObject = new GameObject($"Turret Slot {i + 1:00}");
+                slotObject.transform.SetParent(turretsRoot.transform, false);
+                slotObject.transform.localPosition = position;
+                slotObject.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
+                TurretSlot slot = slotObject.AddComponent<TurretSlot>();
+                slot.Configure(turretPrefab.GetComponent<TurretController>(), true);
+                turretSlots.Add(slot);
             }
 
             controller.Configure(selectionRenderers.ToArray(), color, Color.Lerp(color, Color.white, 0.65f));
+            OrbitRingId ringId = objectName.Contains("Inner") ? OrbitRingId.Inner :
+                objectName.Contains("Middle") ? OrbitRingId.Middle : OrbitRingId.Outer;
+            controller.ConfigureTurretSlotAssets(ringId, turretSlots.ToArray(), new TurretSlot[0]);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, DirectionalPrefabFolder + "/" + objectName + ".prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;

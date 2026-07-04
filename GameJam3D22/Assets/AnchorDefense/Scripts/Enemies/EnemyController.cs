@@ -15,10 +15,13 @@ namespace AnchorDefense
         private Action<EnemyController> releaseAction;
         private Action<Vector3, Color> hitEffectAction;
         private Action<Vector3, Color> deathEffectAction;
+        private TurretRegistry turretRegistry;
+        private EnemyProjectileService enemyProjectiles;
         private float currentHealth;
         private float moveSpeed;
         private float flashRemaining;
         private bool isAlive;
+        private float fireCooldown;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
 
         public bool IsAlive => isAlive;
@@ -37,13 +40,17 @@ namespace AnchorDefense
             float speedMultiplier,
             Action<EnemyController> onRelease,
             Action<Vector3, Color> onHitEffect,
-            Action<Vector3, Color> onDeathEffect)
+            Action<Vector3, Color> onDeathEffect,
+            TurretRegistry turretTargets = null,
+            EnemyProjectileService projectileService = null)
         {
             config = enemyConfig;
             core = targetCore;
             releaseAction = onRelease;
             hitEffectAction = onHitEffect;
             deathEffectAction = onDeathEffect;
+            turretRegistry = turretTargets;
+            enemyProjectiles = projectileService;
             cachedRenderer = cachedRenderer != null ? cachedRenderer : GetComponentInChildren<Renderer>();
             propertyBlock = propertyBlock ?? new MaterialPropertyBlock();
             currentHealth = config.MaxHealth * healthMultiplier;
@@ -51,6 +58,7 @@ namespace AnchorDefense
             SpawnVersion++;
             isAlive = true;
             flashRemaining = 0f;
+            fireCooldown = UnityEngine.Random.Range(0.15f, Mathf.Max(0.15f, config.FireInterval));
             transform.localScale = Vector3.one * config.Size;
             SetColor(config.BaseColor);
         }
@@ -86,6 +94,8 @@ namespace AnchorDefense
             releaseAction = null;
             hitEffectAction = null;
             deathEffectAction = null;
+            turretRegistry = null;
+            enemyProjectiles = null;
         }
 
         private void Update()
@@ -103,7 +113,11 @@ namespace AnchorDefense
                 return;
             }
 
-            if (distance > 0.001f)
+            if (config.AttackMode == EnemyAttackMode.RangedTurret)
+            {
+                UpdateRangedCombat(toCore, distance);
+            }
+            else if (distance > 0.001f)
             {
                 Vector3 direction = toCore / distance;
                 directionalVisual?.SetWorldDirection(direction);
@@ -118,6 +132,32 @@ namespace AnchorDefense
                 {
                     SetColor(config.BaseColor);
                 }
+            }
+        }
+
+        private void UpdateRangedCombat(Vector3 toCore, float distance)
+        {
+            Vector3 coreDirection = distance > 0.001f ? toCore / distance : transform.forward;
+            if (distance > config.RangedStopRadius)
+            {
+                transform.position += coreDirection * (moveSpeed * Time.deltaTime);
+            }
+
+            TurretHealth target = turretRegistry?.FindNearestOperational(transform.position);
+            Vector3 fireDirection = target != null
+                ? (target.transform.position - transform.position).normalized
+                : coreDirection;
+            directionalVisual?.SetWorldDirection(fireDirection);
+            if (fireDirection.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(fireDirection, Vector3.up);
+            }
+
+            fireCooldown -= Time.deltaTime;
+            if (fireCooldown <= 0f)
+            {
+                enemyProjectiles?.Fire(transform.position + fireDirection * 0.65f, fireDirection);
+                fireCooldown = config.FireInterval;
             }
         }
 

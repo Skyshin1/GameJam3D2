@@ -27,6 +27,7 @@ namespace AnchorDefense
 
         public KillResourceWallet KillWallet { get; private set; }
         public TurretRuntimeStats TurretStats { get; private set; }
+        public TurretRegistry TurretRegistry { get; private set; }
         public UpgradeSystem UpgradeSystem { get; private set; }
 
         public void Configure(
@@ -90,16 +91,18 @@ namespace AnchorDefense
                 upgradeTreeConfig,
                 KillWallet,
                 new UpgradeContext(TurretStats, rings));
-            VfxService vfxService = new VfxService(enemyConfig, poolRoot);
             ProjectileService projectileService = new ProjectileService(
                 turretConfig,
                 poolRoot,
                 endlessModeConfig.ProjectilePrewarmCount);
+            TurretHitVfxService turretHitVfx = new TurretHitVfxService(turretConfig, poolRoot);
+            TurretRegistry = new TurretRegistry();
 
             TurretController[] turrets = FindObjectsOfType<TurretController>(true);
             for (int i = 0; i < turrets.Length; i++)
             {
-                turrets[i].Initialize(TurretStats, registry, projectileService);
+                turrets[i].Initialize(TurretStats, registry, projectileService, turretHitVfx);
+                TurretRegistry.Register(turrets[i].Health);
             }
 
             ringInput.Initialize(gameplayCamera, core.transform, inputController);
@@ -107,9 +110,9 @@ namespace AnchorDefense
                 endlessModeConfig,
                 enemyConfig,
                 registry,
+                TurretRegistry,
                 core,
                 gameFlow,
-                vfxService,
                 KillWallet,
                 poolRoot);
             hud.Initialize(core, spawner, registry, gameFlow);

@@ -82,12 +82,17 @@ namespace AnchorDefense.Editor
 
         private static Material CreateZoneMaterial()
         {
+            Shader shader = Shader.Find("AnchorDefense/Cube Zone Wireframe") ??
+                            Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
             Material material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
             if (material == null)
             {
-                Shader shader = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color");
                 material = new Material(shader) { name = "M_CubeZoneVolume" };
                 AssetDatabase.CreateAsset(material, MaterialPath);
+            }
+            else if (shader != null)
+            {
+                material.shader = shader;
             }
             material.SetFloat("_Surface", 1f);
             material.SetFloat("_Blend", 0f);
@@ -99,6 +104,7 @@ namespace AnchorDefense.Editor
             Color color = new Color(1f, 1f, 1f, 0.08f);
             if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", color);
             if (material.HasProperty("_Color")) material.SetColor("_Color", color);
+            if (material.HasProperty("_EdgeWidth")) material.SetFloat("_EdgeWidth", 0.035f);
             EditorUtility.SetDirty(material);
             return material;
         }

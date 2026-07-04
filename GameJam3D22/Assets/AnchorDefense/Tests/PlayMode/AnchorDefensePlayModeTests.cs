@@ -62,7 +62,12 @@ namespace AnchorDefense.Tests
             Assert.That(Object.FindObjectsOfType<TurretSlot>(true).Length, Is.EqualTo(24));
             Assert.That(Object.FindObjectOfType<CoreHealth>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<HudController>(), Is.Not.Null);
-            Assert.That(Object.FindObjectOfType<UpgradeTreeController>(true), Is.Not.Null);
+            UpgradeTreeController upgradeTree = Object.FindObjectOfType<UpgradeTreeController>(true);
+            Assert.That(upgradeTree, Is.Not.Null);
+            AudioSource upgradeTreeAudio = upgradeTree.GetComponent<AudioSource>();
+            Assert.That(upgradeTreeAudio, Is.Not.Null);
+            Assert.That(upgradeTreeAudio.clip, Is.Not.Null);
+            Assert.That(upgradeTreeAudio.clip.name, Is.EqualTo("升级"));
             Assert.That(Object.FindObjectOfType<GameInputController>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<SceneSettingsApplier>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<PauseMenuController>(true), Is.Not.Null);

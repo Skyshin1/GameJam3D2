@@ -23,6 +23,13 @@ namespace AnchorDefense
         [SerializeField] private Image selectedAccent;
         [SerializeField] private UpgradeNodeView[] nodeViews;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource uiAudioSource;
+        [SerializeField] private AudioClip upgradePurchasedClip;
+        [SerializeField] private AudioClip purchaseFailedClip;
+        [SerializeField, Range(0f, 1f)] private float upgradePurchasedVolume = 1f;
+
+
         private UpgradeSystem system;
         private GameFlowController gameFlow;
         private GameInputController input;
@@ -40,6 +47,15 @@ namespace AnchorDefense
             system = upgradeSystem;
             gameFlow = flow;
             input = inputController;
+
+            if (uiAudioSource == null)
+            {
+                uiAudioSource = GetComponent<AudioSource>();
+            }
+            if (uiAudioSource != null)
+            {
+                uiAudioSource.playOnAwake = false;
+            }
             system.Changed += Refresh;
             gameFlow.StateChanged += HandleGameStateChanged;
             openButton.onClick.AddListener(TogglePanel);
@@ -158,10 +174,55 @@ namespace AnchorDefense
 
         private void PurchaseSelected()
         {
-            if (selectedView != null && system.TryPurchase(selectedView.Definition))
+            if (selectedView == null)
             {
-                Refresh();
+                return;
             }
+
+            UpgradeNodeState state = system.GetState(selectedView.Definition);
+            if (system.TryPurchase(selectedView.Definition))
+            {
+                PlayUpgradePurchasedSound();
+                Refresh();
+                return;
+            }
+
+            if (state == UpgradeNodeState.InsufficientKills)
+            {
+                PlayPurchaseFailedSound();
+            }
+
+            Refresh();
+        }
+
+        private void PlayUpgradePurchasedSound()
+        {
+            PlayUiClip(upgradePurchasedClip);
+        }
+
+        private void PlayPurchaseFailedSound()
+        {
+            PlayUiClip(purchaseFailedClip);
+        }
+
+        private void PlayUiClip(AudioClip clip)
+        {
+            if (uiAudioSource == null)
+            {
+                uiAudioSource = GetComponent<AudioSource>();
+            }
+            if (uiAudioSource == null)
+            {
+                return;
+            }
+
+            AudioClip resolvedClip = clip != null ? clip : uiAudioSource.clip;
+            if (resolvedClip == null)
+            {
+                return;
+            }
+
+            uiAudioSource.PlayOneShot(resolvedClip, upgradePurchasedVolume);
         }
 
         private void Refresh()
@@ -210,7 +271,7 @@ namespace AnchorDefense
             selectedDescription.text = node.Description;
             selectedCost.text = $"消耗击杀点  {node.KillCost}";
             selectedAccent.color = selectedView.GetBranchColor();
-            purchaseButton.interactable = state == UpgradeNodeState.Available;
+            purchaseButton.interactable = state == UpgradeNodeState.Available || state == UpgradeNodeState.InsufficientKills;
 
             switch (state)
             {

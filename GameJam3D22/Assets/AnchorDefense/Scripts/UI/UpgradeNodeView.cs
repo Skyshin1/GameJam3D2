@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace AnchorDefense
 {
-    public sealed class UpgradeNodeView : MonoBehaviour
+    public sealed class UpgradeNodeView : MonoBehaviour, IPointerEnterHandler, ISelectHandler
     {
         [SerializeField] private UpgradeNodeDefinition definition;
         [SerializeField] private Button button;
@@ -86,6 +87,22 @@ namespace AnchorDefense
         private void HandleClicked()
         {
             selectedAction?.Invoke(this);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (button != null && button.interactable)
+            {
+                selectedAction?.Invoke(this);
+            }
+        }
+
+        public void OnSelect(BaseEventData eventData)
+        {
+            if (button != null && button.interactable)
+            {
+                selectedAction?.Invoke(this);
+            }
         }
 
         private Color GetStateColor()

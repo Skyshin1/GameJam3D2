@@ -47,6 +47,7 @@ namespace AnchorDefense
             quitButton.onClick.AddListener(QuitGame);
             settingsMenu.Closed += RestoreMainMenuSelection;
             ConfigureButtonNavigation();
+            ControllerSelectionHighlight.EnsureInHierarchy(transform);
         }
 
         private void Start()

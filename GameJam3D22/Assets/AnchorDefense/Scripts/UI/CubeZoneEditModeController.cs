@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace AnchorDefense
 {
-    public sealed class CubeZoneEditModeController : MonoBehaviour
+    public sealed class CubeZoneEditModeController : MonoBehaviour, IControllerCursorContext
     {
         [SerializeField] private Button openButton;
         [SerializeField] private Button closeButton;
@@ -23,6 +25,7 @@ namespace AnchorDefense
         private GameInputController input;
 
         public bool IsEditing => editBanner != null && editBanner.activeSelf;
+        public bool IsControllerCursorActive => IsEditing;
 
         public void Configure(Button open, Button close, GameObject banner,
             GameObject sidebar, ZoneEffectWorldDragSource[] sources,
@@ -54,10 +57,25 @@ namespace AnchorDefense
             for (int i = 0; i < fragmentSources.Length; i++) fragmentSources[i]?.Bind(this);
             RefreshFragmentSources();
             grid?.SetEditMode(false);
+            Text[] bannerTexts = editBanner.GetComponentsInChildren<Text>(true);
+            for (int i = 0; i < bannerTexts.Length; i++)
+            {
+                if (bannerTexts[i] != null && bannerTexts[i].name == "Edit Mode Hint")
+                {
+                    bannerTexts[i].text = "游戏已暂停 · 右摇杆移动磁吸光标 · 按住 A 拖动碎片或方块 · B 完成";
+                    break;
+                }
+            }
         }
 
         private void Update()
         {
+            if (IsEditing && Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame)
+            {
+                ExitEditMode();
+                return;
+            }
+
             if (input == null || input.ToggleZoneEdit == null ||
                 !input.ToggleZoneEdit.WasPressedThisFrame()) return;
 
@@ -113,6 +131,7 @@ namespace AnchorDefense
             if (upgradeSystem != null) upgradeSystem.Changed -= RefreshFragmentSources;
             grid?.SetEditMode(false);
             if (wasEditing) Time.timeScale = 1f;
+            GamepadVirtualCursorController.ClearContext(this);
         }
 
         private void EnterEditMode()
@@ -134,6 +153,14 @@ namespace AnchorDefense
             if (!editing) HideFragmentTooltip();
             openButton.gameObject.SetActive(!editing && grid != null);
             grid?.SetEditMode(editing);
+            if (editing)
+            {
+                GamepadVirtualCursorController.SetContext(this);
+            }
+            else
+            {
+                GamepadVirtualCursorController.ClearContext(this);
+            }
             if (updateTimeScale && gameFlow != null && gameFlow.IsPlaying)
             {
                 Time.timeScale = editing ? 0f : 1f;
@@ -154,6 +181,49 @@ namespace AnchorDefense
             if (effect == null || effect.UnlockRequirement == null) return true;
             return upgradeSystem != null &&
                    upgradeSystem.GetState(effect.UnlockRequirement) == UpgradeNodeState.Purchased;
+        }
+
+        public void CollectControllerCursorTargets(List<ControllerCursorSnapTarget> targets)
+        {
+            if (!IsEditing || targets == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < fragmentSources.Length; i++)
+            {
+                ZoneEffectWorldDragSource source = fragmentSources[i];
+                if (source == null || !source.gameObject.activeInHierarchy) continue;
+                RectTransform rect = source.transform as RectTransform;
+                targets.Add(new ControllerCursorSnapTarget(
+                    source,
+                    GetScreenPosition(rect),
+                    95f));
+            }
+
+            Camera camera = Camera.main;
+            if (grid == null || camera == null) return;
+            for (int i = 0; i < CubeZoneConfig.ZoneCount; i++)
+            {
+                CubeZoneVolume cube = grid.GetCubeById(i);
+                if (cube == null || !cube.gameObject.activeInHierarchy) continue;
+                Vector3 screen = camera.WorldToScreenPoint(cube.transform.position);
+                if (screen.z <= 0f) continue;
+                targets.Add(new ControllerCursorSnapTarget(
+                    cube,
+                    new Vector2(screen.x, screen.y),
+                    125f));
+            }
+        }
+
+        private static Vector2 GetScreenPosition(RectTransform rect)
+        {
+            if (rect == null) return Vector2.zero;
+            Canvas canvas = rect.GetComponentInParent<Canvas>();
+            Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? canvas.worldCamera
+                : null;
+            return RectTransformUtility.WorldToScreenPoint(camera, rect.position);
         }
 
         private void HandleGameStateChanged(GameState state)

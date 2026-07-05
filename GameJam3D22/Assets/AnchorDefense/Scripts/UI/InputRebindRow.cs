@@ -21,6 +21,7 @@ namespace AnchorDefense
         public string ActionName => actionName;
         public Button RebindButton => rebindButton;
         public Text BindingText => bindingText;
+        public bool IsRebinding => operation != null;
 
         public void Configure(string mapName, string inputActionName, int index, Button button, Text valueText)
         {

@@ -50,6 +50,7 @@ namespace AnchorDefense
         private readonly List<Resolution> resolutions = new List<Resolution>();
         private readonly int[] frameRates = { 30, 60, 120, -1 };
         private int selectedCategoryIndex;
+        private bool dropdownExpandedLastFrame;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
         public event Action Closed;
@@ -126,6 +127,7 @@ namespace AnchorDefense
             {
                 rebindRows[i]?.Initialize(inputActions);
             }
+            ControllerSelectionHighlight.EnsureInHierarchy(panelRoot.transform);
             panelRoot.SetActive(false);
         }
 
@@ -276,6 +278,15 @@ namespace AnchorDefense
             Gamepad gamepad = Gamepad.current;
             if (gamepad != null)
             {
+                if (gamepad.buttonEast.wasPressedThisFrame && !IsAnyBindingInProgress())
+                {
+                    if (!dropdownExpandedLastFrame)
+                    {
+                        Close();
+                    }
+                    dropdownExpandedLastFrame = false;
+                    return;
+                }
                 if (gamepad.leftShoulder.wasPressedThisFrame)
                 {
                     CycleCategory(-1);
@@ -290,10 +301,22 @@ namespace AnchorDefense
 
             EventSystem eventSystem = EventSystem.current;
             GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+            Dropdown selectedDropdown = selected != null ? selected.GetComponent<Dropdown>() : null;
+            dropdownExpandedLastFrame = selectedDropdown != null && GameObject.Find("Dropdown List") != null;
             if (selected == null || !selected.activeInHierarchy)
             {
                 SelectCurrentCategory();
             }
+        }
+
+        private bool IsAnyBindingInProgress()
+        {
+            if (rebindRows == null) return false;
+            for (int i = 0; i < rebindRows.Length; i++)
+            {
+                if (rebindRows[i] != null && rebindRows[i].IsRebinding) return true;
+            }
+            return false;
         }
 
         private void BuildOptions()

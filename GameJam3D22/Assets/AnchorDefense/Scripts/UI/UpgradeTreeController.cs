@@ -1,10 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace AnchorDefense
 {
-    public sealed class UpgradeTreeController : MonoBehaviour
+    public sealed class UpgradeTreeController : MonoBehaviour, IControllerCursorContext
     {
         [Header("Navigation")]
         [SerializeField] private GameObject panelRoot;
@@ -39,6 +41,9 @@ namespace AnchorDefense
 
         private Font chineseUiFont;
         private CubeZoneEditModeController zoneEditor;
+        private ScrollRect protocolScroll;
+
+        public bool IsControllerCursorActive => IsOpen;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
@@ -76,6 +81,20 @@ namespace AnchorDefense
             for (int i = 0; i < nodeViews.Length; i++)
             {
                 nodeViews[i]?.Initialize(SelectNode);
+            }
+
+            protocolScroll = nodeViews != null && nodeViews.Length > 0 && nodeViews[0] != null
+                ? nodeViews[0].GetComponentInParent<ScrollRect>()
+                : null;
+            ControllerSelectionHighlight.EnsureInHierarchy(panelRoot.transform);
+            Text[] panelTexts = panelRoot.GetComponentsInChildren<Text>(true);
+            for (int i = 0; i < panelTexts.Length; i++)
+            {
+                if (panelTexts[i] != null && panelTexts[i].name == "Footer Hint")
+                {
+                    panelTexts[i].text = "左摇杆移动画布 · 右摇杆磁吸光标 · A 选择 · X 激活 · B 返回";
+                    break;
+                }
             }
 
             panelRoot.SetActive(false);
@@ -123,6 +142,11 @@ namespace AnchorDefense
             {
                 TogglePanel();
             }
+
+            if (IsOpen)
+            {
+                HandleControllerInput();
+            }
         }
 
         private void OnDestroy()
@@ -147,6 +171,7 @@ namespace AnchorDefense
             {
                 purchaseButton.onClick.RemoveListener(PurchaseSelected);
             }
+            GamepadVirtualCursorController.ClearContext(this);
         }
 
         private void TogglePanel()
@@ -179,11 +204,85 @@ namespace AnchorDefense
             if (open)
             {
                 Refresh();
+                GamepadVirtualCursorController.SetContext(this);
                 if (selectedView != null)
                 {
                     EventSystem.current?.SetSelectedGameObject(selectedView.gameObject);
                 }
             }
+            else
+            {
+                GamepadVirtualCursorController.ClearContext(this);
+            }
+        }
+
+        private void HandleControllerInput()
+        {
+            Gamepad gamepad = Gamepad.current;
+            if (gamepad == null)
+            {
+                return;
+            }
+
+            Vector2 pan = gamepad.leftStick.ReadValue();
+            if (protocolScroll != null && pan.sqrMagnitude > 0.01f)
+            {
+                Vector2 normalized = protocolScroll.normalizedPosition;
+                normalized.x += pan.x * 0.72f * Time.unscaledDeltaTime;
+                normalized.y += pan.y * 0.72f * Time.unscaledDeltaTime;
+                protocolScroll.normalizedPosition = new Vector2(
+                    Mathf.Clamp01(normalized.x), Mathf.Clamp01(normalized.y));
+            }
+
+            if (gamepad.buttonWest.wasPressedThisFrame)
+            {
+                PurchaseSelected();
+            }
+            if (gamepad.buttonEast.wasPressedThisFrame)
+            {
+                ClosePanel();
+            }
+        }
+
+        public void CollectControllerCursorTargets(List<ControllerCursorSnapTarget> targets)
+        {
+            if (!IsOpen || targets == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nodeViews.Length; i++)
+            {
+                UpgradeNodeView view = nodeViews[i];
+                if (view == null || !view.gameObject.activeInHierarchy || view.Definition == null) continue;
+                targets.Add(new ControllerCursorSnapTarget(
+                    view,
+                    GetScreenPosition(view.transform as RectTransform),
+                    76f));
+            }
+
+            AddButtonTarget(targets, purchaseButton, 90f);
+            AddButtonTarget(targets, closeButton, 70f);
+        }
+
+        private static void AddButtonTarget(
+            List<ControllerCursorSnapTarget> targets, Button button, float radius)
+        {
+            if (button == null || !button.gameObject.activeInHierarchy) return;
+            targets.Add(new ControllerCursorSnapTarget(
+                button,
+                GetScreenPosition(button.transform as RectTransform),
+                radius));
+        }
+
+        private static Vector2 GetScreenPosition(RectTransform rect)
+        {
+            if (rect == null) return Vector2.zero;
+            Canvas canvas = rect.GetComponentInParent<Canvas>();
+            Camera camera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? canvas.worldCamera
+                : null;
+            return RectTransformUtility.WorldToScreenPoint(camera, rect.position);
         }
 
         private void SelectNode(UpgradeNodeView view)

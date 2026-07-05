@@ -17,6 +17,7 @@ namespace AnchorDefense
         private bool hovering;
         private bool tooltipShown;
         private bool unlocked;
+        private Vector3 baseScale;
 
         public CubeZoneEffectDefinition Definition => definition;
 
@@ -30,6 +31,11 @@ namespace AnchorDefense
         }
 
         public void Bind(CubeZoneEditModeController controller) => owner = controller;
+
+        private void Awake()
+        {
+            baseScale = transform.localScale;
+        }
 
         public void SetUnlocked(bool value)
         {
@@ -55,12 +61,14 @@ namespace AnchorDefense
             hovering = true;
             hoverTime = 0f;
             tooltipShown = false;
+            transform.localScale = baseScale * 1.045f;
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             hovering = false;
             tooltipShown = false;
+            transform.localScale = baseScale;
             owner?.HideFragmentTooltip();
         }
 

@@ -215,6 +215,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9921889e39da92a4eb38987d4a765832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossConfig: {fileID: 0}
+  bossEveryNormalEnemyCount: 60
+  bossPrewarmCount: 2
+  maxAliveBossCount: 1
 --- !u!114 &34095173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -566,6 +570,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 558590080266185155, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1266979880486813190, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: input
@@ -581,6 +590,16 @@ PrefabInstance:
       propertyPath: upgradeTree
       value: 
       objectReference: {fileID: 1651674008}
+    - target: {fileID: 3311824119622570001, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4043772748547414201, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7455777512613919475, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: m_Pivot.x
@@ -681,10 +700,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8407471622165479092, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9056931451680289163, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: m_Name
       value: PauseMenuUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056931451680289163, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2357,6 +2386,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: UpgradeTreeUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 8405962897925896415, guid: ccf42b7236ca81e499789bf4e5ada3b3,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

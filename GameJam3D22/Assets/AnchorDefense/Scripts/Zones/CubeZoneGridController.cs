@@ -10,6 +10,7 @@ namespace AnchorDefense
         public const int ZoneRaycastLayer = 2;
         public const int MinimumGridCoordinate = -1;
         public const int MaximumGridCoordinate = 1;
+        public static readonly Vector3Int EarthCoreGridPosition = Vector3Int.zero;
 
         private static readonly Vector3Int[] NeighborDirections =
         {
@@ -93,6 +94,7 @@ namespace AnchorDefense
             }
 
             Array.Clear(cubeById, 0, cubeById.Length);
+            HashSet<Vector3Int> initializationPositions = new HashSet<Vector3Int>();
 
             if (zoneVolumes != null)
             {
@@ -195,6 +197,67 @@ namespace AnchorDefense
         public void SelectCubeAtSlot(int cubeId)
         {
             SelectCubeById(cubeId);
+        }
+
+        public bool TryRotateSelectedHorizontalLayer(int quarterTurns)
+        {
+            return selectedCube != null &&
+                   TryRotateHorizontalLayer(selectedCube.GridPosition.y, quarterTurns);
+        }
+
+        public bool TryRotateHorizontalLayer(int layerY, int quarterTurns)
+        {
+            if (layerY < MinimumGridCoordinate || layerY > MaximumGridCoordinate)
+            {
+                return false;
+            }
+
+            int normalizedTurns = NormalizeQuarterTurns(quarterTurns);
+            if (normalizedTurns == 0)
+            {
+                return false;
+            }
+
+            CubeZoneVolume[] layerCubes = new CubeZoneVolume[cubeById.Length];
+            Vector3Int[] targetPositions = new Vector3Int[cubeById.Length];
+            int layerCount = 0;
+
+            for (int i = 0; i < cubeById.Length; i++)
+            {
+                CubeZoneVolume cube = cubeById[i];
+                if (cube == null || cube.GridPosition.y != layerY)
+                {
+                    continue;
+                }
+
+                Vector3Int target = RotateHorizontalPosition(cube.GridPosition, normalizedTurns);
+                if (!IsZoneGridPositionAllowed(target))
+                {
+                    return false;
+                }
+
+                layerCubes[layerCount] = cube;
+                targetPositions[layerCount] = target;
+                layerCount++;
+            }
+
+            if (layerCount == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < layerCount; i++)
+            {
+                layerCubes[i].SetGridPosition(targetPositions[i]);
+            }
+
+            for (int i = 0; i < layerCount; i++)
+            {
+                AnimateCubeTo(layerCubes[i], GetGridLocalPosition(targetPositions[i]));
+            }
+
+            LayoutChanged?.Invoke();
+            return true;
         }
 
         public CubeZoneVolume FindCubeUnderPointer(Camera camera, Vector2 pointerPosition)
@@ -445,7 +508,7 @@ namespace AnchorDefense
                 {
                     Vector3Int candidate = occupied + NeighborDirections[i];
 
-                    if (IsInsideAllowedGrid(candidate) &&
+                    if (IsZoneGridPositionAllowed(candidate) &&
                         !occupiedPositions.Contains(candidate))
                     {
                         uniqueCandidates.Add(candidate);
@@ -530,7 +593,7 @@ namespace AnchorDefense
         private void MoveCubeTo(CubeZoneVolume cube, Vector3Int targetPosition)
         {
             if (cube == null ||
-                !IsInsideAllowedGrid(targetPosition) ||
+                !IsZoneGridPositionAllowed(targetPosition) ||
                 IsOccupied(targetPosition, cube) ||
                 !IsAdjacentToAnotherCube(targetPosition, cube))
             {
@@ -772,11 +835,57 @@ namespace AnchorDefense
                 gridPosition.z * cubeSize);
         }
 
+        private static Vector3Int FindFirstAvailableGridPosition(HashSet<Vector3Int> occupied)
+        {
+            for (int y = MinimumGridCoordinate; y <= MaximumGridCoordinate; y++)
+            {
+                for (int z = MinimumGridCoordinate; z <= MaximumGridCoordinate; z++)
+                {
+                    for (int x = MinimumGridCoordinate; x <= MaximumGridCoordinate; x++)
+                    {
+                        Vector3Int candidate = new Vector3Int(x, y, z);
+                        if (IsZoneGridPositionAllowed(candidate) && !occupied.Contains(candidate))
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return new Vector3Int(MinimumGridCoordinate, MinimumGridCoordinate, MinimumGridCoordinate);
+        }
         private static bool IsInsideAllowedGrid(Vector3Int position)
         {
             return position.x >= MinimumGridCoordinate && position.x <= MaximumGridCoordinate &&
                    position.y >= MinimumGridCoordinate && position.y <= MaximumGridCoordinate &&
                    position.z >= MinimumGridCoordinate && position.z <= MaximumGridCoordinate;
+        }
+
+        public static bool IsZoneGridPositionAllowed(Vector3Int position)
+        {
+            return IsInsideAllowedGrid(position) && !IsEarthCoreGridPosition(position);
+        }
+
+        private static bool IsEarthCoreGridPosition(Vector3Int position)
+        {
+            return position == EarthCoreGridPosition;
+        }
+
+        private static int NormalizeQuarterTurns(int quarterTurns)
+        {
+            int normalized = quarterTurns % 4;
+            return normalized < 0 ? normalized + 4 : normalized;
+        }
+
+        private static Vector3Int RotateHorizontalPosition(Vector3Int position, int normalizedQuarterTurns)
+        {
+            Vector3Int result = position;
+            for (int i = 0; i < normalizedQuarterTurns; i++)
+            {
+                result = new Vector3Int(result.z, result.y, -result.x);
+            }
+
+            return result;
         }
 
         private void ApplyActorVfx(GameObject actor, GameObject prefab)

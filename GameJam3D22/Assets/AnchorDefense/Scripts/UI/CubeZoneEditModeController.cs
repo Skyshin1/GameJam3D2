@@ -76,11 +76,33 @@ namespace AnchorDefense
                 return;
             }
 
+            if (IsEditing)
+            {
+                HandleLayerRotationInput();
+            }
+
             if (input == null || input.ToggleZoneEdit == null ||
                 !input.ToggleZoneEdit.WasPressedThisFrame()) return;
 
             if (IsEditing) ExitEditMode();
             else EnterEditMode();
+        }
+
+        private void HandleLayerRotationInput()
+        {
+            if (grid == null || grid.IsDragging || Keyboard.current == null)
+            {
+                return;
+            }
+
+            if (Keyboard.current.qKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedHorizontalLayer(-1);
+            }
+            else if (Keyboard.current.eKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedHorizontalLayer(1);
+            }
         }
 
         public void ShowFragmentTooltip(CubeZoneEffectDefinition effect, bool unlocked)

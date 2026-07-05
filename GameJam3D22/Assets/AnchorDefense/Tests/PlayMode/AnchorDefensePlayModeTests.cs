@@ -50,6 +50,48 @@ namespace AnchorDefense.Tests
         }
 
 
+        [Test]
+        public void CubeZoneGridKeepsEarthCorePositionReserved()
+        {
+            Assert.That(CubeZoneGridController.IsZoneGridPositionAllowed(Vector3Int.zero), Is.False);
+            Assert.That(CubeZoneGridController.IsZoneGridPositionAllowed(new Vector3Int(1, 0, 0)), Is.True);
+        }
+
+        [UnityTest]
+        public IEnumerator CubeZoneGridRotatesSelectedHorizontalLayerLikeCubeFace()
+        {
+            CubeZoneGridController grid = new GameObject("Test Cube Zone Grid").AddComponent<CubeZoneGridController>();
+            CubeZoneVolume[] cubes = CreateCornerZoneVolumes();
+            try
+            {
+                grid.Configure(null, cubes);
+                grid.Initialize(null, null, null);
+                grid.SelectCubeById(4);
+
+                Assert.That(grid.TryRotateSelectedHorizontalLayer(1), Is.True);
+                yield return null;
+
+                Assert.That(cubes[4].GridPosition, Is.EqualTo(new Vector3Int(1, 1, 1)));
+                Assert.That(cubes[5].GridPosition, Is.EqualTo(new Vector3Int(1, 1, -1)));
+                Assert.That(cubes[6].GridPosition, Is.EqualTo(new Vector3Int(-1, 1, 1)));
+                Assert.That(cubes[7].GridPosition, Is.EqualTo(new Vector3Int(-1, 1, -1)));
+                for (int i = 0; i < cubes.Length; i++)
+                {
+                    Assert.That(cubes[i].GridPosition, Is.Not.EqualTo(Vector3Int.zero));
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(grid.gameObject);
+                for (int i = 0; i < cubes.Length; i++)
+                {
+                    if (cubes[i] != null)
+                    {
+                        Object.DestroyImmediate(cubes[i].gameObject);
+                    }
+                }
+            }
+        }
 [Test]
         public void SlowSelfRotatorDefaultsToGentleLocalYaw()
         {
@@ -185,6 +227,7 @@ namespace AnchorDefense.Tests
                 Assert.That(gridPosition.x, Is.InRange(-1, 1));
                 Assert.That(gridPosition.y, Is.InRange(-1, 1));
                 Assert.That(gridPosition.z, Is.InRange(-1, 1));
+                Assert.That(gridPosition, Is.Not.EqualTo(Vector3Int.zero));
                 Assert.That(zoneVolumes[i].transform.localPosition,
                     Is.EqualTo((Vector3)gridPosition * zoneGrid.Config.CubeSize));
                 for (int j = i + 1; j < zoneVolumes.Length; j++)
@@ -452,6 +495,29 @@ namespace AnchorDefense.Tests
             Assert.That(bootstrap.TurretStats.DisableDuration, Is.EqualTo(10f).Within(0.01f));
         }
 
+        private static CubeZoneVolume[] CreateCornerZoneVolumes()
+        {
+            Vector3Int[] positions =
+            {
+                new Vector3Int(-1, -1, -1),
+                new Vector3Int(1, -1, -1),
+                new Vector3Int(-1, -1, 1),
+                new Vector3Int(1, -1, 1),
+                new Vector3Int(-1, 1, 1),
+                new Vector3Int(1, 1, 1),
+                new Vector3Int(-1, 1, -1),
+                new Vector3Int(1, 1, -1)
+            };
+
+            CubeZoneVolume[] cubes = new CubeZoneVolume[positions.Length];
+            for (int i = 0; i < positions.Length; i++)
+            {
+                cubes[i] = new GameObject("Test Cube Zone " + i).AddComponent<CubeZoneVolume>();
+                cubes[i].Configure(i, positions[i], null, null, null);
+            }
+
+            return cubes;
+        }
         private static T GetSerializedField<T>(object target, string fieldName) where T : class
         {
             FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);

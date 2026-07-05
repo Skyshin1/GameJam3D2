@@ -155,7 +155,9 @@ namespace AnchorDefense
             }
 
             Vector2 cameraAxis = input.CameraOrbit.ReadValue<Vector2>();
-            if (input.CameraOrbitPress.IsPressed() && cameraAxis.sqrMagnitude > 0.01f && Time.deltaTime > 0f)
+            // A right stick already carries both direction and intent. Requiring the
+            // player to hold the stick button at the same time made orbiting unreliable.
+            if (cameraAxis.sqrMagnitude > 0.01f && Time.deltaTime > 0f)
             {
                 ApplyCameraOrbitDelta(
                     cameraAxis * 260f * Time.deltaTime * GameSettingsService.Current.cameraOrbitSensitivity);
@@ -227,7 +229,11 @@ namespace AnchorDefense
             }
 
             Vector2 pointerPosition = input.Point.ReadValue<Vector2>();
-            if (input.SecondaryPress.WasPressedThisFrame())
+            bool orbitModifierPressed = input.CameraOrbitPress != null && input.CameraOrbitPress.IsPressed();
+            bool orbitModifierStarted = input.CameraOrbitPress != null && input.CameraOrbitPress.WasPressedThisFrame();
+            bool cameraPressHeld = input.SecondaryPress.IsPressed() || orbitModifierPressed;
+
+            if (input.SecondaryPress.WasPressedThisFrame() || orbitModifierStarted)
             {
                 isCameraDragging = false;
 
@@ -240,12 +246,12 @@ namespace AnchorDefense
                 isCameraDragging = true;
             }
 
-            if (input.SecondaryPress.WasReleasedThisFrame())
+            if (!cameraPressHeld)
             {
                 isCameraDragging = false;
             }
 
-            if (input.SecondaryPress.IsPressed() && isCameraDragging)
+            if (cameraPressHeld && isCameraDragging)
             {
                 Vector2 delta = pointerPosition - previousCameraPointerPosition;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -48,8 +49,10 @@ namespace AnchorDefense
 
         private readonly List<Resolution> resolutions = new List<Resolution>();
         private readonly int[] frameRates = { 30, 60, 120, -1 };
+        private int selectedCategoryIndex;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
+        public event Action Closed;
 
         public void ConfigureView(
             GameObject root,
@@ -117,6 +120,7 @@ namespace AnchorDefense
             InputBindingPersistence.Load(inputActions);
             BuildOptions();
             WireEvents();
+            ConfigureCategoryNavigation();
             EnsureGamepadBindingRows();
             for (int i = 0; i < rebindRows.Length; i++)
             {
@@ -249,13 +253,47 @@ namespace AnchorDefense
             Populate(GameSettingsService.Current);
             ShowCategory(0);
             panelRoot.SetActive(true);
-            EventSystem.current?.SetSelectedGameObject(
-                categoryButtons != null && categoryButtons.Length > 0 ? categoryButtons[0].gameObject : closeButton.gameObject);
+            SelectCurrentCategory();
         }
 
         public void Close()
         {
+            if (!IsOpen)
+            {
+                return;
+            }
             panelRoot.SetActive(false);
+            Closed?.Invoke();
+        }
+
+        private void Update()
+        {
+            if (!IsOpen)
+            {
+                return;
+            }
+
+            Gamepad gamepad = Gamepad.current;
+            if (gamepad != null)
+            {
+                if (gamepad.leftShoulder.wasPressedThisFrame)
+                {
+                    CycleCategory(-1);
+                    return;
+                }
+                if (gamepad.rightShoulder.wasPressedThisFrame)
+                {
+                    CycleCategory(1);
+                    return;
+                }
+            }
+
+            EventSystem eventSystem = EventSystem.current;
+            GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+            if (selected == null || !selected.activeInHierarchy)
+            {
+                SelectCurrentCategory();
+            }
         }
 
         private void BuildOptions()
@@ -396,10 +434,78 @@ namespace AnchorDefense
 
         private void ShowCategory(int selectedIndex)
         {
+            selectedCategoryIndex = categoryPanels != null && categoryPanels.Length > 0
+                ? Mathf.Clamp(selectedIndex, 0, categoryPanels.Length - 1)
+                : 0;
             for (int i = 0; i < categoryPanels.Length; i++)
             {
-                categoryPanels[i].SetActive(i == selectedIndex);
+                categoryPanels[i].SetActive(i == selectedCategoryIndex);
             }
+        }
+
+        private void CycleCategory(int direction)
+        {
+            if (categoryButtons == null || categoryButtons.Length == 0)
+            {
+                return;
+            }
+
+            selectedCategoryIndex =
+                (selectedCategoryIndex + direction + categoryButtons.Length) % categoryButtons.Length;
+            ShowCategory(selectedCategoryIndex);
+            SelectCurrentCategory();
+        }
+
+        private void SelectCurrentCategory()
+        {
+            GameObject target = categoryButtons != null && categoryButtons.Length > 0
+                ? categoryButtons[Mathf.Clamp(selectedCategoryIndex, 0, categoryButtons.Length - 1)].gameObject
+                : closeButton != null ? closeButton.gameObject : null;
+            if (target != null && target.activeInHierarchy)
+            {
+                EventSystem.current?.SetSelectedGameObject(target);
+            }
+        }
+
+        private void ConfigureCategoryNavigation()
+        {
+            if (categoryButtons == null || categoryButtons.Length == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < categoryButtons.Length; i++)
+            {
+                Button current = categoryButtons[i];
+                if (current == null) continue;
+                Navigation navigation = current.navigation;
+                navigation.mode = Navigation.Mode.Explicit;
+                navigation.selectOnLeft = categoryButtons[(i - 1 + categoryButtons.Length) % categoryButtons.Length];
+                navigation.selectOnRight = categoryButtons[(i + 1) % categoryButtons.Length];
+                navigation.selectOnUp = closeButton;
+                navigation.selectOnDown = categoryPanels != null && i < categoryPanels.Length
+                    ? FindFirstSelectable(categoryPanels[i])
+                    : null;
+                current.navigation = navigation;
+            }
+        }
+
+        private static Selectable FindFirstSelectable(GameObject root)
+        {
+            if (root == null)
+            {
+                return null;
+            }
+
+            Selectable[] selectables = root.GetComponentsInChildren<Selectable>(true);
+            for (int i = 0; i < selectables.Length; i++)
+            {
+                if (selectables[i] != null && selectables[i].interactable)
+                {
+                    return selectables[i];
+                }
+            }
+            return null;
         }
 
         private int FindResolution(int width, int height)

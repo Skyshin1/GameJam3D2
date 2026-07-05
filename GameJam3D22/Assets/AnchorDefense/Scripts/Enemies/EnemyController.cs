@@ -27,6 +27,7 @@ namespace AnchorDefense
         private float fireCooldown;
         private float zoneSpeedMultiplier = 1f;
         private float zoneDamagePerSecond;
+        private float zoneDamageTakenMultiplier = 1f;
 
         private float orbitAngle;
         private float orbitBobPhase;
@@ -48,6 +49,7 @@ namespace AnchorDefense
         public int SpawnVersion { get; private set; }
         public float ZoneSpeedMultiplier => zoneSpeedMultiplier;
         public float ZoneDamagePerSecond => zoneDamagePerSecond;
+        public float ZoneDamageTakenMultiplier => zoneDamageTakenMultiplier;
 
         public event Action<EnemyController> Killed;
 
@@ -55,6 +57,11 @@ namespace AnchorDefense
         {
             zoneSpeedMultiplier = Mathf.Clamp(speedMultiplier, 0.05f, 4f);
             zoneDamagePerSecond = Mathf.Max(0f, damagePerSecond);
+        }
+
+        public void SetZoneDamageTakenMultiplier(float multiplier)
+        {
+            zoneDamageTakenMultiplier = Mathf.Clamp(multiplier, 1f, 10f);
         }
 
         public void ConfigureDirectionalVisual(DirectionalSpriteRenderer visual)
@@ -115,6 +122,7 @@ namespace AnchorDefense
 
             zoneSpeedMultiplier = 1f;
             zoneDamagePerSecond = 0f;
+            zoneDamageTakenMultiplier = 1f;
 
             transform.localScale = Vector3.one * config.Size;
             SetColor(config.BaseColor);
@@ -129,7 +137,7 @@ namespace AnchorDefense
                 return;
             }
 
-            currentHealth -= damage.Amount;
+            currentHealth -= damage.Amount * zoneDamageTakenMultiplier;
             hitEffectAction?.Invoke(damage.HitPoint, config.HitColor);
 
             if (currentHealth <= 0f)
@@ -157,6 +165,7 @@ namespace AnchorDefense
             enemyProjectiles = null;
             zoneSpeedMultiplier = 1f;
             zoneDamagePerSecond = 0f;
+            zoneDamageTakenMultiplier = 1f;
         }
 
         private void Update()

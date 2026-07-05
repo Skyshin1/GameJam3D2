@@ -15,13 +15,16 @@ MonoBehaviour:
   <CubeSize>k__BackingField: 10
   <SelectedCubeColor>k__BackingField: {r: 1, g: 1, b: 1, a: 0.05}
   <SwapTargetColor>k__BackingField: {r: 0.3, g: 1, b: 0.9, a: 0.2}
-  <AvailableHintColor>k__BackingField: {r: 0.32637152, g: 0.41906303, b: 0.46540874,
-    a: 0.050980393}
+  <AvailableHintColor>k__BackingField: {r: 0.32637152, g: 0.41906303, b: 0.46540874, a: 0.050980393}
   <HoveredHintColor>k__BackingField: {r: 0.25, g: 1, b: 0.65, a: 0.34}
   <AvailableEffects>k__BackingField:
   - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
   - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}
   - {fileID: 11400000, guid: 38678cf482df124469e1f3b1576990f3, type: 2}
+  - {fileID: 11400000, guid: 7b5d5bc6def0ee445811e2be8edb0ca1, type: 2}
+  - {fileID: 11400000, guid: b2e23678a8b1cee49ad1650dfa3330cb, type: 2}
+  - {fileID: 11400000, guid: e258ce0122e0a2940b43693ae591c1ba, type: 2}
+  - {fileID: 11400000, guid: 371b1884f443517479683fd4549f491d, type: 2}
   <DefaultZoneEffects>k__BackingField:
   - {fileID: 11400000, guid: aee15a7a26422264e8aa06da6b1e9d97, type: 2}
   - {fileID: 11400000, guid: ce966aaf448eeb74d90b42b06aa7432d, type: 2}

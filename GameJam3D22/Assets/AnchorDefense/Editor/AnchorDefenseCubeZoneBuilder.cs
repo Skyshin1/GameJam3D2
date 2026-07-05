@@ -15,7 +15,15 @@ namespace AnchorDefense.Editor
         private const string BlueEffectPath = ZoneConfigFolder + "/BlueTurretAcceleration.asset";
         private const string RedEffectPath = ZoneConfigFolder + "/RedEnemySuppression.asset";
         private const string GreenEffectPath = ZoneConfigFolder + "/GreenTurretDamage.asset";
+        private const string YellowEffectPath = ZoneConfigFolder + "/YellowTurretHealth.asset";
+        private const string PurpleEffectPath = ZoneConfigFolder + "/PurpleEnemyVulnerability.asset";
+        private const string OrangeEffectPath = ZoneConfigFolder + "/OrangeTurretRange.asset";
+        private const string CyanEffectPath = ZoneConfigFolder + "/CyanTurretRepair.asset";
         private const string GreenUnlockNodePath = Root + "/Configs/Upgrades/Nodes/ZoneDamageFragment.asset";
+        private const string YellowUnlockNodePath = Root + "/Configs/Upgrades/Nodes/ZoneHealthFragment.asset";
+        private const string PurpleUnlockNodePath = Root + "/Configs/Upgrades/Nodes/ZoneVulnerabilityFragment.asset";
+        private const string OrangeUnlockNodePath = Root + "/Configs/Upgrades/Nodes/ZoneRangeFragment.asset";
+        private const string CyanUnlockNodePath = Root + "/Configs/Upgrades/Nodes/ZoneRepairFragment.asset";
         private const string ConfigPath = ZoneConfigFolder + "/CubeZoneConfig.asset";
         private const string MaterialPath = Root + "/Art/Materials/M_CubeZoneVolume.mat";
         private const string GridPrefabPath = Root + "/Prefabs/Zones/CubeZoneGrid.prefab";
@@ -70,9 +78,37 @@ namespace AnchorDefense.Editor
             green.Configure("zone.turret.damage", "绿色：聚焦增幅",
                 "区域内炮塔造成的伤害提高 50%。需要先解锁翠绿火控碎片。", new Color(0.08f, 1f, 0.32f, 0.12f),
                 CubeZoneEffectType.TurretDamageBoost, 1f, 1.5f, 1f, 0f, greenUnlock);
+            CubeZoneEffectDefinition yellow = CreateOrLoad<CubeZoneEffectDefinition>(YellowEffectPath);
+            UpgradeNodeDefinition yellowUnlock = AssetDatabase.LoadAssetAtPath<UpgradeNodeDefinition>(YellowUnlockNodePath);
+            yellow.Configure("zone.turret.health", "黄色：生命锚定",
+                "区域内所有友方炮塔最大生命提高 50%。", new Color(1f, 0.82f, 0.08f, 0.12f),
+                CubeZoneEffectType.TurretHealthBoost, 1f, 1f, 1f, 0f, yellowUnlock,
+                turretMaxHealthMultiplier: 1.5f);
+            CubeZoneEffectDefinition purple = CreateOrLoad<CubeZoneEffectDefinition>(PurpleEffectPath);
+            UpgradeNodeDefinition purpleUnlock = AssetDatabase.LoadAssetAtPath<UpgradeNodeDefinition>(PurpleUnlockNodePath);
+            purple.Configure("zone.enemy.vulnerability", "紫色：结构裂解",
+                "区域内敌人受到的所有伤害提高 35%。", new Color(0.65f, 0.18f, 1f, 0.12f),
+                CubeZoneEffectType.EnemyVulnerability, 1f, 1f, 1f, 0f, purpleUnlock,
+                enemyDamageTakenMultiplier: 1.35f);
+            CubeZoneEffectDefinition orange = CreateOrLoad<CubeZoneEffectDefinition>(OrangeEffectPath);
+            UpgradeNodeDefinition orangeUnlock = AssetDatabase.LoadAssetAtPath<UpgradeNodeDefinition>(OrangeUnlockNodePath);
+            orange.Configure("zone.turret.range", "橙色：视界延展",
+                "区域内炮塔射程提高 35%。", new Color(1f, 0.38f, 0.06f, 0.12f),
+                CubeZoneEffectType.TurretRangeBoost, 1f, 1f, 1f, 0f, orangeUnlock,
+                turretRangeMultiplier: 1.35f);
+            CubeZoneEffectDefinition cyan = CreateOrLoad<CubeZoneEffectDefinition>(CyanEffectPath);
+            UpgradeNodeDefinition cyanUnlock = AssetDatabase.LoadAssetAtPath<UpgradeNodeDefinition>(CyanUnlockNodePath);
+            cyan.Configure("zone.turret.repair", "青色：纳米维修",
+                "区域内仍在运作的炮塔每秒恢复 4 点生命。", new Color(0.08f, 0.9f, 1f, 0.12f),
+                CubeZoneEffectType.TurretRepair, 1f, 1f, 1f, 0f, cyanUnlock,
+                turretHealingPerSecond: 4f);
             EditorUtility.SetDirty(blue);
             EditorUtility.SetDirty(red);
             EditorUtility.SetDirty(green);
+            EditorUtility.SetDirty(yellow);
+            EditorUtility.SetDirty(purple);
+            EditorUtility.SetDirty(orange);
+            EditorUtility.SetDirty(cyan);
 
             CubeZoneEffectDefinition[] defaults = new CubeZoneEffectDefinition[CubeZoneConfig.ZoneCount];
             for (int i = 0; i < defaults.Length; i++)
@@ -81,7 +117,7 @@ namespace AnchorDefense.Editor
             }
             CubeZoneConfig config = CreateOrLoad<CubeZoneConfig>(ConfigPath);
             float cubeSize = config.CubeSize >= 1f ? config.CubeSize : 10.5f;
-            config.Configure(cubeSize, new[] { blue, red, green }, defaults);
+            config.Configure(cubeSize, new[] { blue, red, green, yellow, purple, orange, cyan }, defaults);
             EditorUtility.SetDirty(config);
             return config;
         }
@@ -369,18 +405,18 @@ namespace AnchorDefense.Editor
                     effect.ZoneColor * new Color(1f, 1f, 1f, 5f));
                 RectTransform cardRect = card.rectTransform;
                 cardRect.anchorMin = cardRect.anchorMax = new Vector2(0.5f, 1f);
-                cardRect.sizeDelta = new Vector2(300f, 82f);
-                cardRect.anchoredPosition = new Vector2(0f, -112f - i * 98f);
+                cardRect.sizeDelta = new Vector2(300f, 62f);
+                cardRect.anchoredPosition = new Vector2(0f, -96f - i * 72f);
                 CanvasGroup group = card.gameObject.AddComponent<CanvasGroup>();
                 Image fragmentIcon = CreateImage("Fragment Icon", card.transform,
                     effect.Icon != null ? Color.white : effect.ZoneColor);
                 SetRect(fragmentIcon.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f),
-                    new Vector2(12f, 12f), new Vector2(78f, -12f));
+                    new Vector2(10f, 8f), new Vector2(64f, -8f));
                 fragmentIcon.sprite = effect.Icon;
                 Text fragmentLabel = CreateText("Fragment Name", card.transform, font, 17,
                     TextAnchor.MiddleLeft, Color.white);
                 SetRect(fragmentLabel.rectTransform, Vector2.zero, Vector2.one,
-                    new Vector2(92f, 8f), new Vector2(-10f, -8f));
+                    new Vector2(76f, 6f), new Vector2(-10f, -6f));
                 ZoneEffectWorldDragSource source = card.gameObject.AddComponent<ZoneEffectWorldDragSource>();
                 source.Configure(effect, fragmentIcon, fragmentLabel, group);
                 worldSources.Add(source);

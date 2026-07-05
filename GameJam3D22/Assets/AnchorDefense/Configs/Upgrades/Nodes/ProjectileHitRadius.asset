@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed6000dfe90b77b41b2b900f16b81419, type: 3}
+  m_Name: ProjectileHitRadius
+  m_EditorClassIdentifier: 
+  <Id>k__BackingField: turret.projectile.radius
+  <DisplayName>k__BackingField: "\u8FD1\u70B8\u5F15\u4FE1"
+  <Description>k__BackingField: "\u6269\u5927\u70AE\u5F39\u7684\u547D\u4E2D\u5224\u5B9A\u534A\u5F84
+    35%\uFF0C\u63D0\u9AD8\u5BF9\u9AD8\u901F\u76EE\u6807\u7684\u547D\u4E2D\u7A33\u5B9A\u6027\u3002"
+  <ShortLabel>k__BackingField: HIT
+  <Icon>k__BackingField: {fileID: 0}
+  <KillCost>k__BackingField: 22
+  <Placeholder>k__BackingField: 0
+  <Prerequisites>k__BackingField:
+  - {fileID: 11400000, guid: ce3418250a5b9374f94dc7ad365a828f, type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: 40bccea903bf1864da22a237a483d4dd, type: 2}

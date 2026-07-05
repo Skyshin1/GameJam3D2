@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c65d715a3f7440382abe49fb3740f99, type: 3}
-  m_Name: BlueTurretAcceleration
+  m_Name: CyanTurretRepair
   m_EditorClassIdentifier: 
-  <Id>k__BackingField: zone.turret.acceleration
-  <DisplayName>k__BackingField: "\u84DD\u8272\uFF1A\u70AE\u5854\u8D85\u9891"
-  <Description>k__BackingField: "\u533A\u57DF\u5185\u70AE\u5854\u5C04\u51FB\u95F4\u9694\u7F29\u77ED
-    30%\u3002"
+  <Id>k__BackingField: zone.turret.repair
+  <DisplayName>k__BackingField: "\u9752\u8272\uFF1A\u7EB3\u7C73\u7EF4\u4FEE"
+  <Description>k__BackingField: "\u533A\u57DF\u5185\u4ECD\u5728\u8FD0\u4F5C\u7684\u70AE\u5854\u6BCF\u79D2\u6062\u590D
+    4 \u70B9\u751F\u547D\u3002"
   <Icon>k__BackingField: {fileID: 0}
-  <ZoneColor>k__BackingField: {r: 0.08, g: 0.48, b: 1, a: 0.12}
-  <EffectType>k__BackingField: 1
-  <TurretFireIntervalMultiplier>k__BackingField: 0.7
+  <ZoneColor>k__BackingField: {r: 0.08, g: 0.9, b: 1, a: 0.12}
+  <EffectType>k__BackingField: 7
+  <TurretFireIntervalMultiplier>k__BackingField: 1
   <TurretDamageMultiplier>k__BackingField: 1
   <TurretMaxHealthMultiplier>k__BackingField: 1
   <TurretRangeMultiplier>k__BackingField: 1
-  <TurretHealingPerSecond>k__BackingField: 0
+  <TurretHealingPerSecond>k__BackingField: 4
   <EnemySpeedMultiplier>k__BackingField: 1
   <EnemyDamagePerSecond>k__BackingField: 0
   <EnemyDamageTakenMultiplier>k__BackingField: 1
-  <UnlockRequirement>k__BackingField: {fileID: 0}
+  <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: 0f42216bef3d61444b329b2a699b1042, type: 2}
   <ZoneVfxPrefab>k__BackingField: {fileID: 0}
-  <TurretVfxPrefab>k__BackingField: {fileID: 6064416128017296509, guid: 8d560e122b1cfe940b1b026c45cf500c, type: 3}
+  <TurretVfxPrefab>k__BackingField: {fileID: 0}
   <EnemyVfxPrefab>k__BackingField: {fileID: 0}

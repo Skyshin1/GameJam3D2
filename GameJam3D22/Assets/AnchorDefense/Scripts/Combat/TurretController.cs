@@ -23,6 +23,7 @@ namespace AnchorDefense
         private float cooldown;
         private float zoneFireIntervalMultiplier = 1f;
         private float zoneDamageMultiplier = 1f;
+        private float zoneRangeMultiplier = 1f;
 
         public void Initialize(
             TurretRuntimeStats turretStats,
@@ -42,6 +43,7 @@ namespace AnchorDefense
         public TurretProjectileType ProjectileType => projectileType;
         public float ZoneFireIntervalMultiplier => zoneFireIntervalMultiplier;
         public float ZoneDamageMultiplier => zoneDamageMultiplier;
+        public float ZoneRangeMultiplier => zoneRangeMultiplier;
 
         public void ConfigureFirePoint(Transform projectileOrigin)
         {
@@ -93,6 +95,11 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
             zoneDamageMultiplier = Mathf.Clamp(multiplier, 1f, 10f);
         }
 
+        public void SetZoneRangeMultiplier(float multiplier)
+        {
+            zoneRangeMultiplier = Mathf.Clamp(multiplier, 1f, 10f);
+        }
+
         private void Update()
         {
             if (runtimeStats == null || firePoint == null || (health != null && !health.IsAlive))
@@ -120,7 +127,9 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
             if (cooldown <= 0f)
             {
                 projectileService.Fire(firePoint.position, currentTarget,
-                    runtimeStats.Damage * zoneDamageMultiplier, projectileType);
+                    runtimeStats.Damage * zoneDamageMultiplier, projectileType,
+                    runtimeStats.ProjectileSpeedMultiplier,
+                    runtimeStats.ProjectileHitRadiusMultiplier);
                 PlayFireSound();
                 cooldown = runtimeStats.FireInterval * zoneFireIntervalMultiplier;
             }
@@ -142,14 +151,16 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
 
         private bool IsTargetValid(EnemyController target)
         {
+            float range = runtimeStats.Range * zoneRangeMultiplier;
             return target != null && target.IsAlive &&
-                   (target.transform.position - transform.position).sqrMagnitude <= runtimeStats.Range * runtimeStats.Range;
+                   (target.transform.position - transform.position).sqrMagnitude <= range * range;
         }
 
         private EnemyController FindNearestTarget()
         {
             EnemyController nearest = null;
-            float nearestSqrDistance = runtimeStats.Range * runtimeStats.Range;
+            float range = runtimeStats.Range * zoneRangeMultiplier;
+            float nearestSqrDistance = range * range;
             var enemies = registry.ActiveEnemies;
 
             for (int i = 0; i < enemies.Count; i++)

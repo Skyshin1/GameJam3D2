@@ -692,6 +692,21 @@ namespace AnchorDefense
                         ? effect.TurretDamageMultiplier
                         : 1f);
 
+                turret?.SetZoneRangeMultiplier(
+                    effect != null && effect.EffectType == CubeZoneEffectType.TurretRangeBoost
+                        ? effect.TurretRangeMultiplier
+                        : 1f);
+
+                health.SetZoneMaxHealthMultiplier(
+                    effect != null && effect.EffectType == CubeZoneEffectType.TurretHealthBoost
+                        ? effect.TurretMaxHealthMultiplier
+                        : 1f);
+
+                if (effect != null && effect.EffectType == CubeZoneEffectType.TurretRepair)
+                {
+                    health.Heal(effect.TurretHealingPerSecond * Time.deltaTime);
+                }
+
                 ApplyActorVfx(health.gameObject, effect != null ? effect.TurretVfxPrefab : null);
             }
         }
@@ -718,6 +733,11 @@ namespace AnchorDefense
                 {
                     enemy.SetZoneEffect(1f, 0f);
                 }
+
+                enemy.SetZoneDamageTakenMultiplier(
+                    effect != null && effect.EffectType == CubeZoneEffectType.EnemyVulnerability
+                        ? effect.EnemyDamageTakenMultiplier
+                        : 1f);
 
                 ApplyActorVfx(enemy.gameObject, effect != null ? effect.EnemyVfxPrefab : null);
             }

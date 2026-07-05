@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed6000dfe90b77b41b2b900f16b81419, type: 3}
+  m_Name: TurretRecovery
+  m_EditorClassIdentifier: 
+  <Id>k__BackingField: turret.recovery.01
+  <DisplayName>k__BackingField: "\u81EA\u5F8B\u91CD\u542F"
+  <Description>k__BackingField: "\u70AE\u5854\u762B\u75EA\u540E\u7684\u81EA\u68C0\u6D41\u7A0B\u52A0\u901F\uFF0C\u6062\u590D\u65F6\u95F4\u7F29\u77ED
+    30%\u3002\u9700\u8981\u5148\u6FC0\u6D3B\u951A\u7532\u534F\u8BAE\u3002"
+  <ShortLabel>k__BackingField: RST
+  <Icon>k__BackingField: {fileID: 0}
+  <KillCost>k__BackingField: 18
+  <Placeholder>k__BackingField: 0
+  <Prerequisites>k__BackingField:
+  - {fileID: 11400000, guid: cdad1217a633628458f3bfc253336468, type: 2}
+  <Effects>k__BackingField:
+  - {fileID: 11400000, guid: c51f7bf756bbd4d4e9c0d74fdb80010e, type: 2}

@@ -3634,6 +3634,7 @@ MonoBehaviour:
   actionMapName: Gameplay
   actionName: ToggleUpgrade
   bindingIndex: 0
+  bindingGroup: Keyboard&Mouse
   rebindButton: {fileID: 1132299990564623527}
   bindingText: {fileID: 2577751728049545634}
 --- !u!1 &1529410026348958220
@@ -5055,6 +5056,7 @@ MonoBehaviour:
   actionMapName: Gameplay
   actionName: PrimaryPress
   bindingIndex: 0
+  bindingGroup: Keyboard&Mouse
   rebindButton: {fileID: 6364049662735440743}
   bindingText: {fileID: 4155168851666914882}
 --- !u!1 &1915785916895065708
@@ -6924,6 +6926,7 @@ MonoBehaviour:
   actionMapName: Gameplay
   actionName: Pause
   bindingIndex: 0
+  bindingGroup: Keyboard&Mouse
   rebindButton: {fileID: 6492890643045470382}
   bindingText: {fileID: 110049250656538328}
 --- !u!1 &2864380605550074738
@@ -7615,9 +7618,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3303797650642059959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -720, y: 337}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 367, y: -140}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7944112781627835624
@@ -8805,6 +8808,7 @@ MonoBehaviour:
   actionMapName: Gameplay
   actionName: CycleCamera
   bindingIndex: 0
+  bindingGroup: Keyboard&Mouse
   rebindButton: {fileID: 2395532323420512996}
   bindingText: {fileID: 6765515137164282718}
 --- !u!1 &3689840581465286793
@@ -9100,9 +9104,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8565015690397694297}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 68.99994, y: -7.999939}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -96.00006, y: -7.999939}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2846191108730132869
@@ -12343,9 +12347,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3303797650642059959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 34.678}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -936, y: 54}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 151, y: 54}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6540681665874631435
@@ -15784,9 +15788,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3303797650642059959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -664, y: 186}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 423, y: 186}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7477379396092088265
@@ -16816,6 +16820,7 @@ MonoBehaviour:
   actionMapName: Gameplay
   actionName: SecondaryPress
   bindingIndex: 0
+  bindingGroup: Keyboard&Mouse
   rebindButton: {fileID: 5970904228314719712}
   bindingText: {fileID: 5353265582646081869}
 --- !u!1 &7059538208722348736

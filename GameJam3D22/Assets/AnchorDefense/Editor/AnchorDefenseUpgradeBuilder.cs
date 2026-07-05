@@ -220,6 +220,7 @@ namespace AnchorDefense.Editor
                 health = root.AddComponent<TurretHealth>();
             }
             controller.ConfigureHealth(health);
+            AssignUiFonts(root);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             PrefabUtility.UnloadPrefabContents(root);
         }
@@ -290,7 +291,8 @@ namespace AnchorDefense.Editor
                     upgradeSlots.Add(slot);
                 }
                 ring.ConfigureTurretSlotAssets(ringId, initialSlots.ToArray(), upgradeSlots.ToArray());
-                PrefabUtility.SaveAsPrefabAsset(root, path);
+                AssignUiFonts(root);
+            PrefabUtility.SaveAsPrefabAsset(root, path);
                 PrefabUtility.UnloadPrefabContents(root);
                 return;
             }
@@ -330,6 +332,7 @@ namespace AnchorDefense.Editor
             }
 
             ring.ConfigureTurretSlots(ringId, initialTurrets.ToArray(), upgradeTurrets.ToArray());
+            AssignUiFonts(root);
             PrefabUtility.SaveAsPrefabAsset(root, path);
             PrefabUtility.UnloadPrefabContents(root);
         }
@@ -346,7 +349,7 @@ namespace AnchorDefense.Editor
 
         private static UpgradeTreeController CreateUpgradeUiPrefab(UpgradeTreeConfig config)
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             GameObject canvasObject = new GameObject(
                 "UpgradeTreeUI",
                 typeof(Canvas),
@@ -529,6 +532,7 @@ namespace AnchorDefense.Editor
                 views.ToArray());
             overlay.gameObject.SetActive(false);
 
+            AssignUiFonts(canvasObject);
             PrefabUtility.SaveAsPrefabAsset(canvasObject, UiPrefabPath);
             UnityEngine.Object.DestroyImmediate(canvasObject);
             return AssetDatabase.LoadAssetAtPath<UpgradeTreeController>(UiPrefabPath);
@@ -707,6 +711,70 @@ namespace AnchorDefense.Editor
                 }
                 current = next;
             }
+        }
+        private const string EnglishUiFontPath = "Assets/AnchorDefense/Art/UI/DomeaScrawl-Regular.ttf";
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private static Font LoadEnglishUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(EnglishUiFontPath);
+            return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        private static Font LoadChineseUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+            return font != null ? font : LoadEnglishUiFont();
+        }
+
+        private static void AssignUiFonts(GameObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            Font english = LoadEnglishUiFont();
+            Font chinese = LoadChineseUiFont();
+            Text[] texts = root.GetComponentsInChildren<Text>(true);
+            foreach (Text text in texts)
+            {
+                string value = string.IsNullOrEmpty(text.text) ? GetTransformPath(text.transform) : text.text;
+                text.font = ContainsCjk(value) ? chinese : english;
+                EditorUtility.SetDirty(text);
+            }
+        }
+
+        private static bool ContainsCjk(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if ((c >= 0x3400 && c <= 0x4DBF) ||
+                    (c >= 0x4E00 && c <= 0x9FFF) ||
+                    (c >= 0xF900 && c <= 0xFAFF))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+
+            return path;
         }
     }
 }

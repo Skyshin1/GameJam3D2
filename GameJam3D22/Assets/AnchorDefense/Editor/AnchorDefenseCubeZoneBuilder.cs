@@ -201,6 +201,7 @@ namespace AnchorDefense.Editor
                 hints.Add(hint.transform);
             }
             root.GetComponent<CubeZoneGridController>().Configure(config, volumes.ToArray(), hints.ToArray());
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, GridPrefabPath);
             Object.DestroyImmediate(root);
             return prefab;
@@ -236,7 +237,7 @@ namespace AnchorDefense.Editor
             Transform oldSidebar = root.transform.Find("Field Weaving Sidebar");
             if (oldSidebar != null) Object.DestroyImmediate(oldSidebar.gameObject);
 
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             Button openButton = CreateButton("Zone Assignment", frame, font, "区域配置",
                 new Vector2(1f, 1f), new Vector2(-260f, -55f), new Vector2(170f, 46f), Cyan);
             Image panel = CreateImage("Zone Assignment Panel", frame, DarkPanel);
@@ -414,6 +415,7 @@ namespace AnchorDefense.Editor
             editBanner.gameObject.SetActive(false);
             sidebar.gameObject.SetActive(false);
             tooltip.gameObject.SetActive(false);
+            AssignUiFonts(root);
             PrefabUtility.SaveAsPrefabAsset(root, UpgradeUiPath);
             PrefabUtility.UnloadPrefabContents(root);
         }
@@ -563,6 +565,70 @@ namespace AnchorDefense.Editor
             rect.anchorMax = max;
             rect.offsetMin = offsetMin;
             rect.offsetMax = offsetMax;
+        }
+        private const string EnglishUiFontPath = "Assets/AnchorDefense/Art/UI/DomeaScrawl-Regular.ttf";
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private static Font LoadEnglishUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(EnglishUiFontPath);
+            return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        private static Font LoadChineseUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+            return font != null ? font : LoadEnglishUiFont();
+        }
+
+        private static void AssignUiFonts(GameObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            Font english = LoadEnglishUiFont();
+            Font chinese = LoadChineseUiFont();
+            Text[] texts = root.GetComponentsInChildren<Text>(true);
+            foreach (Text text in texts)
+            {
+                string value = string.IsNullOrEmpty(text.text) ? GetTransformPath(text.transform) : text.text;
+                text.font = ContainsCjk(value) ? chinese : english;
+                EditorUtility.SetDirty(text);
+            }
+        }
+
+        private static bool ContainsCjk(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if ((c >= 0x3400 && c <= 0x4DBF) ||
+                    (c >= 0x4E00 && c <= 0x9FFF) ||
+                    (c >= 0xF900 && c <= 0xFAFF))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+
+            return path;
         }
     }
 }

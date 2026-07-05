@@ -103,7 +103,7 @@ namespace AnchorDefense.Editor
 
         private static GameObject CreateMainMenuPrefab(InputActionAsset inputActions)
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             GameObject root = new GameObject(
                 "MainMenuUI",
                 typeof(Canvas),
@@ -157,6 +157,7 @@ namespace AnchorDefense.Editor
             MainMenuController mainMenu = root.GetComponent<MainMenuController>();
             mainMenu.Configure(startButton, settingsButton, quitButton, settingsController, inputActions);
 
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, MainMenuPrefabPath);
             Object.DestroyImmediate(root);
             return prefab;
@@ -267,7 +268,7 @@ namespace AnchorDefense.Editor
 
         private static GameObject CreateLoadingPrefab()
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             GameObject root = new GameObject(
                 "LoadingUI",
                 typeof(Canvas),
@@ -317,6 +318,7 @@ namespace AnchorDefense.Editor
             tip.text = "提示：旋转轨道能够改变炮台阵列的拦截方向";
 
             root.GetComponent<LoadingScreenController>().Configure(fill, percentage, status, anchorRect);
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, LoadingPrefabPath);
             Object.DestroyImmediate(root);
             return prefab;
@@ -324,7 +326,7 @@ namespace AnchorDefense.Editor
 
         private static GameObject CreatePausePrefab(InputActionAsset inputActions)
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             GameObject root = new GameObject(
                 "PauseMenuUI",
                 typeof(Canvas),
@@ -362,6 +364,7 @@ namespace AnchorDefense.Editor
                 overlay.gameObject, resume, settings, mainMenu, settingsController);
             overlay.gameObject.SetActive(false);
 
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PausePrefabPath);
             Object.DestroyImmediate(root);
             return prefab;
@@ -819,6 +822,70 @@ namespace AnchorDefense.Editor
             rect.anchorMax = anchorMax;
             rect.offsetMin = offsetMin;
             rect.offsetMax = offsetMax;
+        }
+        private const string EnglishUiFontPath = "Assets/AnchorDefense/Art/UI/DomeaScrawl-Regular.ttf";
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private static Font LoadEnglishUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(EnglishUiFontPath);
+            return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        private static Font LoadChineseUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+            return font != null ? font : LoadEnglishUiFont();
+        }
+
+        private static void AssignUiFonts(GameObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            Font english = LoadEnglishUiFont();
+            Font chinese = LoadChineseUiFont();
+            Text[] texts = root.GetComponentsInChildren<Text>(true);
+            foreach (Text text in texts)
+            {
+                string value = string.IsNullOrEmpty(text.text) ? GetTransformPath(text.transform) : text.text;
+                text.font = ContainsCjk(value) ? chinese : english;
+                EditorUtility.SetDirty(text);
+            }
+        }
+
+        private static bool ContainsCjk(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if ((c >= 0x3400 && c <= 0x4DBF) ||
+                    (c >= 0x4E00 && c <= 0x9FFF) ||
+                    (c >= 0xF900 && c <= 0xFAFF))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+
+            return path;
         }
     }
 }

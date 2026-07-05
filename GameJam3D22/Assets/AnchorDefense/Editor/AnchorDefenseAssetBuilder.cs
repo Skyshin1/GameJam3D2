@@ -238,6 +238,7 @@ namespace AnchorDefense.Editor
 
             PooledParticleEffect effect = root.AddComponent<PooledParticleEffect>();
             effect.Configure(particles);
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
             return prefab.GetComponent<PooledParticleEffect>();
@@ -263,6 +264,7 @@ namespace AnchorDefense.Editor
             light.shadows = LightShadows.None;
             ProjectileController controller = root.AddComponent<ProjectileController>();
             controller.Configure(trail);
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, GameplayPrefabs + "/Projectile.prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab.GetComponent<ProjectileController>();
@@ -279,6 +281,7 @@ namespace AnchorDefense.Editor
             CreatePrimitive("Front Core", PrimitiveType.Sphere, visualRoot.transform, new Vector3(0f, 0f, 0.62f), Vector3.one * 0.36f, accentMaterial);
             CreatePrimitive("Left Fin", PrimitiveType.Cube, visualRoot.transform, new Vector3(-0.66f, 0f, -0.08f), new Vector3(0.42f, 0.14f, 0.72f), accentMaterial, Quaternion.Euler(0f, 16f, 18f));
             CreatePrimitive("Right Fin", PrimitiveType.Cube, visualRoot.transform, new Vector3(0.66f, 0f, -0.08f), new Vector3(0.42f, 0.14f, 0.72f), accentMaterial, Quaternion.Euler(0f, -16f, -18f));
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, GameplayPrefabs + "/Enemy.prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab.GetComponent<EnemyController>();
@@ -304,6 +307,7 @@ namespace AnchorDefense.Editor
             muzzle.transform.SetParent(root.transform, false);
             muzzle.transform.localPosition = new Vector3(0f, 0.32f, 1.08f);
             controller.ConfigureFirePoint(muzzle.transform);
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, GameplayPrefabs + "/Turret.prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;
@@ -338,6 +342,7 @@ namespace AnchorDefense.Editor
             light.intensity = 2.4f;
             light.color = new Color(0.08f, 0.55f, 1f);
             light.shadows = LightShadows.None;
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, GameplayPrefabs + "/CorePlanet.prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;
@@ -399,6 +404,7 @@ namespace AnchorDefense.Editor
 
             controller.Configure(selectionRenderers.ToArray(), color, Color.Lerp(color, Color.white, 0.65f));
             controller.ConfigureTurretSlotAssets(ringId, turretSlots.ToArray(), new TurretSlot[0]);
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;
@@ -424,6 +430,7 @@ namespace AnchorDefense.Editor
             shape.radius = 36f;
             shape.radiusThickness = 1f;
             stars.GetComponent<ParticleSystemRenderer>().sharedMaterial = material;
+            AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, EnvironmentPrefabs + "/StarField.prefab");
             UnityEngine.Object.DestroyImmediate(root);
             return prefab;
@@ -431,7 +438,7 @@ namespace AnchorDefense.Editor
 
         private static GameObject CreateHudPrefab()
         {
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = LoadEnglishUiFont();
             GameObject canvasObject = new GameObject("HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -483,6 +490,7 @@ namespace AnchorDefense.Editor
 
             HudController hud = canvasObject.AddComponent<HudController>();
             hud.ConfigureView(healthText, timeText, enemyText, finalTime, healthFill, gameOverPanel.gameObject, restartButton);
+            AssignUiFonts(canvasObject);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(canvasObject, UiPrefabs + "/HUD.prefab");
             UnityEngine.Object.DestroyImmediate(canvasObject);
             return prefab;
@@ -648,6 +656,70 @@ namespace AnchorDefense.Editor
             rect.anchorMax = anchorMax;
             rect.offsetMin = offsetMin;
             rect.offsetMax = offsetMax;
+        }
+        private const string EnglishUiFontPath = "Assets/AnchorDefense/Art/UI/DomeaScrawl-Regular.ttf";
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private static Font LoadEnglishUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(EnglishUiFontPath);
+            return font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        private static Font LoadChineseUiFont()
+        {
+            Font font = AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+            return font != null ? font : LoadEnglishUiFont();
+        }
+
+        private static void AssignUiFonts(GameObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            Font english = LoadEnglishUiFont();
+            Font chinese = LoadChineseUiFont();
+            Text[] texts = root.GetComponentsInChildren<Text>(true);
+            foreach (Text text in texts)
+            {
+                string value = string.IsNullOrEmpty(text.text) ? GetTransformPath(text.transform) : text.text;
+                text.font = ContainsCjk(value) ? chinese : english;
+                EditorUtility.SetDirty(text);
+            }
+        }
+
+        private static bool ContainsCjk(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if ((c >= 0x3400 && c <= 0x4DBF) ||
+                    (c >= 0x4E00 && c <= 0x9FFF) ||
+                    (c >= 0xF900 && c <= 0xFAFF))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                path = transform.name + "/" + path;
+            }
+
+            return path;
         }
     }
 }

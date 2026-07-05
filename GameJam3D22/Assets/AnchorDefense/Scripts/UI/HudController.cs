@@ -18,6 +18,9 @@ namespace AnchorDefense
         private CoreHealth core;
         private EndlessEnemySpawner spawner;
         private EnemyRegistry registry;
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private Font chineseUiFont;
         private GameFlowController gameFlow;
 
         public void ConfigureView(
@@ -47,6 +50,7 @@ namespace AnchorDefense
             core = coreHealth;
             spawner = enemySpawner;
             registry = enemyRegistry;
+            ApplyRuntimeFonts();
             gameFlow = flow;
 
             core.HealthChanged += HandleHealthChanged;
@@ -109,5 +113,53 @@ namespace AnchorDefense
             Time.timeScale = 1f;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
-    }
+    
+
+private void ApplyRuntimeFonts()
+        {
+            if (chineseUiFont == null)
+            {
+                if (healthText != null && healthText.font != null)
+                {
+                    chineseUiFont = healthText.font;
+                }
+                else if (timerText != null && timerText.font != null)
+                {
+                    chineseUiFont = timerText.font;
+                }
+                else if (enemyText != null && enemyText.font != null)
+                {
+                    chineseUiFont = enemyText.font;
+                }
+
+#if UNITY_EDITOR
+                Font editorFont = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+                if (editorFont != null)
+                {
+                    chineseUiFont = editorFont;
+                }
+#endif
+            }
+
+            if (chineseUiFont == null)
+            {
+                return;
+            }
+
+            if (healthText != null)
+            {
+                healthText.font = chineseUiFont;
+            }
+
+            if (timerText != null)
+            {
+                timerText.font = chineseUiFont;
+            }
+
+            if (enemyText != null)
+            {
+                enemyText.font = chineseUiFont;
+            }
+        }
+}
 }

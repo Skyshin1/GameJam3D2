@@ -35,6 +35,9 @@ namespace AnchorDefense
         private GameFlowController gameFlow;
         private GameInputController input;
         private UpgradeNodeView selectedView;
+        private const string ChineseUiFontPath = "Assets/AnchorDefense/Art/UI/PF频凡胡涂体 PFANHUTUTI.ttf";
+
+        private Font chineseUiFont;
         private CubeZoneEditModeController zoneEditor;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
@@ -53,6 +56,7 @@ namespace AnchorDefense
         {
             system = upgradeSystem;
             gameFlow = flow;
+            ApplyDetailFonts();
             input = inputController;
 
             if (uiAudioSource == null)
@@ -334,5 +338,62 @@ namespace AnchorDefense
 
             return null;
         }
-    }
+    
+
+private void ApplyDetailFonts()
+        {
+            if (chineseUiFont == null)
+            {
+                if (selectedTitle != null && selectedTitle.font != null)
+                {
+                    chineseUiFont = selectedTitle.font;
+                }
+                else if (selectedDescription != null && selectedDescription.font != null)
+                {
+                    chineseUiFont = selectedDescription.font;
+                }
+                else if (selectedCost != null && selectedCost.font != null)
+                {
+                    chineseUiFont = selectedCost.font;
+                }
+                else if (selectedStatus != null && selectedStatus.font != null)
+                {
+                    chineseUiFont = selectedStatus.font;
+                }
+
+#if UNITY_EDITOR
+                Font editorFont = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>(ChineseUiFontPath);
+                if (editorFont != null)
+                {
+                    chineseUiFont = editorFont;
+                }
+#endif
+            }
+
+            if (chineseUiFont == null)
+            {
+                return;
+            }
+
+            if (selectedTitle != null)
+            {
+                selectedTitle.font = chineseUiFont;
+            }
+
+            if (selectedDescription != null)
+            {
+                selectedDescription.font = chineseUiFont;
+            }
+
+            if (selectedCost != null)
+            {
+                selectedCost.font = chineseUiFont;
+            }
+
+            if (selectedStatus != null)
+            {
+                selectedStatus.font = chineseUiFont;
+            }
+        }
+}
 }

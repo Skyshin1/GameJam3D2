@@ -475,8 +475,17 @@ namespace AnchorDefense
 
             selectedCategoryIndex =
                 (selectedCategoryIndex + direction + categoryButtons.Length) % categoryButtons.Length;
+
             ShowCategory(selectedCategoryIndex);
-            SelectCurrentCategory();
+
+            GameObject target = categoryButtons[selectedCategoryIndex] != null
+                ? categoryButtons[selectedCategoryIndex].gameObject
+                : null;
+
+            if (target != null && target.activeInHierarchy)
+            {
+                EventSystem.current?.SetSelectedGameObject(target);
+            }
         }
 
         private void SelectCurrentCategory()
@@ -500,16 +509,42 @@ namespace AnchorDefense
             for (int i = 0; i < categoryButtons.Length; i++)
             {
                 Button current = categoryButtons[i];
-                if (current == null) continue;
-                Navigation navigation = current.navigation;
-                navigation.mode = Navigation.Mode.Explicit;
-                navigation.selectOnLeft = categoryButtons[(i - 1 + categoryButtons.Length) % categoryButtons.Length];
-                navigation.selectOnRight = categoryButtons[(i + 1) % categoryButtons.Length];
-                navigation.selectOnUp = closeButton;
-                navigation.selectOnDown = categoryPanels != null && i < categoryPanels.Length
+                if (current == null)
+                {
+                    continue;
+                }
+
+                Button upButton = categoryButtons[(i - 1 + categoryButtons.Length) % categoryButtons.Length];
+                Button downButton = categoryButtons[(i + 1) % categoryButtons.Length];
+
+                Selectable firstPanelSelectable = categoryPanels != null && i < categoryPanels.Length
                     ? FindFirstSelectable(categoryPanels[i])
                     : null;
+
+                Navigation navigation = current.navigation;
+                navigation.mode = Navigation.Mode.Explicit;
+
+                // 左侧分类是竖排，所以手柄上下应该切换分类
+                navigation.selectOnUp = upButton;
+                navigation.selectOnDown = downButton;
+
+                // 向右进入当前分类内容区
+                navigation.selectOnRight = firstPanelSelectable;
+
+                // 向左留在自己，避免乱跳
+                navigation.selectOnLeft = current;
+
                 current.navigation = navigation;
+            }
+
+            if (closeButton != null)
+            {
+                Navigation closeNavigation = closeButton.navigation;
+                closeNavigation.mode = Navigation.Mode.Explicit;
+                closeNavigation.selectOnDown = categoryButtons[0];
+                closeNavigation.selectOnLeft = categoryButtons[0];
+                closeNavigation.selectOnRight = categoryButtons[0];
+                closeButton.navigation = closeNavigation;
             }
         }
 

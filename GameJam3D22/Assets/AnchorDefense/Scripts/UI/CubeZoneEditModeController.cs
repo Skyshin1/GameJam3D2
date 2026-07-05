@@ -95,11 +95,11 @@ namespace AnchorDefense
                 return;
             }
 
-            if (Keyboard.current.qKey.wasPressedThisFrame)
+            if (Keyboard.current.aKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedHorizontalLayer(-1);
             }
-            else if (Keyboard.current.eKey.wasPressedThisFrame)
+            else if (Keyboard.current.dKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedHorizontalLayer(1);
             }

@@ -17,6 +17,11 @@ namespace AnchorDefense
         public InputAction CycleCamera { get; private set; }
         public InputAction ToggleUpgrade { get; private set; }
         public InputAction Pause { get; private set; }
+        public InputAction RingAxis { get; private set; }
+        public InputAction CameraOrbit { get; private set; }
+        public InputAction CycleRing { get; private set; }
+        public InputAction CameraOrbitPress { get; private set; }
+        public InputAction ToggleZoneEdit { get; private set; }
 
         public void Configure(InputActionAsset actions)
         {
@@ -55,6 +60,11 @@ namespace AnchorDefense
             CycleCamera = gameplayMap.FindAction("CycleCamera", true);
             ToggleUpgrade = gameplayMap.FindAction("ToggleUpgrade", true);
             Pause = gameplayMap.FindAction("Pause", true);
+            RingAxis = gameplayMap.FindAction("RingAxis", true);
+            CameraOrbit = gameplayMap.FindAction("CameraOrbit", true);
+            CycleRing = gameplayMap.FindAction("CycleRing", true);
+            CameraOrbitPress = gameplayMap.FindAction("CameraOrbitPress", true);
+            ToggleZoneEdit = gameplayMap.FindAction("ToggleZoneEdit", true);
         }
     }
 }

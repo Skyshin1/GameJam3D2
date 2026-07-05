@@ -45,6 +45,14 @@ namespace AnchorDefense.Editor
             BuildInternal(false);
         }
 
+        [MenuItem("Tools/Anchor Defense/Rebuild Shared Settings UI")]
+        public static void RebuildSettingsUiOnly()
+        {
+            AssetDatabase.ImportAsset(MainMenuPrefabPath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.ImportAsset(PausePrefabPath, ImportAssetOptions.ForceUpdate);
+            Debug.Log("Existing art-authored settings prefabs preserved. Device binding columns are extended at runtime.");
+        }
+
         private static void BuildInternal(bool rebuildUi)
         {
             InputActionAsset inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath);
@@ -58,7 +66,7 @@ namespace AnchorDefense.Editor
             GameObject mainMenuPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(MainMenuPrefabPath);
             GameObject loadingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(LoadingPrefabPath);
             GameObject pausePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PausePrefabPath);
-            if (mainMenuPrefab == null || rebuildUi)
+            if (mainMenuPrefab == null)
             {
                 mainMenuPrefab = CreateMainMenuPrefab(inputActions);
             }
@@ -66,7 +74,7 @@ namespace AnchorDefense.Editor
             {
                 loadingPrefab = CreateLoadingPrefab();
             }
-            if (pausePrefab == null || rebuildUi)
+            if (pausePrefab == null)
             {
                 pausePrefab = CreatePausePrefab(inputActions);
             }
@@ -246,13 +254,43 @@ namespace AnchorDefense.Editor
             Text cameraValue = CreateValueLabel(panels[3].transform, font, 136f);
             CreateRowLabel(panels[3].transform, font, "相机环绕灵敏度", 136f);
 
-            string[] actionNames = { "PrimaryPress", "SecondaryPress", "CycleCamera", "ToggleUpgrade", "Pause" };
-            string[] actionLabels = { "选择 / 旋转轨道", "旋转相机", "切换相机模式", "打开升级树", "暂停 / 返回" };
-            var rebindRows = new InputRebindRow[actionNames.Length];
-            for (int i = 0; i < actionNames.Length; i++)
+            Text keyboardHeader = CreateText("Keyboard Header", panels[3].transform, font, 16,
+                TextAnchor.MiddleCenter, Cyan);
+            SetRect(keyboardHeader.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-545f, -205f), new Vector2(-315f, -170f));
+            keyboardHeader.text = "键鼠";
+            Text gamepadHeader = CreateText("Gamepad Header", panels[3].transform, font, 16,
+                TextAnchor.MiddleCenter, new Color(0.25f, 1f, 0.67f));
+            SetRect(gamepadHeader.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-265f, -205f), new Vector2(-35f, -170f));
+            gamepadHeader.text = "手柄";
+
+            string[] actionLabels =
             {
-                rebindRows[i] = CreateRebindRow(panels[3].transform, font, actionLabels[i], actionNames[i], 215f + i * 62f);
+                "选择 / 切换轨道", "旋转相机", "切换相机模式",
+                "打开升级树", "锚域编织", "暂停 / 返回"
+            };
+            string[] keyboardActions =
+            {
+                "PrimaryPress", "SecondaryPress", "CycleCamera",
+                "ToggleUpgrade", "ToggleZoneEdit", "Pause"
+            };
+            string[] gamepadActions =
+            {
+                "CycleRing", "CameraOrbitPress", "CycleCamera",
+                "ToggleUpgrade", "ToggleZoneEdit", "Pause"
+            };
+            var rebindRows = new List<InputRebindRow>(actionLabels.Length * 2);
+            for (int i = 0; i < actionLabels.Length; i++)
+            {
+                CreateDualRebindRow(panels[3].transform, font, actionLabels[i],
+                    keyboardActions[i], gamepadActions[i], 210f + i * 54f, rebindRows);
             }
+            Text stickHint = CreateText("Gamepad Stick Hint", panels[3].transform, font, 15,
+                TextAnchor.MiddleLeft, new Color(0.55f, 0.76f, 0.88f));
+            SetRect(stickHint.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(48f, 72f), new Vector2(-280f, 108f));
+            stickHint.text = "手柄：左摇杆旋转当前轨道 · 按住右摇杆并推动可环绕相机 · 十字键/左摇杆导航菜单";
             Button resetBindings = CreateSmallButton("Reset Bindings", panels[3].transform, font, "恢复默认键位", new Vector2(-180f, 34f), new Vector2(220f, 46f), Violet, new Vector2(1f, 0f));
 
             Button resetDefaults = CreateSmallButton("Reset Defaults", frame.transform, font, "恢复默认设置", new Vector2(-430f, 60f), new Vector2(210f, 50f), Violet, new Vector2(1f, 0f));
@@ -262,7 +300,7 @@ namespace AnchorDefense.Editor
                 overlay.gameObject, closeButton, apply, resetDefaults, resetBindings, tabButtons, panels,
                 resolution, screenMode, brightness, brightnessValue, verticalSync, showZoneBorders, frameRate,
                 quality, antiAliasing, master, masterValue, music, musicValue, sfx, sfxValue,
-                ringSensitivity, ringValue, cameraSensitivity, cameraValue, inputActions, rebindRows);
+                ringSensitivity, ringValue, cameraSensitivity, cameraValue, inputActions, rebindRows.ToArray());
             overlay.gameObject.SetActive(false);
         }
 
@@ -641,6 +679,26 @@ namespace AnchorDefense.Editor
             InputRebindRow row = button.gameObject.AddComponent<InputRebindRow>();
             row.Configure("Gameplay", actionName, 0, button, bindingText);
             return row;
+        }
+
+        private static void CreateDualRebindRow(Transform parent, Font font, string label,
+            string keyboardAction, string gamepadAction, float top, List<InputRebindRow> rows)
+        {
+            CreateRowLabel(parent, font, label, top);
+            Button keyboardButton = CreateSmallButton(keyboardAction + " Keyboard Rebind", parent, font, "--",
+                new Vector2(-430f, -top - 24f), new Vector2(230f, 42f), Cyan, new Vector2(1f, 1f));
+            InputRebindRow keyboardRow = keyboardButton.gameObject.AddComponent<InputRebindRow>();
+            keyboardRow.Configure("Gameplay", keyboardAction, "Keyboard&Mouse",
+                keyboardButton, keyboardButton.GetComponentInChildren<Text>());
+            rows.Add(keyboardRow);
+
+            Button gamepadButton = CreateSmallButton(gamepadAction + " Gamepad Rebind", parent, font, "--",
+                new Vector2(-150f, -top - 24f), new Vector2(230f, 42f),
+                new Color(0.25f, 1f, 0.67f), new Vector2(1f, 1f));
+            InputRebindRow gamepadRow = gamepadButton.gameObject.AddComponent<InputRebindRow>();
+            gamepadRow.Configure("Gameplay", gamepadAction, "Gamepad",
+                gamepadButton, gamepadButton.GetComponentInChildren<Text>());
+            rows.Add(gamepadRow);
         }
 
         private static void CreateRowLabel(Transform parent, Font font, string text, float top)

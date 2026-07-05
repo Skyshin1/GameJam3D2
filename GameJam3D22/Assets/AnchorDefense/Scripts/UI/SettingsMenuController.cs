@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -116,11 +117,119 @@ namespace AnchorDefense
             InputBindingPersistence.Load(inputActions);
             BuildOptions();
             WireEvents();
+            EnsureGamepadBindingRows();
             for (int i = 0; i < rebindRows.Length; i++)
             {
                 rebindRows[i]?.Initialize(inputActions);
             }
             panelRoot.SetActive(false);
+        }
+
+        private void EnsureGamepadBindingRows()
+        {
+            if (rebindRows == null || rebindRows.Length == 0) return;
+            for (int i = 0; i < rebindRows.Length; i++)
+            {
+                if (rebindRows[i] != null && rebindRows[i].name.Contains("Gamepad Rebind")) return;
+            }
+
+            var rows = new List<InputRebindRow>(rebindRows);
+            string[] gamepadActions =
+            {
+                "CycleRing", "CameraOrbitPress", "CycleCamera", "ToggleUpgrade", "Pause"
+            };
+
+            int sourceCount = Mathf.Min(5, rebindRows.Length);
+            for (int i = 0; i < sourceCount; i++)
+            {
+                InputRebindRow keyboardRow = rebindRows[i];
+                if (keyboardRow == null || keyboardRow.RebindButton == null) continue;
+                PrepareKeyboardColumn(keyboardRow);
+                rows.Add(CloneBindingButton(keyboardRow, gamepadActions[i], "Gamepad", -150f));
+            }
+
+            InputRebindRow pauseRow = FindRow("Pause");
+            if (pauseRow != null && pauseRow.RebindButton != null)
+            {
+                RectTransform pauseRect = pauseRow.RebindButton.transform as RectTransform;
+                float newY = pauseRect != null ? pauseRect.anchoredPosition.y - 58f : -550f;
+                CloneNearestLabel(pauseRow.RebindButton.transform.parent, pauseRect, newY, "锚域编织");
+
+                GameObject keyboardClone = Instantiate(pauseRow.RebindButton.gameObject,
+                    pauseRow.RebindButton.transform.parent);
+                keyboardClone.name = "ToggleZoneEdit Keyboard Rebind";
+                RectTransform keyboardRect = keyboardClone.transform as RectTransform;
+                keyboardRect.sizeDelta = new Vector2(230f, 42f);
+                keyboardRect.anchoredPosition = new Vector2(-430f, newY);
+                InputRebindRow keyboardZone = keyboardClone.GetComponent<InputRebindRow>();
+                Button keyboardButton = keyboardClone.GetComponent<Button>();
+                Text keyboardText = keyboardClone.GetComponentInChildren<Text>();
+                keyboardZone.Configure("Gameplay", "ToggleZoneEdit", "Keyboard&Mouse", keyboardButton, keyboardText);
+                rows.Add(keyboardZone);
+
+                rows.Add(CloneBindingButton(keyboardZone, "ToggleZoneEdit", "Gamepad", -150f));
+            }
+
+            rebindRows = rows.ToArray();
+        }
+
+        private InputRebindRow FindRow(string action)
+        {
+            for (int i = 0; i < rebindRows.Length; i++)
+            {
+                if (rebindRows[i] != null && rebindRows[i].ActionName == action) return rebindRows[i];
+            }
+            return null;
+        }
+
+        private static void PrepareKeyboardColumn(InputRebindRow row)
+        {
+            RectTransform rect = row.RebindButton.transform as RectTransform;
+            if (rect == null) return;
+            rect.sizeDelta = new Vector2(230f, 42f);
+            rect.anchoredPosition = new Vector2(-430f, rect.anchoredPosition.y);
+            row.Configure("Gameplay", row.ActionName, "Keyboard&Mouse", row.RebindButton, row.BindingText);
+        }
+
+        private static InputRebindRow CloneBindingButton(InputRebindRow source, string action,
+            string group, float x)
+        {
+            GameObject clone = Instantiate(source.RebindButton.gameObject, source.RebindButton.transform.parent);
+            clone.name = action + " Gamepad Rebind";
+            RectTransform sourceRect = source.RebindButton.transform as RectTransform;
+            RectTransform rect = clone.transform as RectTransform;
+            rect.sizeDelta = new Vector2(230f, 42f);
+            rect.anchoredPosition = new Vector2(x, sourceRect != null ? sourceRect.anchoredPosition.y : 0f);
+            Button button = clone.GetComponent<Button>();
+            Text text = clone.GetComponentInChildren<Text>();
+            InputRebindRow row = clone.GetComponent<InputRebindRow>();
+            row.Configure("Gameplay", action, group, button, text);
+            return row;
+        }
+
+        private static void CloneNearestLabel(Transform parent, RectTransform sourceButton,
+            float targetY, string labelText)
+        {
+            if (parent == null || sourceButton == null) return;
+            Text nearest = null;
+            float nearestDistance = float.PositiveInfinity;
+            Text[] texts = parent.GetComponentsInChildren<Text>(true);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                if (texts[i].transform.parent != parent) continue;
+                RectTransform rect = texts[i].rectTransform;
+                float distance = Mathf.Abs(rect.anchoredPosition.y - sourceButton.anchoredPosition.y);
+                if (distance < nearestDistance)
+                {
+                    nearest = texts[i];
+                    nearestDistance = distance;
+                }
+            }
+            if (nearest == null) return;
+            Text clone = Instantiate(nearest, parent);
+            clone.name = labelText + " Label";
+            clone.text = labelText;
+            clone.rectTransform.anchoredPosition = new Vector2(nearest.rectTransform.anchoredPosition.x, targetY);
         }
 
         private void OnDestroy()
@@ -140,6 +249,8 @@ namespace AnchorDefense
             Populate(GameSettingsService.Current);
             ShowCategory(0);
             panelRoot.SetActive(true);
+            EventSystem.current?.SetSelectedGameObject(
+                categoryButtons != null && categoryButtons.Length > 0 ? categoryButtons[0].gameObject : closeButton.gameObject);
         }
 
         public void Close()

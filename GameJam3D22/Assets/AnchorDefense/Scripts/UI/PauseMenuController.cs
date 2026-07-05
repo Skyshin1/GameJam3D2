@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -109,6 +110,10 @@ namespace AnchorDefense
         private void SetPaused(bool paused)
         {
             panelRoot.SetActive(paused);
+            if (paused)
+            {
+                EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+            }
             if (gameFlow != null && gameFlow.IsPlaying)
             {
                 Time.timeScale = paused ? 0f : 1f;

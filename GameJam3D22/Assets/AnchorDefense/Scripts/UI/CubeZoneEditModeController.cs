@@ -20,6 +20,7 @@ namespace AnchorDefense
         private GameFlowController gameFlow;
         private UpgradeTreeController upgradeTree;
         private UpgradeSystem upgradeSystem;
+        private GameInputController input;
 
         public bool IsEditing => editBanner != null && editBanner.activeSelf;
 
@@ -40,18 +41,28 @@ namespace AnchorDefense
         }
 
         public void Initialize(CubeZoneGridController zoneGrid, GameFlowController flow,
-            UpgradeTreeController tree, UpgradeSystem upgrades)
+            UpgradeTreeController tree, UpgradeSystem upgrades, GameInputController inputController)
         {
             grid = zoneGrid;
             gameFlow = flow;
             upgradeTree = tree;
             upgradeSystem = upgrades;
+            input = inputController;
             openButton.gameObject.SetActive(grid != null);
             if (gameFlow != null) gameFlow.StateChanged += HandleGameStateChanged;
             if (upgradeSystem != null) upgradeSystem.Changed += RefreshFragmentSources;
             for (int i = 0; i < fragmentSources.Length; i++) fragmentSources[i]?.Bind(this);
             RefreshFragmentSources();
             grid?.SetEditMode(false);
+        }
+
+        private void Update()
+        {
+            if (input == null || input.ToggleZoneEdit == null ||
+                !input.ToggleZoneEdit.WasPressedThisFrame()) return;
+
+            if (IsEditing) ExitEditMode();
+            else EnterEditMode();
         }
 
         public void ShowFragmentTooltip(CubeZoneEffectDefinition effect, bool unlocked)

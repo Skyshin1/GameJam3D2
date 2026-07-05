@@ -58,6 +58,51 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RingAxis",
+                    "type": "Value",
+                    "id": "ba73e434-7790-4481-a175-2fdc0fa0660d",
+                    "expectedControlType": "Axis",
+                    "processors": "axisDeadzone",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CameraOrbit",
+                    "type": "Value",
+                    "id": "9b29c63d-c4cc-47fc-87af-cb0b0c27a92a",
+                    "expectedControlType": "Vector2",
+                    "processors": "stickDeadzone",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "CycleRing",
+                    "type": "Button",
+                    "id": "ce330dae-ec1a-42b8-8a9d-12132db63bc5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CameraOrbitPress",
+                    "type": "Button",
+                    "id": "da36f521-4726-44bc-b63e-b327a0e4e8ee",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleZoneEdit",
+                    "type": "Button",
+                    "id": "8e6725af-0e91-45e5-96d0-5ea889fdcdbc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -126,6 +171,116 @@
                     "action": "Pause",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "77b4785e-44d0-466b-a45a-493f876f2cf8",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "CycleRing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b518cc3f-2691-45eb-9490-c6da140eb809",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "ToggleZoneEdit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0a8c8dc4-a11d-45e8-b484-52a090460064",
+                    "path": "<Gamepad>/leftStick/x",
+                    "interactions": "",
+                    "processors": "axisDeadzone",
+                    "groups": "Gamepad",
+                    "action": "RingAxis",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "36c494c1-1a20-4619-86c7-5fd3014cf2cf",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "stickDeadzone",
+                    "groups": "Gamepad",
+                    "action": "CameraOrbit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d60eebfd-fcd6-4b85-b6a9-a8c5fa90b486",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CycleRing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "22c64753-b752-4e3b-bbd2-ae45db8dac92",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CameraOrbitPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "379dfd3e-d67c-428e-82bb-135c016d616e",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CycleCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "054a4135-6f68-4ef6-8193-ac7c8fa16ca1",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ToggleUpgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "711ceaf3-bb25-46ff-9a1e-c470ae85c0e8",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "84ae1bfe-04cf-4d8a-9f05-82cf27fc1302",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "ToggleZoneEdit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
@@ -142,6 +297,17 @@
                 },
                 {
                     "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Gamepad",
+            "bindingGroup": "Gamepad",
+            "devices": [
+                {
+                    "devicePath": "<Gamepad>",
                     "isOptional": false,
                     "isOR": false
                 }

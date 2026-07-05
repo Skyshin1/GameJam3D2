@@ -123,7 +123,7 @@ namespace AnchorDefense
             CubeZoneAssignmentController zoneAssignment = FindObjectOfType<CubeZoneAssignmentController>(true);
             zoneAssignment?.Initialize(zoneGrid, UpgradeSystem);
             CubeZoneEditModeController zoneEditor = FindObjectOfType<CubeZoneEditModeController>(true);
-            zoneEditor?.Initialize(zoneGrid, gameFlow, upgradeTree, UpgradeSystem);
+            zoneEditor?.Initialize(zoneGrid, gameFlow, upgradeTree, UpgradeSystem, inputController);
             upgradeTree.ConfigureZoneEditor(zoneEditor);
             FindObjectOfType<PauseMenuController>(true)?.ConfigureZoneEditor(zoneEditor);
 

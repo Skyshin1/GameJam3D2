@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace AnchorDefense
@@ -174,6 +175,10 @@ namespace AnchorDefense
             if (open)
             {
                 Refresh();
+                if (selectedView != null)
+                {
+                    EventSystem.current?.SetSelectedGameObject(selectedView.gameObject);
+                }
             }
         }
 

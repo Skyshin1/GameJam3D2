@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -31,6 +32,8 @@ namespace AnchorDefense
         private OrbitRingController selectedRing;
         private CubeZoneGridController cubeZoneGrid;
         private GameInputController input;
+        private OrbitRingController[] selectableRings;
+        private int selectedRingIndex = -1;
 
         private Vector2 previousRingPointerPosition;
         private Vector2 previousCameraPointerPosition;
@@ -60,6 +63,8 @@ namespace AnchorDefense
             orbitTarget = target;
             input = inputController;
             cubeZoneGrid = FindObjectOfType<CubeZoneGridController>(true);
+            selectableRings = FindObjectsOfType<OrbitRingController>(true);
+            Array.Sort(selectableRings, (a, b) => a.RingId.CompareTo(b.RingId));
 
             fixedCameraPosition = gameplayCamera.transform.position;
             fixedCameraRotation = gameplayCamera.transform.rotation;
@@ -127,8 +132,43 @@ namespace AnchorDefense
                 CycleCameraOrbitMode();
             }
 
+            HandleGamepadInput();
+
             HandleRingInput();
             HandleCameraInput();
+        }
+
+        private void HandleGamepadInput()
+        {
+            if (input.CycleRing.WasPressedThisFrame())
+            {
+                SelectNextRing();
+            }
+
+            float ringAxis = input.RingAxis.ReadValue<float>();
+            if (Mathf.Abs(ringAxis) > 0.05f && Time.deltaTime > 0f)
+            {
+                if (selectedRing == null) SelectNextRing();
+                selectedRing?.RotateByDrag(
+                    ringAxis * 260f * Time.deltaTime,
+                    ringRotationSensitivity * GameSettingsService.Current.ringDragSensitivity);
+            }
+
+            Vector2 cameraAxis = input.CameraOrbit.ReadValue<Vector2>();
+            if (input.CameraOrbitPress.IsPressed() && cameraAxis.sqrMagnitude > 0.01f && Time.deltaTime > 0f)
+            {
+                ApplyCameraOrbitDelta(
+                    cameraAxis * 260f * Time.deltaTime * GameSettingsService.Current.cameraOrbitSensitivity);
+            }
+        }
+
+        private void SelectNextRing()
+        {
+            if (selectableRings == null || selectableRings.Length == 0) return;
+            selectedRing?.SetSelected(false);
+            selectedRingIndex = (selectedRingIndex + 1) % selectableRings.Length;
+            selectedRing = selectableRings[selectedRingIndex];
+            selectedRing?.SetSelected(true);
         }
 
         private void HandleRingInput()
@@ -342,6 +382,11 @@ namespace AnchorDefense
             selectedRing?.SetSelected(false);
 
             selectedRing = nextSelection;
+
+            if (selectedRing != null && selectableRings != null)
+            {
+                selectedRingIndex = Array.IndexOf(selectableRings, selectedRing);
+            }
 
             selectedRing?.SetSelected(true);
             return nextSelection != null;

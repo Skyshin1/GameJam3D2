@@ -27,8 +27,17 @@ MonoBehaviour:
   <ProjectilePrefab>k__BackingField: {fileID: 3928814468507712704, guid: 3611861485cf92942aa89325b992c2b1,
     type: 3}
   <ProjectileColor>k__BackingField: {r: 1, g: 0.22, b: 0.08, a: 1}
+  <OrbitRadius>k__BackingField: 13
+  <OrbitAxis>k__BackingField: {x: 0, y: 1, z: 0}
+  <OrbitHeight>k__BackingField: 0
+  <OrbitAngularSpeed>k__BackingField: 35
+  <OrbitPositionSmoothness>k__BackingField: 8
+  <OrbitProjectileFireOffset>k__BackingField: 0.85
+  <OrbitBobAmplitude>k__BackingField: 1.2
+  <OrbitBobFrequency>k__BackingField: 0.65
+  <RandomizeOrbitBobPhase>k__BackingField: 1
   <Size>k__BackingField: 0.55
-  <BaseColor>k__BackingField: {r: 0.92, g: 0.16, b: 0.25, a: 1}
+  <BaseColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <HitColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <HitFlashDuration>k__BackingField: 0.1
   <HitEffectPrefab>k__BackingField: {fileID: -6159039040866376367, guid: 5eff8f0e0d3965a44ac5515a2b0aa180,

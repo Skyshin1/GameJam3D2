@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11214723a5b34068b0246b3a65df27b0, type: 3}
   m_Name: CubeZoneConfig
   m_EditorClassIdentifier: 
-  <CubeSize>k__BackingField: 10.5
+  <CubeSize>k__BackingField: 10
   <SelectedCubeColor>k__BackingField: {r: 1, g: 1, b: 1, a: 0.05}
   <SwapTargetColor>k__BackingField: {r: 0.3, g: 1, b: 0.9, a: 0.2}
   <AvailableHintColor>k__BackingField: {r: 0.32637152, g: 0.41906303, b: 0.46540874,

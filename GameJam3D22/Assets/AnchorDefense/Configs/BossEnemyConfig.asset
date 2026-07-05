@@ -10,37 +10,37 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29b005f2de3d2af4e9f646374938ce14, type: 3}
-  m_Name: EnemyConfig_Ranged
+  m_Name: BossEnemyConfig
   m_EditorClassIdentifier: 
-  <Prefab>k__BackingField: {fileID: 4480680133650565963, guid: 2d299ae9231bd0b4aa340ce9b22b40aa,
+  <Prefab>k__BackingField: {fileID: 4480680133650565963, guid: ac292c2c7b597564abebb1aa51f3d8bc,
     type: 3}
-  <MaxHealth>k__BackingField: 36
-  <MoveSpeed>k__BackingField: 1.25
-  <CoreDamage>k__BackingField: 0
-  <AttackMode>k__BackingField: 1
+  <MaxHealth>k__BackingField: 100
+  <MoveSpeed>k__BackingField: 1.8
+  <CoreDamage>k__BackingField: 10
+  <AttackMode>k__BackingField: 2
   <RangedStopRadius>k__BackingField: 10.5
-  <FireInterval>k__BackingField: 2.2
-  <ProjectileDamage>k__BackingField: 18
-  <ProjectileSpeed>k__BackingField: 8
+  <FireInterval>k__BackingField: 2
+  <ProjectileDamage>k__BackingField: 30
+  <ProjectileSpeed>k__BackingField: 10
   <ProjectileLifetime>k__BackingField: 4
   <ProjectileHitRadius>k__BackingField: 0.18
   <ProjectilePrefab>k__BackingField: {fileID: 3928814468507712704, guid: 3611861485cf92942aa89325b992c2b1,
     type: 3}
-  <ProjectileColor>k__BackingField: {r: 1, g: 0.15, b: 0.04, a: 1}
-  <OrbitRadius>k__BackingField: 13
+  <ProjectileColor>k__BackingField: {r: 1, g: 0.22, b: 0.08, a: 1}
+  <OrbitRadius>k__BackingField: 15
   <OrbitAxis>k__BackingField: {x: 0, y: 1, z: 0}
   <OrbitHeight>k__BackingField: 0
   <OrbitAngularSpeed>k__BackingField: 35
   <OrbitPositionSmoothness>k__BackingField: 8
   <OrbitProjectileFireOffset>k__BackingField: 0.85
-  <OrbitBobAmplitude>k__BackingField: 1.2
+  <OrbitBobAmplitude>k__BackingField: 2
   <OrbitBobFrequency>k__BackingField: 0.65
   <RandomizeOrbitBobPhase>k__BackingField: 1
-  <Size>k__BackingField: 0.62
+  <Size>k__BackingField: 0.55
   <BaseColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <HitColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <HitFlashDuration>k__BackingField: 0.1
-  <HitEffectPrefab>k__BackingField: {fileID: 1501207461257158460, guid: db43b879890749f40bb21b4017ec477f,
+  <HitEffectPrefab>k__BackingField: {fileID: -6159039040866376367, guid: 5eff8f0e0d3965a44ac5515a2b0aa180,
     type: 3}
-  <DeathEffectPrefab>k__BackingField: {fileID: 1485718088780051649, guid: 3f5cd603e6c4fc249b2bfcce88cdc0c0,
+  <DeathEffectPrefab>k__BackingField: {fileID: 5660198245418926790, guid: 009079b785f659a4b90ae3917a06e3e3,
     type: 3}

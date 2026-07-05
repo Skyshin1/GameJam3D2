@@ -224,6 +224,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9921889e39da92a4eb38987d4a765832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossConfig: {fileID: 11400000, guid: ed714a0f48998a945827d173ad53d9e0, type: 2}
+  bossEveryNormalEnemyCount: 10
+  bossPrewarmCount: 2
+  maxAliveBossCount: 1
 --- !u!114 &34095173
 MonoBehaviour:
   m_ObjectHideFlags: 0

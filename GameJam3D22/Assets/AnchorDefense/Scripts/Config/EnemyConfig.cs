@@ -5,7 +5,8 @@ namespace AnchorDefense
     public enum EnemyAttackMode
     {
         ContactCore,
-        RangedTurret
+        RangedTurret,
+        OrbitTurretBoss
     }
 
     [CreateAssetMenu(menuName = "Anchor Defense/Enemy Config", fileName = "EnemyConfig")]
@@ -29,6 +30,19 @@ namespace AnchorDefense
         [field: SerializeField, Min(0.01f)] public float ProjectileHitRadius { get; private set; } = 0.18f;
         [field: SerializeField] public EnemyProjectileController ProjectilePrefab { get; private set; }
         [field: SerializeField] public Color ProjectileColor { get; private set; } = new Color(1f, 0.22f, 0.08f);
+
+        [field: Header("Orbit Boss")]
+        [field: SerializeField, Min(0.1f)] public float OrbitRadius { get; private set; } = 13f;
+        [field: SerializeField] public Vector3 OrbitAxis { get; private set; } = Vector3.up;
+        [field: SerializeField] public float OrbitHeight { get; private set; } = 0f;
+        [field: SerializeField, Min(1f)] public float OrbitAngularSpeed { get; private set; } = 35f;
+        [field: SerializeField, Min(0.1f)] public float OrbitPositionSmoothness { get; private set; } = 8f;
+        [field: SerializeField, Min(0f)] public float OrbitProjectileFireOffset { get; private set; } = 0.85f;
+
+        [field: Header("Orbit Boss Floating")]
+        [field: SerializeField, Min(0f)] public float OrbitBobAmplitude { get; private set; } = 1.2f;
+        [field: SerializeField, Min(0f)] public float OrbitBobFrequency { get; private set; } = 0.65f;
+        [field: SerializeField] public bool RandomizeOrbitBobPhase { get; private set; } = true;
 
         [field: Header("Presentation")]
         [field: SerializeField, Min(0.05f)] public float Size { get; private set; } = 0.55f;

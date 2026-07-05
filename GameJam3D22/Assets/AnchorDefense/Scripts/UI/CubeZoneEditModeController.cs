@@ -103,6 +103,22 @@ namespace AnchorDefense
             {
                 grid.TryRotateSelectedHorizontalLayer(1);
             }
+            else if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedDepthLayer(-1);
+            }
+            else if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedDepthLayer(1);
+            }
+            else if (Keyboard.current.upArrowKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedWidthLayer(1);
+            }
+            else if (Keyboard.current.downArrowKey.wasPressedThisFrame)
+            {
+                grid.TryRotateSelectedWidthLayer(-1);
+            }
         }
 
         public void ShowFragmentTooltip(CubeZoneEffectDefinition effect, bool unlocked)

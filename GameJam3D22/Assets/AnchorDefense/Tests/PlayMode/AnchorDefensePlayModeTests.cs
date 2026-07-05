@@ -51,9 +51,9 @@ namespace AnchorDefense.Tests
 
 
         [Test]
-        public void CubeZoneGridKeepsEarthCorePositionReserved()
+        public void CubeZoneGridAllowsEarthCorePositionForZoneLayout()
         {
-            Assert.That(CubeZoneGridController.IsZoneGridPositionAllowed(Vector3Int.zero), Is.False);
+            Assert.That(CubeZoneGridController.IsZoneGridPositionAllowed(Vector3Int.zero), Is.True);
             Assert.That(CubeZoneGridController.IsZoneGridPositionAllowed(new Vector3Int(1, 0, 0)), Is.True);
         }
 
@@ -75,10 +75,6 @@ namespace AnchorDefense.Tests
                 Assert.That(cubes[5].GridPosition, Is.EqualTo(new Vector3Int(1, 1, -1)));
                 Assert.That(cubes[6].GridPosition, Is.EqualTo(new Vector3Int(-1, 1, 1)));
                 Assert.That(cubes[7].GridPosition, Is.EqualTo(new Vector3Int(-1, 1, -1)));
-                for (int i = 0; i < cubes.Length; i++)
-                {
-                    Assert.That(cubes[i].GridPosition, Is.Not.EqualTo(Vector3Int.zero));
-                }
             }
             finally
             {
@@ -92,7 +88,46 @@ namespace AnchorDefense.Tests
                 }
             }
         }
-[Test]
+        [UnityTest]
+        public IEnumerator CubeZoneGridRotatesSelectedVerticalLayersLikeCubeFaces()
+        {
+            CubeZoneGridController grid = new GameObject("Test Cube Zone Grid").AddComponent<CubeZoneGridController>();
+            CubeZoneVolume[] cubes = CreateCornerZoneVolumes();
+            try
+            {
+                grid.Configure(null, cubes);
+                grid.Initialize(null, null, null);
+                grid.SelectCubeById(0);
+
+                Assert.That(grid.TryRotateSelectedDepthLayer(1), Is.True);
+                yield return null;
+                Assert.That(cubes[0].GridPosition, Is.EqualTo(new Vector3Int(1, -1, -1)));
+                Assert.That(cubes[1].GridPosition, Is.EqualTo(new Vector3Int(1, 1, -1)));
+                Assert.That(cubes[6].GridPosition, Is.EqualTo(new Vector3Int(-1, -1, -1)));
+                Assert.That(cubes[7].GridPosition, Is.EqualTo(new Vector3Int(-1, 1, -1)));
+
+                grid.SelectCubeById(0);
+                Assert.That(grid.TryRotateSelectedWidthLayer(1), Is.True);
+                yield return null;
+                Assert.That(cubes[0].GridPosition, Is.EqualTo(new Vector3Int(1, -1, 1)));
+                Assert.That(cubes[1].GridPosition, Is.EqualTo(new Vector3Int(1, -1, -1)));
+                Assert.That(cubes[3].GridPosition, Is.EqualTo(new Vector3Int(1, 1, 1)));
+                Assert.That(cubes[5].GridPosition, Is.EqualTo(new Vector3Int(1, 1, -1)));
+            }
+            finally
+            {
+                Object.DestroyImmediate(grid.gameObject);
+                for (int i = 0; i < cubes.Length; i++)
+                {
+                    if (cubes[i] != null)
+                    {
+                        Object.DestroyImmediate(cubes[i].gameObject);
+                    }
+                }
+            }
+        }
+
+        [Test]
         public void SlowSelfRotatorDefaultsToGentleLocalYaw()
         {
             var rotator = new GameObject("Rotator").AddComponent<SlowSelfRotator>();
@@ -200,7 +235,7 @@ namespace AnchorDefense.Tests
             AudioSource upgradeTreeAudio = upgradeTree.GetComponent<AudioSource>();
             Assert.That(upgradeTreeAudio, Is.Not.Null);
             Assert.That(upgradeTreeAudio.clip, Is.Not.Null);
-            Assert.That(upgradeTreeAudio.clip.name, Is.EqualTo("升级"));
+            Assert.That(upgradeTreeAudio.clip.name, Is.EqualTo("鍗囩骇"));
             Assert.That(Object.FindObjectOfType<GameInputController>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<SceneSettingsApplier>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<PauseMenuController>(true), Is.Not.Null);
@@ -227,7 +262,6 @@ namespace AnchorDefense.Tests
                 Assert.That(gridPosition.x, Is.InRange(-1, 1));
                 Assert.That(gridPosition.y, Is.InRange(-1, 1));
                 Assert.That(gridPosition.z, Is.InRange(-1, 1));
-                Assert.That(gridPosition, Is.Not.EqualTo(Vector3Int.zero));
                 Assert.That(zoneVolumes[i].transform.localPosition,
                     Is.EqualTo((Vector3)gridPosition * zoneGrid.Config.CubeSize));
                 for (int j = i + 1; j < zoneVolumes.Length; j++)

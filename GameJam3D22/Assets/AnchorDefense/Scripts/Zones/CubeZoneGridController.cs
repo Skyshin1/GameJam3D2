@@ -205,9 +205,36 @@ namespace AnchorDefense
                    TryRotateHorizontalLayer(selectedCube.GridPosition.y, quarterTurns);
         }
 
+        public bool TryRotateSelectedDepthLayer(int quarterTurns)
+        {
+            return selectedCube != null &&
+                   TryRotateDepthLayer(selectedCube.GridPosition.z, quarterTurns);
+        }
+
+        public bool TryRotateSelectedWidthLayer(int quarterTurns)
+        {
+            return selectedCube != null &&
+                   TryRotateWidthLayer(selectedCube.GridPosition.x, quarterTurns);
+        }
+
         public bool TryRotateHorizontalLayer(int layerY, int quarterTurns)
         {
-            if (layerY < MinimumGridCoordinate || layerY > MaximumGridCoordinate)
+            return TryRotateLayer(layerY, quarterTurns, 1);
+        }
+
+        public bool TryRotateDepthLayer(int layerZ, int quarterTurns)
+        {
+            return TryRotateLayer(layerZ, quarterTurns, 2);
+        }
+
+        public bool TryRotateWidthLayer(int layerX, int quarterTurns)
+        {
+            return TryRotateLayer(layerX, quarterTurns, 0);
+        }
+
+        private bool TryRotateLayer(int layerCoordinate, int quarterTurns, int axis)
+        {
+            if (layerCoordinate < MinimumGridCoordinate || layerCoordinate > MaximumGridCoordinate)
             {
                 return false;
             }
@@ -225,12 +252,12 @@ namespace AnchorDefense
             for (int i = 0; i < cubeById.Length; i++)
             {
                 CubeZoneVolume cube = cubeById[i];
-                if (cube == null || cube.GridPosition.y != layerY)
+                if (cube == null || GetAxisCoordinate(cube.GridPosition, axis) != layerCoordinate)
                 {
                     continue;
                 }
 
-                Vector3Int target = RotateHorizontalPosition(cube.GridPosition, normalizedTurns);
+                Vector3Int target = RotatePositionAroundAxis(cube.GridPosition, normalizedTurns, axis);
                 if (!IsZoneGridPositionAllowed(target))
                 {
                     return false;
@@ -259,7 +286,6 @@ namespace AnchorDefense
             LayoutChanged?.Invoke();
             return true;
         }
-
         public CubeZoneVolume FindCubeUnderPointer(Camera camera, Vector2 pointerPosition)
         {
             return FindClosestCubeByScreenPosition(camera, pointerPosition, 1f);
@@ -863,12 +889,7 @@ namespace AnchorDefense
 
         public static bool IsZoneGridPositionAllowed(Vector3Int position)
         {
-            return IsInsideAllowedGrid(position) && !IsEarthCoreGridPosition(position);
-        }
-
-        private static bool IsEarthCoreGridPosition(Vector3Int position)
-        {
-            return position == EarthCoreGridPosition;
+            return IsInsideAllowedGrid(position);
         }
 
         private static int NormalizeQuarterTurns(int quarterTurns)
@@ -877,12 +898,30 @@ namespace AnchorDefense
             return normalized < 0 ? normalized + 4 : normalized;
         }
 
-        private static Vector3Int RotateHorizontalPosition(Vector3Int position, int normalizedQuarterTurns)
+        private static int GetAxisCoordinate(Vector3Int position, int axis)
+        {
+            if (axis == 0) return position.x;
+            if (axis == 1) return position.y;
+            return position.z;
+        }
+
+        private static Vector3Int RotatePositionAroundAxis(Vector3Int position, int normalizedQuarterTurns, int axis)
         {
             Vector3Int result = position;
             for (int i = 0; i < normalizedQuarterTurns; i++)
             {
-                result = new Vector3Int(result.z, result.y, -result.x);
+                if (axis == 0)
+                {
+                    result = new Vector3Int(result.x, result.z, -result.y);
+                }
+                else if (axis == 1)
+                {
+                    result = new Vector3Int(result.z, result.y, -result.x);
+                }
+                else
+                {
+                    result = new Vector3Int(-result.y, result.x, result.z);
+                }
             }
 
             return result;

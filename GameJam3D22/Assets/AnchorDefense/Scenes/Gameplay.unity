@@ -1,4 +1,4 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -2020,6 +2020,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 12800000, guid: eb77e2ee4e840fa44acb7f1ca5801e8d,
         type: 3}
+    - target: {fileID: 555695329376110304, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 558590080266185155, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2061,6 +2066,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 914662136493696202, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 976649758431667925, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
@@ -2607,6 +2617,11 @@ PrefabInstance:
     - target: {fileID: 7798094591677056983, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798094591677056983, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7907437648735622831, guid: 6634f3a1a6dea0f449892c505b290d02,

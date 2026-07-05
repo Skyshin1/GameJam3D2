@@ -27,7 +27,9 @@ MonoBehaviour:
   <EnemySpeedMultiplier>k__BackingField: 1
   <EnemyDamagePerSecond>k__BackingField: 0
   <EnemyDamageTakenMultiplier>k__BackingField: 1
-  <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: bc9793ba6a1099e41a8829e238f04f67, type: 2}
+  <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: bc9793ba6a1099e41a8829e238f04f67,
+    type: 2}
   <ZoneVfxPrefab>k__BackingField: {fileID: 0}
-  <TurretVfxPrefab>k__BackingField: {fileID: 0}
+  <TurretVfxPrefab>k__BackingField: {fileID: 6064416128017296509, guid: 19e5db5ae33001f4ba1243b99612dd38,
+    type: 3}
   <EnemyVfxPrefab>k__BackingField: {fileID: 0}

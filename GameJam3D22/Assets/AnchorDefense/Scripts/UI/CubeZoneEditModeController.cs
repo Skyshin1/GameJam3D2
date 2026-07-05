@@ -103,19 +103,19 @@ namespace AnchorDefense
             {
                 grid.TryRotateSelectedHorizontalLayer(1);
             }
-            else if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
+            else if (Keyboard.current.zKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedDepthLayer(-1);
             }
-            else if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
+            else if (Keyboard.current.cKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedDepthLayer(1);
             }
-            else if (Keyboard.current.upArrowKey.wasPressedThisFrame)
+            else if (Keyboard.current.sKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedWidthLayer(1);
             }
-            else if (Keyboard.current.downArrowKey.wasPressedThisFrame)
+            else if (Keyboard.current.xKey.wasPressedThisFrame)
             {
                 grid.TryRotateSelectedWidthLayer(-1);
             }

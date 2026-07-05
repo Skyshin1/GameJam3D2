@@ -120,62 +120,72 @@ public class ScreenSpaceOutlines : ScriptableRendererFeature
             ConfigureClear(ClearFlag.Color, settings.backgroundColor);
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (screenSpaceOutlineMaterial == null || normalsMaterial == null)
+                return;
+
+            RTHandle cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
+            if (cameraColorTarget == null || cameraColorTarget.rt == null)
+                return;
+
+            if (normals == null || normals.rt == null)
                 return;
 
             if (temporaryBuffer == null || temporaryBuffer.rt == null)
                 return;
 
             CommandBuffer cmd = CommandBufferPool.Get("ScreenSpaceOutlines");
-
-            using (new ProfilingScope(cmd, new ProfilingSampler("ScreenSpaceOutlines")))
+            try
             {
+                using (new ProfilingScope(cmd, new ProfilingSampler("ScreenSpaceOutlines")))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+
+                    DrawingSettings drawSettings = CreateDrawingSettings(
+                        shaderTagIdList,
+                        ref renderingData,
+                        renderingData.cameraData.defaultOpaqueSortFlags
+                    );
+
+                    drawSettings.perObjectData = settings.perObjectData;
+                    drawSettings.enableDynamicBatching = settings.enableDynamicBatching;
+                    drawSettings.enableInstancing = settings.enableInstancing;
+                    drawSettings.overrideMaterial = normalsMaterial;
+
+                    RendererListParams rendererListParams = new RendererListParams(
+                        renderingData.cullResults,
+                        drawSettings,
+                        filteringSettings
+                    );
+
+                    RendererList rendererList = context.CreateRendererList(ref rendererListParams);
+                    cmd.DrawRendererList(rendererList);
+
+                    cmd.SetGlobalTexture(SceneViewSpaceNormalsID, normals);
+
+                    Blitter.BlitCameraTexture(
+                        cmd,
+                        cameraColorTarget,
+                        temporaryBuffer,
+                        screenSpaceOutlineMaterial,
+                        0
+                    );
+
+                    Blitter.BlitCameraTexture(
+                        cmd,
+                        temporaryBuffer,
+                        cameraColorTarget
+                    );
+                }
+
                 context.ExecuteCommandBuffer(cmd);
-                cmd.Clear();
-
-                DrawingSettings drawSettings = CreateDrawingSettings(
-                    shaderTagIdList,
-                    ref renderingData,
-                    renderingData.cameraData.defaultOpaqueSortFlags
-                );
-
-                drawSettings.perObjectData = settings.perObjectData;
-                drawSettings.enableDynamicBatching = settings.enableDynamicBatching;
-                drawSettings.enableInstancing = settings.enableInstancing;
-                drawSettings.overrideMaterial = normalsMaterial;
-
-                RendererListParams rendererListParams = new RendererListParams(
-                    renderingData.cullResults,
-                    drawSettings,
-                    filteringSettings
-                );
-
-                RendererList rendererList = context.CreateRendererList(ref rendererListParams);
-                cmd.DrawRendererList(rendererList);
-
-                cmd.SetGlobalTexture(SceneViewSpaceNormalsID, normals);
-
-                RTHandle cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-                Blitter.BlitCameraTexture(
-                    cmd,
-                    cameraColorTarget,
-                    temporaryBuffer,
-                    screenSpaceOutlineMaterial,
-                    0
-                );
-
-                Blitter.BlitCameraTexture(
-                    cmd,
-                    temporaryBuffer,
-                    cameraColorTarget
-                );
             }
-
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+            finally
+            {
+                CommandBufferPool.Release(cmd);
+            }
         }
 
         public void Release()
@@ -206,14 +216,14 @@ public class ScreenSpaceOutlines : ScriptableRendererFeature
 
         if (outlineShader == null)
         {
-            Debug.LogError("ScreenSpaceOutlines: ÕÒ²»µ½ Shader \"Hidden/Outlines\"¡£Çë¼ì²é Outlines Shader µÚÒ»ÐÐµÄÃû×Ö¡£");
+            Debug.LogError("ScreenSpaceOutlines: ï¿½Ò²ï¿½ï¿½ï¿½ Shader \"Hidden/Outlines\"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Outlines Shader ï¿½ï¿½Ò»ï¿½Ðµï¿½ï¿½ï¿½ï¿½Ö¡ï¿½");
             screenSpaceOutlinePass = null;
             return;
         }
 
         if (normalsShader == null)
         {
-            Debug.LogError("ScreenSpaceOutlines: ÕÒ²»µ½ Shader \"Hidden/ViewSpaceNormals\"¡£Çë¼ì²é ViewSpaceNormals Shader µÚÒ»ÐÐµÄÃû×Ö¡£");
+            Debug.LogError("ScreenSpaceOutlines: ï¿½Ò²ï¿½ï¿½ï¿½ Shader \"Hidden/ViewSpaceNormals\"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ViewSpaceNormals Shader ï¿½ï¿½Ò»ï¿½Ðµï¿½ï¿½ï¿½ï¿½Ö¡ï¿½");
             screenSpaceOutlinePass = null;
             return;
         }

@@ -15,7 +15,7 @@ MonoBehaviour:
   <Id>k__BackingField: zone.turret.health
   <DisplayName>k__BackingField: "\u9EC4\u8272\uFF1A\u751F\u547D\u951A\u5B9A"
   <Description>k__BackingField: "\u533A\u57DF\u5185\u6240\u6709\u53CB\u65B9\u70AE\u5854\u6700\u5927\u751F\u547D\u63D0\u9AD8
-    50%\u3002"
+    50%"
   <Icon>k__BackingField: {fileID: 0}
   <ZoneColor>k__BackingField: {r: 1, g: 0.82, b: 0.08, a: 0.12}
   <EffectType>k__BackingField: 4
@@ -27,7 +27,9 @@ MonoBehaviour:
   <EnemySpeedMultiplier>k__BackingField: 1
   <EnemyDamagePerSecond>k__BackingField: 0
   <EnemyDamageTakenMultiplier>k__BackingField: 1
-  <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: b9dcd4ea5992a0649aeeea206af2a75f, type: 2}
+  <UnlockRequirement>k__BackingField: {fileID: 11400000, guid: b9dcd4ea5992a0649aeeea206af2a75f,
+    type: 2}
   <ZoneVfxPrefab>k__BackingField: {fileID: 0}
-  <TurretVfxPrefab>k__BackingField: {fileID: 0}
+  <TurretVfxPrefab>k__BackingField: {fileID: 419230059809877750, guid: 0f933251899050c4dadc659948e75471,
+    type: 3}
   <EnemyVfxPrefab>k__BackingField: {fileID: 0}

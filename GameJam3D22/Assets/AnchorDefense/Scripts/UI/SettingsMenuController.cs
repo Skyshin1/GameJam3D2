@@ -49,8 +49,10 @@ namespace AnchorDefense
 
         private readonly List<Resolution> resolutions = new List<Resolution>();
         private readonly int[] frameRates = { 30, 60, 120, -1 };
+
         private int selectedCategoryIndex;
         private bool dropdownExpandedLastFrame;
+        private CanvasGroup panelCanvasGroup;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
         public event Action Closed;
@@ -119,27 +121,51 @@ namespace AnchorDefense
         {
             GameSettingsService.EnsureLoaded();
             InputBindingPersistence.Load(inputActions);
+
             BuildOptions();
             WireEvents();
             ConfigureCategoryNavigation();
             EnsureGamepadBindingRows();
-            for (int i = 0; i < rebindRows.Length; i++)
+
+            if (rebindRows != null)
             {
-                rebindRows[i]?.Initialize(inputActions);
+                for (int i = 0; i < rebindRows.Length; i++)
+                {
+                    rebindRows[i]?.Initialize(inputActions);
+                }
             }
-            ControllerSelectionHighlight.EnsureInHierarchy(panelRoot.transform);
-            panelRoot.SetActive(false);
+
+            if (panelRoot != null)
+            {
+                ControllerSelectionHighlight.EnsureInHierarchy(panelRoot.transform);
+
+                panelCanvasGroup = panelRoot.GetComponent<CanvasGroup>();
+                if (panelCanvasGroup == null)
+                {
+                    panelCanvasGroup = panelRoot.AddComponent<CanvasGroup>();
+                }
+            }
+
+            SetPanelVisible(false);
         }
 
         private void EnsureGamepadBindingRows()
         {
-            if (rebindRows == null || rebindRows.Length == 0) return;
+            if (rebindRows == null || rebindRows.Length == 0)
+            {
+                return;
+            }
+
             for (int i = 0; i < rebindRows.Length; i++)
             {
-                if (rebindRows[i] != null && rebindRows[i].name.Contains("Gamepad Rebind")) return;
+                if (rebindRows[i] != null && rebindRows[i].name.Contains("Gamepad Rebind"))
+                {
+                    return;
+                }
             }
 
             var rows = new List<InputRebindRow>(rebindRows);
+
             string[] gamepadActions =
             {
                 "CycleRing", "CameraOrbitPress", "CycleCamera", "ToggleUpgrade", "Pause"
@@ -149,7 +175,11 @@ namespace AnchorDefense
             for (int i = 0; i < sourceCount; i++)
             {
                 InputRebindRow keyboardRow = rebindRows[i];
-                if (keyboardRow == null || keyboardRow.RebindButton == null) continue;
+                if (keyboardRow == null || keyboardRow.RebindButton == null)
+                {
+                    continue;
+                }
+
                 PrepareKeyboardColumn(keyboardRow);
                 rows.Add(CloneBindingButton(keyboardRow, gamepadActions[i], "Gamepad", -150f));
             }
@@ -159,21 +189,32 @@ namespace AnchorDefense
             {
                 RectTransform pauseRect = pauseRow.RebindButton.transform as RectTransform;
                 float newY = pauseRect != null ? pauseRect.anchoredPosition.y - 58f : -550f;
+
                 CloneNearestLabel(pauseRow.RebindButton.transform.parent, pauseRect, newY, "锚域编织");
 
-                GameObject keyboardClone = Instantiate(pauseRow.RebindButton.gameObject,
+                GameObject keyboardClone = Instantiate(
+                    pauseRow.RebindButton.gameObject,
                     pauseRow.RebindButton.transform.parent);
+
                 keyboardClone.name = "ToggleZoneEdit Keyboard Rebind";
+
                 RectTransform keyboardRect = keyboardClone.transform as RectTransform;
-                keyboardRect.sizeDelta = new Vector2(230f, 42f);
-                keyboardRect.anchoredPosition = new Vector2(-430f, newY);
+                if (keyboardRect != null)
+                {
+                    keyboardRect.sizeDelta = new Vector2(230f, 42f);
+                    keyboardRect.anchoredPosition = new Vector2(-430f, newY);
+                }
+
                 InputRebindRow keyboardZone = keyboardClone.GetComponent<InputRebindRow>();
                 Button keyboardButton = keyboardClone.GetComponent<Button>();
                 Text keyboardText = keyboardClone.GetComponentInChildren<Text>();
-                keyboardZone.Configure("Gameplay", "ToggleZoneEdit", "Keyboard&Mouse", keyboardButton, keyboardText);
-                rows.Add(keyboardZone);
 
-                rows.Add(CloneBindingButton(keyboardZone, "ToggleZoneEdit", "Gamepad", -150f));
+                if (keyboardZone != null)
+                {
+                    keyboardZone.Configure("Gameplay", "ToggleZoneEdit", "Keyboard&Mouse", keyboardButton, keyboardText);
+                    rows.Add(keyboardZone);
+                    rows.Add(CloneBindingButton(keyboardZone, "ToggleZoneEdit", "Gamepad", -150f));
+                }
             }
 
             rebindRows = rows.ToArray();
@@ -181,72 +222,155 @@ namespace AnchorDefense
 
         private InputRebindRow FindRow(string action)
         {
+            if (rebindRows == null)
+            {
+                return null;
+            }
+
             for (int i = 0; i < rebindRows.Length; i++)
             {
-                if (rebindRows[i] != null && rebindRows[i].ActionName == action) return rebindRows[i];
+                if (rebindRows[i] != null && rebindRows[i].ActionName == action)
+                {
+                    return rebindRows[i];
+                }
             }
+
             return null;
         }
 
         private static void PrepareKeyboardColumn(InputRebindRow row)
         {
+            if (row == null || row.RebindButton == null)
+            {
+                return;
+            }
+
             RectTransform rect = row.RebindButton.transform as RectTransform;
-            if (rect == null) return;
+            if (rect == null)
+            {
+                return;
+            }
+
             rect.sizeDelta = new Vector2(230f, 42f);
             rect.anchoredPosition = new Vector2(-430f, rect.anchoredPosition.y);
             row.Configure("Gameplay", row.ActionName, "Keyboard&Mouse", row.RebindButton, row.BindingText);
         }
 
-        private static InputRebindRow CloneBindingButton(InputRebindRow source, string action,
-            string group, float x)
+        private static InputRebindRow CloneBindingButton(
+            InputRebindRow source,
+            string action,
+            string group,
+            float x)
         {
-            GameObject clone = Instantiate(source.RebindButton.gameObject, source.RebindButton.transform.parent);
+            if (source == null || source.RebindButton == null)
+            {
+                return null;
+            }
+
+            GameObject clone = Instantiate(
+                source.RebindButton.gameObject,
+                source.RebindButton.transform.parent);
+
             clone.name = action + " Gamepad Rebind";
+
             RectTransform sourceRect = source.RebindButton.transform as RectTransform;
             RectTransform rect = clone.transform as RectTransform;
-            rect.sizeDelta = new Vector2(230f, 42f);
-            rect.anchoredPosition = new Vector2(x, sourceRect != null ? sourceRect.anchoredPosition.y : 0f);
+
+            if (rect != null)
+            {
+                rect.sizeDelta = new Vector2(230f, 42f);
+                rect.anchoredPosition = new Vector2(
+                    x,
+                    sourceRect != null ? sourceRect.anchoredPosition.y : 0f);
+            }
+
             Button button = clone.GetComponent<Button>();
             Text text = clone.GetComponentInChildren<Text>();
             InputRebindRow row = clone.GetComponent<InputRebindRow>();
-            row.Configure("Gameplay", action, group, button, text);
+
+            if (row != null)
+            {
+                row.Configure("Gameplay", action, group, button, text);
+            }
+
             return row;
         }
 
-        private static void CloneNearestLabel(Transform parent, RectTransform sourceButton,
-            float targetY, string labelText)
+        private static void CloneNearestLabel(
+            Transform parent,
+            RectTransform sourceButton,
+            float targetY,
+            string labelText)
         {
-            if (parent == null || sourceButton == null) return;
+            if (parent == null || sourceButton == null)
+            {
+                return;
+            }
+
             Text nearest = null;
             float nearestDistance = float.PositiveInfinity;
             Text[] texts = parent.GetComponentsInChildren<Text>(true);
+
             for (int i = 0; i < texts.Length; i++)
             {
-                if (texts[i].transform.parent != parent) continue;
+                if (texts[i].transform.parent != parent)
+                {
+                    continue;
+                }
+
                 RectTransform rect = texts[i].rectTransform;
                 float distance = Mathf.Abs(rect.anchoredPosition.y - sourceButton.anchoredPosition.y);
+
                 if (distance < nearestDistance)
                 {
                     nearest = texts[i];
                     nearestDistance = distance;
                 }
             }
-            if (nearest == null) return;
+
+            if (nearest == null)
+            {
+                return;
+            }
+
             Text clone = Instantiate(nearest, parent);
             clone.name = labelText + " Label";
             clone.text = labelText;
-            clone.rectTransform.anchoredPosition = new Vector2(nearest.rectTransform.anchoredPosition.x, targetY);
+            clone.rectTransform.anchoredPosition =
+                new Vector2(nearest.rectTransform.anchoredPosition.x, targetY);
         }
 
         private void OnDestroy()
         {
-            closeButton.onClick.RemoveListener(Close);
-            applyButton.onClick.RemoveListener(Apply);
-            resetDefaultsButton.onClick.RemoveListener(ResetDefaults);
-            resetBindingsButton.onClick.RemoveListener(ResetBindings);
-            for (int i = 0; i < categoryButtons.Length; i++)
+            if (closeButton != null)
             {
-                categoryButtons[i].onClick.RemoveAllListeners();
+                closeButton.onClick.RemoveListener(Close);
+            }
+
+            if (applyButton != null)
+            {
+                applyButton.onClick.RemoveListener(Apply);
+            }
+
+            if (resetDefaultsButton != null)
+            {
+                resetDefaultsButton.onClick.RemoveListener(ResetDefaults);
+            }
+
+            if (resetBindingsButton != null)
+            {
+                resetBindingsButton.onClick.RemoveListener(ResetBindings);
+            }
+
+            if (categoryButtons != null)
+            {
+                for (int i = 0; i < categoryButtons.Length; i++)
+                {
+                    if (categoryButtons[i] != null)
+                    {
+                        categoryButtons[i].onClick.RemoveAllListeners();
+                    }
+                }
             }
         }
 
@@ -254,8 +378,21 @@ namespace AnchorDefense
         {
             Populate(GameSettingsService.Current);
             ShowCategory(0);
-            panelRoot.SetActive(true);
+
+            SetPanelVisible(true);
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem != null)
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
+
             SelectCurrentCategory();
+
+            if (panelRoot != null)
+            {
+                ControllerSelectionHighlight.RefreshAllInHierarchy(panelRoot.transform);
+            }
         }
 
         public void Close()
@@ -264,8 +401,49 @@ namespace AnchorDefense
             {
                 return;
             }
-            panelRoot.SetActive(false);
+
+            ClearSelectionIfInsidePanel();
+            SetPanelVisible(false);
+
             Closed?.Invoke();
+        }
+
+        private void SetPanelVisible(bool visible)
+        {
+            if (panelRoot == null)
+            {
+                return;
+            }
+
+            panelRoot.SetActive(visible);
+
+            if (panelCanvasGroup != null)
+            {
+                panelCanvasGroup.alpha = 1f;
+                panelCanvasGroup.interactable = visible;
+                panelCanvasGroup.blocksRaycasts = visible;
+            }
+        }
+
+        private void ClearSelectionIfInsidePanel()
+        {
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null || panelRoot == null)
+            {
+                return;
+            }
+
+            GameObject selected = eventSystem.currentSelectedGameObject;
+            if (selected == null)
+            {
+                return;
+            }
+
+            if (selected.transform == panelRoot.transform ||
+                selected.transform.IsChildOf(panelRoot.transform))
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
         }
 
         private void Update()
@@ -284,14 +462,17 @@ namespace AnchorDefense
                     {
                         Close();
                     }
+
                     dropdownExpandedLastFrame = false;
                     return;
                 }
+
                 if (gamepad.leftShoulder.wasPressedThisFrame)
                 {
                     CycleCategory(-1);
                     return;
                 }
+
                 if (gamepad.rightShoulder.wasPressedThisFrame)
                 {
                     CycleCategory(1);
@@ -302,7 +483,11 @@ namespace AnchorDefense
             EventSystem eventSystem = EventSystem.current;
             GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
             Dropdown selectedDropdown = selected != null ? selected.GetComponent<Dropdown>() : null;
-            dropdownExpandedLastFrame = selectedDropdown != null && GameObject.Find("Dropdown List") != null;
+
+            dropdownExpandedLastFrame =
+                selectedDropdown != null &&
+                GameObject.Find("Dropdown List") != null;
+
             if (selected == null || !selected.activeInHierarchy)
             {
                 SelectCurrentCategory();
@@ -311,133 +496,336 @@ namespace AnchorDefense
 
         private bool IsAnyBindingInProgress()
         {
-            if (rebindRows == null) return false;
+            if (rebindRows == null)
+            {
+                return false;
+            }
+
             for (int i = 0; i < rebindRows.Length; i++)
             {
-                if (rebindRows[i] != null && rebindRows[i].IsRebinding) return true;
+                if (rebindRows[i] != null && rebindRows[i].IsRebinding)
+                {
+                    return true;
+                }
             }
+
             return false;
         }
 
         private void BuildOptions()
         {
-            resolutionDropdown.ClearOptions();
+            if (resolutionDropdown != null)
+            {
+                resolutionDropdown.ClearOptions();
+            }
+
             resolutions.Clear();
+
             var resolutionNames = new List<string>();
             Resolution[] available = Screen.resolutions;
+
             for (int i = 0; i < available.Length; i++)
             {
                 Resolution candidate = available[i];
-                bool duplicate = resolutions.Exists(item => item.width == candidate.width && item.height == candidate.height);
+
+                bool duplicate = resolutions.Exists(
+                    item => item.width == candidate.width &&
+                            item.height == candidate.height);
+
                 if (duplicate)
                 {
                     continue;
                 }
+
                 resolutions.Add(candidate);
                 resolutionNames.Add($"{candidate.width} × {candidate.height}");
             }
+
             if (resolutions.Count == 0)
             {
                 resolutions.Add(Screen.currentResolution);
                 resolutionNames.Add($"{Screen.currentResolution.width} × {Screen.currentResolution.height}");
             }
-            resolutionDropdown.AddOptions(resolutionNames);
 
-            screenModeDropdown.ClearOptions();
-            screenModeDropdown.AddOptions(new List<string> { "无边框全屏", "独占全屏", "窗口模式" });
-            frameRateDropdown.ClearOptions();
-            frameRateDropdown.AddOptions(new List<string> { "30 FPS", "60 FPS", "120 FPS", "不限制" });
-            qualityDropdown.ClearOptions();
-            qualityDropdown.AddOptions(new List<string>(QualitySettings.names));
-            antiAliasingDropdown.ClearOptions();
-            antiAliasingDropdown.AddOptions(new List<string> { "关闭", "FXAA", "SMAA（高质量）" });
+            resolutionDropdown?.AddOptions(resolutionNames);
+
+            if (screenModeDropdown != null)
+            {
+                screenModeDropdown.ClearOptions();
+                screenModeDropdown.AddOptions(new List<string> { "无边框全屏", "独占全屏", "窗口模式" });
+            }
+
+            if (frameRateDropdown != null)
+            {
+                frameRateDropdown.ClearOptions();
+                frameRateDropdown.AddOptions(new List<string> { "30 FPS", "60 FPS", "120 FPS", "不限制" });
+            }
+
+            if (qualityDropdown != null)
+            {
+                qualityDropdown.ClearOptions();
+                qualityDropdown.AddOptions(new List<string>(QualitySettings.names));
+            }
+
+            if (antiAliasingDropdown != null)
+            {
+                antiAliasingDropdown.ClearOptions();
+                antiAliasingDropdown.AddOptions(new List<string> { "关闭", "FXAA", "SMAA（高质量）" });
+            }
         }
 
         private void WireEvents()
         {
-            closeButton.onClick.AddListener(Close);
-            applyButton.onClick.AddListener(Apply);
-            resetDefaultsButton.onClick.AddListener(ResetDefaults);
-            resetBindingsButton.onClick.AddListener(ResetBindings);
-            for (int i = 0; i < categoryButtons.Length; i++)
+            closeButton?.onClick.AddListener(Close);
+            applyButton?.onClick.AddListener(Apply);
+            resetDefaultsButton?.onClick.AddListener(ResetDefaults);
+            resetBindingsButton?.onClick.AddListener(ResetBindings);
+
+            if (categoryButtons != null)
             {
-                int index = i;
-                categoryButtons[i].onClick.AddListener(() => ShowCategory(index));
+                for (int i = 0; i < categoryButtons.Length; i++)
+                {
+                    int index = i;
+
+                    if (categoryButtons[i] != null)
+                    {
+                        categoryButtons[i].onClick.AddListener(() => ShowCategory(index));
+                    }
+                }
             }
 
-            brightnessSlider.onValueChanged.AddListener(_ => brightnessValue.text = brightnessSlider.value.ToString("+0.0;-0.0;0.0"));
-            masterVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
-            musicVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
-            soundEffectsVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
-            ringSensitivitySlider.onValueChanged.AddListener(_ => ringSensitivityValue.text = ringSensitivitySlider.value.ToString("0.00") + "×");
-            cameraSensitivitySlider.onValueChanged.AddListener(_ => cameraSensitivityValue.text = cameraSensitivitySlider.value.ToString("0.00") + "×");
+            if (brightnessSlider != null && brightnessValue != null)
+            {
+                brightnessSlider.onValueChanged.AddListener(
+                    _ => brightnessValue.text = brightnessSlider.value.ToString("+0.0;-0.0;0.0"));
+            }
+
+            masterVolumeSlider?.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
+            musicVolumeSlider?.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
+            soundEffectsVolumeSlider?.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
+
+            if (ringSensitivitySlider != null && ringSensitivityValue != null)
+            {
+                ringSensitivitySlider.onValueChanged.AddListener(
+                    _ => ringSensitivityValue.text = ringSensitivitySlider.value.ToString("0.00") + "×");
+            }
+
+            if (cameraSensitivitySlider != null && cameraSensitivityValue != null)
+            {
+                cameraSensitivitySlider.onValueChanged.AddListener(
+                    _ => cameraSensitivityValue.text = cameraSensitivitySlider.value.ToString("0.00") + "×");
+            }
         }
 
         private void HandleAudioVolumeChanged()
         {
-            masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%";
-            musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%";
-            soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%";
+            if (masterVolumeValue != null && masterVolumeSlider != null)
+            {
+                masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%";
+            }
+
+            if (musicVolumeValue != null && musicVolumeSlider != null)
+            {
+                musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%";
+            }
+
+            if (soundEffectsVolumeValue != null && soundEffectsVolumeSlider != null)
+            {
+                soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%";
+            }
 
             GameSettingsData settings = GameSettingsService.Current.Clone();
-            settings.masterVolume = masterVolumeSlider.value;
-            settings.musicVolume = musicVolumeSlider.value;
-            settings.soundEffectsVolume = soundEffectsVolumeSlider.value;
+
+            if (masterVolumeSlider != null)
+            {
+                settings.masterVolume = masterVolumeSlider.value;
+            }
+
+            if (musicVolumeSlider != null)
+            {
+                settings.musicVolume = musicVolumeSlider.value;
+            }
+
+            if (soundEffectsVolumeSlider != null)
+            {
+                settings.soundEffectsVolume = soundEffectsVolumeSlider.value;
+            }
+
             GameSettingsService.ApplyAndSave(settings);
         }
 
         private void Populate(GameSettingsData settings)
         {
-            resolutionDropdown.value = FindResolution(settings.resolutionWidth, settings.resolutionHeight);
-            screenModeDropdown.value = GetScreenModeIndex((FullScreenMode)settings.fullScreenMode);
+            if (settings == null)
+            {
+                return;
+            }
+
+            if (resolutionDropdown != null)
+            {
+                resolutionDropdown.value = FindResolution(settings.resolutionWidth, settings.resolutionHeight);
+            }
+
+            if (screenModeDropdown != null)
+            {
+                screenModeDropdown.value = GetScreenModeIndex((FullScreenMode)settings.fullScreenMode);
+            }
+
             SetSteppedValue(brightnessSlider, settings.brightness);
-            verticalSyncToggle.SetIsOnWithoutNotify(settings.verticalSync);
-            showZoneBordersToggle.SetIsOnWithoutNotify(settings.showZoneBordersOutsideEdit);
-            frameRateDropdown.value = GetFrameRateIndex(settings.frameRateLimit);
-            qualityDropdown.value = settings.qualityLevel;
-            antiAliasingDropdown.value = (int)settings.antiAliasing;
+
+            if (verticalSyncToggle != null)
+            {
+                verticalSyncToggle.SetIsOnWithoutNotify(settings.verticalSync);
+            }
+
+            if (showZoneBordersToggle != null)
+            {
+                showZoneBordersToggle.SetIsOnWithoutNotify(settings.showZoneBordersOutsideEdit);
+            }
+
+            if (frameRateDropdown != null)
+            {
+                frameRateDropdown.value = GetFrameRateIndex(settings.frameRateLimit);
+            }
+
+            if (qualityDropdown != null)
+            {
+                qualityDropdown.value = settings.qualityLevel;
+            }
+
+            if (antiAliasingDropdown != null)
+            {
+                antiAliasingDropdown.value = (int)settings.antiAliasing;
+            }
+
             SetSteppedValue(masterVolumeSlider, settings.masterVolume);
             SetSteppedValue(musicVolumeSlider, settings.musicVolume);
             SetSteppedValue(soundEffectsVolumeSlider, settings.soundEffectsVolume);
             SetSteppedValue(ringSensitivitySlider, settings.ringDragSensitivity);
             SetSteppedValue(cameraSensitivitySlider, settings.cameraOrbitSensitivity);
-            brightnessValue.text = brightnessSlider.value.ToString("+0.0;-0.0;0.0");
-            masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%";
-            musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%";
-            soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%";
-            ringSensitivityValue.text = ringSensitivitySlider.value.ToString("0.00") + "×";
-            cameraSensitivityValue.text = cameraSensitivitySlider.value.ToString("0.00") + "×";
+
+            if (brightnessValue != null && brightnessSlider != null)
+            {
+                brightnessValue.text = brightnessSlider.value.ToString("+0.0;-0.0;0.0");
+            }
+
+            if (masterVolumeValue != null && masterVolumeSlider != null)
+            {
+                masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%";
+            }
+
+            if (musicVolumeValue != null && musicVolumeSlider != null)
+            {
+                musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%";
+            }
+
+            if (soundEffectsVolumeValue != null && soundEffectsVolumeSlider != null)
+            {
+                soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%";
+            }
+
+            if (ringSensitivityValue != null && ringSensitivitySlider != null)
+            {
+                ringSensitivityValue.text = ringSensitivitySlider.value.ToString("0.00") + "×";
+            }
+
+            if (cameraSensitivityValue != null && cameraSensitivitySlider != null)
+            {
+                cameraSensitivityValue.text = cameraSensitivitySlider.value.ToString("0.00") + "×";
+            }
         }
 
         private static void SetSteppedValue(Slider slider, float value)
         {
+            if (slider == null)
+            {
+                return;
+            }
+
             SliderStepQuantizer quantizer = slider.GetComponent<SliderStepQuantizer>();
             if (quantizer != null)
             {
                 quantizer.SetValueWithoutNotify(value);
                 return;
             }
+
             slider.SetValueWithoutNotify(value);
         }
 
         private void Apply()
         {
             GameSettingsData settings = GameSettingsService.Current.Clone();
-            Resolution selectedResolution = resolutions[Mathf.Clamp(resolutionDropdown.value, 0, resolutions.Count - 1)];
-            settings.resolutionWidth = selectedResolution.width;
-            settings.resolutionHeight = selectedResolution.height;
-            settings.fullScreenMode = (int)GetScreenMode(screenModeDropdown.value);
-            settings.brightness = brightnessSlider.value;
-            settings.verticalSync = verticalSyncToggle.isOn;
-            settings.showZoneBordersOutsideEdit = showZoneBordersToggle.isOn;
-            settings.frameRateLimit = frameRates[Mathf.Clamp(frameRateDropdown.value, 0, frameRates.Length - 1)];
-            settings.qualityLevel = qualityDropdown.value;
-            settings.antiAliasing = (AntiAliasingSetting)antiAliasingDropdown.value;
-            settings.masterVolume = masterVolumeSlider.value;
-            settings.musicVolume = musicVolumeSlider.value;
-            settings.soundEffectsVolume = soundEffectsVolumeSlider.value;
-            settings.ringDragSensitivity = ringSensitivitySlider.value;
-            settings.cameraOrbitSensitivity = cameraSensitivitySlider.value;
+
+            if (resolutions.Count > 0 && resolutionDropdown != null)
+            {
+                Resolution selectedResolution =
+                    resolutions[Mathf.Clamp(resolutionDropdown.value, 0, resolutions.Count - 1)];
+
+                settings.resolutionWidth = selectedResolution.width;
+                settings.resolutionHeight = selectedResolution.height;
+            }
+
+            if (screenModeDropdown != null)
+            {
+                settings.fullScreenMode = (int)GetScreenMode(screenModeDropdown.value);
+            }
+
+            if (brightnessSlider != null)
+            {
+                settings.brightness = brightnessSlider.value;
+            }
+
+            if (verticalSyncToggle != null)
+            {
+                settings.verticalSync = verticalSyncToggle.isOn;
+            }
+
+            if (showZoneBordersToggle != null)
+            {
+                settings.showZoneBordersOutsideEdit = showZoneBordersToggle.isOn;
+            }
+
+            if (frameRateDropdown != null)
+            {
+                settings.frameRateLimit =
+                    frameRates[Mathf.Clamp(frameRateDropdown.value, 0, frameRates.Length - 1)];
+            }
+
+            if (qualityDropdown != null)
+            {
+                settings.qualityLevel = qualityDropdown.value;
+            }
+
+            if (antiAliasingDropdown != null)
+            {
+                settings.antiAliasing = (AntiAliasingSetting)antiAliasingDropdown.value;
+            }
+
+            if (masterVolumeSlider != null)
+            {
+                settings.masterVolume = masterVolumeSlider.value;
+            }
+
+            if (musicVolumeSlider != null)
+            {
+                settings.musicVolume = musicVolumeSlider.value;
+            }
+
+            if (soundEffectsVolumeSlider != null)
+            {
+                settings.soundEffectsVolume = soundEffectsVolumeSlider.value;
+            }
+
+            if (ringSensitivitySlider != null)
+            {
+                settings.ringDragSensitivity = ringSensitivitySlider.value;
+            }
+
+            if (cameraSensitivitySlider != null)
+            {
+                settings.cameraOrbitSensitivity = cameraSensitivitySlider.value;
+            }
+
             GameSettingsService.ApplyAndSave(settings);
         }
 
@@ -449,6 +837,12 @@ namespace AnchorDefense
         private void ResetBindings()
         {
             InputBindingPersistence.Reset(inputActions);
+
+            if (rebindRows == null)
+            {
+                return;
+            }
+
             for (int i = 0; i < rebindRows.Length; i++)
             {
                 rebindRows[i]?.Refresh();
@@ -460,9 +854,18 @@ namespace AnchorDefense
             selectedCategoryIndex = categoryPanels != null && categoryPanels.Length > 0
                 ? Mathf.Clamp(selectedIndex, 0, categoryPanels.Length - 1)
                 : 0;
+
+            if (categoryPanels == null)
+            {
+                return;
+            }
+
             for (int i = 0; i < categoryPanels.Length; i++)
             {
-                categoryPanels[i].SetActive(i == selectedCategoryIndex);
+                if (categoryPanels[i] != null)
+                {
+                    categoryPanels[i].SetActive(i == selectedCategoryIndex);
+                }
             }
         }
 
@@ -492,7 +895,10 @@ namespace AnchorDefense
         {
             GameObject target = categoryButtons != null && categoryButtons.Length > 0
                 ? categoryButtons[Mathf.Clamp(selectedCategoryIndex, 0, categoryButtons.Length - 1)].gameObject
-                : closeButton != null ? closeButton.gameObject : null;
+                : closeButton != null
+                    ? closeButton.gameObject
+                    : null;
+
             if (target != null && target.activeInHierarchy)
             {
                 EventSystem.current?.SetSelectedGameObject(target);
@@ -514,26 +920,23 @@ namespace AnchorDefense
                     continue;
                 }
 
-                Button upButton = categoryButtons[(i - 1 + categoryButtons.Length) % categoryButtons.Length];
-                Button downButton = categoryButtons[(i + 1) % categoryButtons.Length];
+                Button upButton =
+                    categoryButtons[(i - 1 + categoryButtons.Length) % categoryButtons.Length];
 
-                Selectable firstPanelSelectable = categoryPanels != null && i < categoryPanels.Length
-                    ? FindFirstSelectable(categoryPanels[i])
-                    : null;
+                Button downButton =
+                    categoryButtons[(i + 1) % categoryButtons.Length];
+
+                Selectable firstPanelSelectable =
+                    categoryPanels != null && i < categoryPanels.Length
+                        ? FindFirstSelectable(categoryPanels[i])
+                        : null;
 
                 Navigation navigation = current.navigation;
                 navigation.mode = Navigation.Mode.Explicit;
-
-                // 左侧分类是竖排，所以手柄上下应该切换分类
                 navigation.selectOnUp = upButton;
                 navigation.selectOnDown = downButton;
-
-                // 向右进入当前分类内容区
                 navigation.selectOnRight = firstPanelSelectable;
-
-                // 向左留在自己，避免乱跳
                 navigation.selectOnLeft = current;
-
                 current.navigation = navigation;
             }
 
@@ -556,6 +959,7 @@ namespace AnchorDefense
             }
 
             Selectable[] selectables = root.GetComponentsInChildren<Selectable>(true);
+
             for (int i = 0; i < selectables.Length; i++)
             {
                 if (selectables[i] != null && selectables[i].interactable)
@@ -563,6 +967,7 @@ namespace AnchorDefense
                     return selectables[i];
                 }
             }
+
             return null;
         }
 
@@ -575,6 +980,7 @@ namespace AnchorDefense
                     return i;
                 }
             }
+
             return Mathf.Max(0, resolutions.Count - 1);
         }
 
@@ -587,20 +993,37 @@ namespace AnchorDefense
                     return i;
                 }
             }
+
             return 2;
         }
 
         private static int GetScreenModeIndex(FullScreenMode mode)
         {
-            if (mode == FullScreenMode.ExclusiveFullScreen) return 1;
-            if (mode == FullScreenMode.Windowed) return 2;
+            if (mode == FullScreenMode.ExclusiveFullScreen)
+            {
+                return 1;
+            }
+
+            if (mode == FullScreenMode.Windowed)
+            {
+                return 2;
+            }
+
             return 0;
         }
 
         private static FullScreenMode GetScreenMode(int index)
         {
-            if (index == 1) return FullScreenMode.ExclusiveFullScreen;
-            if (index == 2) return FullScreenMode.Windowed;
+            if (index == 1)
+            {
+                return FullScreenMode.ExclusiveFullScreen;
+            }
+
+            if (index == 2)
+            {
+                return FullScreenMode.Windowed;
+            }
+
             return FullScreenMode.FullScreenWindow;
         }
     }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -21,6 +22,7 @@ namespace AnchorDefense
         [SerializeField] private InputActionAsset inputActions;
 
         private GameObject lastMainMenuSelection;
+        private Coroutine restoreSelectionRoutine;
 
         public void Configure(
             Button start,
@@ -39,20 +41,41 @@ namespace AnchorDefense
         private void Awake()
         {
             Time.timeScale = 1f;
+
             GameSettingsService.EnsureLoaded();
             InputBindingPersistence.Load(inputActions);
             EnsureUiInputModule();
-            startButton.onClick.AddListener(StartGame);
-            settingsButton.onClick.AddListener(OpenSettings);
-            quitButton.onClick.AddListener(QuitGame);
-            settingsMenu.Closed += RestoreMainMenuSelection;
+
+            if (startButton != null)
+            {
+                startButton.onClick.AddListener(StartGame);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.AddListener(OpenSettings);
+            }
+
+            if (quitButton != null)
+            {
+                quitButton.onClick.AddListener(QuitGame);
+            }
+
+            if (settingsMenu != null)
+            {
+                settingsMenu.Closed += RestoreMainMenuSelection;
+            }
+
             ConfigureButtonNavigation();
             ControllerSelectionHighlight.EnsureInHierarchy(transform);
         }
 
         private void Start()
         {
-            SelectMainMenuButton(startButton.gameObject);
+            ControllerSelectionHighlight.EnsureInHierarchy(transform);
+            ControllerSelectionHighlight.RefreshAllInHierarchy(transform);
+
+            SelectMainMenuButton(startButton != null ? startButton.gameObject : null);
         }
 
         private void Update()
@@ -64,7 +87,8 @@ namespace AnchorDefense
 
             EventSystem eventSystem = EventSystem.current;
             GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
-            if (selected != null && selected.activeInHierarchy)
+
+            if (selected != null && selected.activeInHierarchy && IsMainMenuObject(selected))
             {
                 lastMainMenuSelection = selected;
                 return;
@@ -72,14 +96,34 @@ namespace AnchorDefense
 
             SelectMainMenuButton(lastMainMenuSelection != null
                 ? lastMainMenuSelection
-                : startButton.gameObject);
+                : startButton != null
+                    ? startButton.gameObject
+                    : null);
         }
 
         private void OnDestroy()
         {
-            startButton.onClick.RemoveListener(StartGame);
-            settingsButton.onClick.RemoveListener(OpenSettings);
-            quitButton.onClick.RemoveListener(QuitGame);
+            if (restoreSelectionRoutine != null)
+            {
+                StopCoroutine(restoreSelectionRoutine);
+                restoreSelectionRoutine = null;
+            }
+
+            if (startButton != null)
+            {
+                startButton.onClick.RemoveListener(StartGame);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.RemoveListener(OpenSettings);
+            }
+
+            if (quitButton != null)
+            {
+                quitButton.onClick.RemoveListener(QuitGame);
+            }
+
             if (settingsMenu != null)
             {
                 settingsMenu.Closed -= RestoreMainMenuSelection;
@@ -88,13 +132,52 @@ namespace AnchorDefense
 
         private void OpenSettings()
         {
-            lastMainMenuSelection = settingsButton.gameObject;
-            settingsMenu.Open();
+            lastMainMenuSelection = settingsButton != null
+                ? settingsButton.gameObject
+                : startButton != null
+                    ? startButton.gameObject
+                    : null;
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem != null)
+            {
+                eventSystem.SetSelectedGameObject(null);
+            }
+
+            settingsMenu?.Open();
         }
 
         private void RestoreMainMenuSelection()
         {
-            SelectMainMenuButton(settingsButton.gameObject);
+            if (restoreSelectionRoutine != null)
+            {
+                StopCoroutine(restoreSelectionRoutine);
+            }
+
+            restoreSelectionRoutine = StartCoroutine(RestoreMainMenuSelectionNextFrame());
+        }
+
+        private IEnumerator RestoreMainMenuSelectionNextFrame()
+        {
+            yield return null;
+            yield return null;
+
+            ControllerSelectionHighlight.EnsureInHierarchy(transform);
+            ControllerSelectionHighlight.RefreshAllInHierarchy(transform);
+
+            GameObject target = settingsButton != null
+                ? settingsButton.gameObject
+                : startButton != null
+                    ? startButton.gameObject
+                    : null;
+
+            SelectMainMenuButton(target);
+
+            yield return null;
+
+            ControllerSelectionHighlight.RefreshAllInHierarchy(transform);
+
+            restoreSelectionRoutine = null;
         }
 
         private void SelectMainMenuButton(GameObject target)
@@ -103,13 +186,40 @@ namespace AnchorDefense
             {
                 target = startButton != null ? startButton.gameObject : null;
             }
-            if (target == null)
+
+            if (target == null || !target.activeInHierarchy)
             {
                 return;
             }
 
             lastMainMenuSelection = target;
-            EventSystem.current?.SetSelectedGameObject(target);
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+            {
+                return;
+            }
+
+            eventSystem.sendNavigationEvents = true;
+
+            eventSystem.SetSelectedGameObject(null);
+            eventSystem.SetSelectedGameObject(target);
+
+            ControllerSelectionHighlight highlight = target.GetComponent<ControllerSelectionHighlight>();
+            if (highlight != null)
+            {
+                highlight.ForceRefreshPublic();
+            }
+        }
+
+        private bool IsMainMenuObject(GameObject target)
+        {
+            if (target == null)
+            {
+                return false;
+            }
+
+            return target.transform == transform || target.transform.IsChildOf(transform);
         }
 
         private void ConfigureButtonNavigation()
@@ -126,6 +236,11 @@ namespace AnchorDefense
 
         private static void SetVerticalNavigation(Button button, Selectable up, Selectable down)
         {
+            if (button == null)
+            {
+                return;
+            }
+
             Navigation navigation = button.navigation;
             navigation.mode = Navigation.Mode.Explicit;
             navigation.selectOnUp = up;
@@ -144,11 +259,15 @@ namespace AnchorDefense
             }
 
             eventSystem.sendNavigationEvents = true;
-            InputSystemUIInputModule inputModule = eventSystem.GetComponent<InputSystemUIInputModule>();
+
+            InputSystemUIInputModule inputModule =
+                eventSystem.GetComponent<InputSystemUIInputModule>();
+
             if (inputModule == null)
             {
                 inputModule = eventSystem.gameObject.AddComponent<InputSystemUIInputModule>();
             }
+
             if (inputModule.actionsAsset == null)
             {
                 inputModule.AssignDefaultActions();

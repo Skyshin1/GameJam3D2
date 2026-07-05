@@ -2526,6 +2526,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 12800000, guid: ee7dd0e358c475b4db4b06774a017b26,
         type: 3}
+    - target: {fileID: 6453419417257512069, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6576626197615705182, guid: 6634f3a1a6dea0f449892c505b290d02,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2849,6 +2854,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PauseMenuUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056931451680289163, guid: 6634f3a1a6dea0f449892c505b290d02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -19,6 +19,10 @@ namespace AnchorDefense
         private EndlessEnemySpawner spawner;
         private EnemyRegistry registry;
         private GameFlowController gameFlow;
+        private string coreLabel;
+        private string timerLabel;
+        private string enemyLabel;
+        private string finalTimeLabel;
 
         public void ConfigureView(
             Text coreHealthText,
@@ -49,6 +53,11 @@ namespace AnchorDefense
             registry = enemyRegistry;
             gameFlow = flow;
 
+            coreLabel = ExtractLeadingLabel(healthText != null ? healthText.text : null, "CORE");
+            timerLabel = ExtractLeadingLabel(timerText != null ? timerText.text : null, "TIME");
+            enemyLabel = ExtractLeadingLabel(enemyText != null ? enemyText.text : null, "ENEMY");
+            finalTimeLabel = ExtractLeadingLabel(finalTimeText != null ? finalTimeText.text : null, "TIME");
+
             core.HealthChanged += HandleHealthChanged;
             gameFlow.StateChanged += HandleStateChanged;
             restartButton.onClick.AddListener(RestartGame);
@@ -63,8 +72,8 @@ namespace AnchorDefense
                 return;
             }
 
-            timerText.text = $"生存时间  {FormatTime(spawner.ElapsedTime)}";
-            enemyText.text = $"敌人  {registry.Count}";
+            timerText.text = $"{timerLabel}  {FormatTime(spawner.ElapsedTime)}";
+            enemyText.text = $"{enemyLabel}  {registry.Count}";
         }
 
         private void OnDestroy()
@@ -82,7 +91,7 @@ namespace AnchorDefense
 
         private void HandleHealthChanged(float current, float maximum)
         {
-            healthText.text = $"核心  {Mathf.CeilToInt(current)} / {Mathf.CeilToInt(maximum)}";
+            healthText.text = $"{coreLabel}  {Mathf.CeilToInt(current)} / {Mathf.CeilToInt(maximum)}";
             healthFill.fillAmount = maximum > 0f ? current / maximum : 0f;
         }
 
@@ -94,8 +103,18 @@ namespace AnchorDefense
                 return;
             }
 
-            finalTimeText.text = $"坚持了 {FormatTime(spawner.ElapsedTime)}";
+            finalTimeText.text = $"{finalTimeLabel}  {FormatTime(spawner.ElapsedTime)}";
             gameOverPanel.SetActive(true);
+        }
+
+        private static string ExtractLeadingLabel(string initialText, string fallback)
+        {
+            if (string.IsNullOrWhiteSpace(initialText)) return fallback;
+            string value = initialText.Trim();
+            int end = 0;
+            while (end < value.Length && !char.IsDigit(value[end])) end++;
+            string label = value.Substring(0, end).Trim().TrimEnd(':', '：', '/', '-');
+            return string.IsNullOrWhiteSpace(label) ? fallback : label.Trim();
         }
 
         private static string FormatTime(float seconds)

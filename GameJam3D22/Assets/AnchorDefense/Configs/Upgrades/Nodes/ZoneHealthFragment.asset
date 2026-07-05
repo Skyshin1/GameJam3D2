@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed6000dfe90b77b41b2b900f16b81419, type: 3}
-  m_Name: ZoneDamageFragment
+  m_Name: ZoneHealthFragment
   m_EditorClassIdentifier: 
-  <Id>k__BackingField: zone.fragment.damage
-  <DisplayName>k__BackingField: "\u7FE0\u7EFF\u706B\u63A7\u788E\u7247"
-  <Description>k__BackingField: "\u89E3\u9501\u7EFF\u8272\u533A\u57DF\u914D\u7F6E\uFF1A\u5904\u4E8E\u8BE5\u533A\u57DF\u5185\u7684\u70AE\u5854\u4F24\u5BB3\u63D0\u9AD8
-    50%\u3002\u89E3\u9501\u540E\u53EF\u5728\u951A\u57DF\u7F16\u7EC7\u4FA7\u680F\u4E2D\u5206\u914D\u3002"
-  <ShortLabel>k__BackingField: GRN
+  <Id>k__BackingField: zone.fragment.health
+  <DisplayName>k__BackingField: "\u7425\u73C0\u751F\u547D\u788E\u7247"
+  <Description>k__BackingField: "\u89E3\u9501\u9EC4\u8272\u533A\u57DF\u914D\u7F6E\uFF1A\u533A\u57DF\u5185\u6240\u6709\u53CB\u65B9\u70AE\u5854\u6700\u5927\u751F\u547D\u63D0\u9AD8
+    50%\u3002"
+  <ShortLabel>k__BackingField: YLW
   <Icon>k__BackingField: {fileID: 0}
-  <KillCost>k__BackingField: 18
+  <KillCost>k__BackingField: 16
   <Placeholder>k__BackingField: 0
   <Prerequisites>k__BackingField: []
   <Effects>k__BackingField: []

@@ -46,13 +46,21 @@ namespace AnchorDefense
 
         public void Fire(Vector3 origin, EnemyController target, float damage, TurretProjectileType type)
         {
+            Fire(origin, target, damage, type, 1f, 1f);
+        }
+
+        public void Fire(Vector3 origin, EnemyController target, float damage, TurretProjectileType type,
+            float speedMultiplier, float hitRadiusMultiplier)
+        {
             if (target == null || !target.IsAlive)
             {
                 return;
             }
             TurretProjectileType safeType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
-            Spawn(origin, target, damage, safeType, config.ProjectileSpeed,
-                config.ProjectileHitRadius, config.ProjectileLifetime);
+            Spawn(origin, target, damage, safeType,
+                config.ProjectileSpeed * Mathf.Max(0.1f, speedMultiplier),
+                config.ProjectileHitRadius * Mathf.Max(0.1f, hitRadiusMultiplier),
+                config.ProjectileLifetime);
             SpawnMuzzle(origin, GetProjectileColor(safeType));
         }
 

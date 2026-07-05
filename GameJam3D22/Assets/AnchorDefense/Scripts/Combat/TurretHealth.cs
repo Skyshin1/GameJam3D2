@@ -8,6 +8,7 @@ namespace AnchorDefense
         private TurretRuntimeStats runtimeStats;
         private Action<Vector3> hitFeedback;
         private float disabledRemaining;
+        private float zoneMaxHealthMultiplier = 1f;
 
         public float CurrentHealth { get; private set; }
         public float MaxHealth { get; private set; }
@@ -27,7 +28,8 @@ namespace AnchorDefense
 
             runtimeStats = stats;
             hitFeedback = onHitFeedback;
-            MaxHealth = runtimeStats != null ? runtimeStats.MaxHealth : 1f;
+            zoneMaxHealthMultiplier = 1f;
+            MaxHealth = GetEffectiveMaxHealth();
             CurrentHealth = MaxHealth;
             IsAlive = true;
             disabledRemaining = 0f;
@@ -45,7 +47,8 @@ namespace AnchorDefense
                 return;
             }
 
-            CurrentHealth = Mathf.Max(0f, CurrentHealth - damage.Amount);
+            float damageMultiplier = runtimeStats != null ? runtimeStats.DamageTakenMultiplier : 1f;
+            CurrentHealth = Mathf.Max(0f, CurrentHealth - damage.Amount * damageMultiplier);
             hitFeedback?.Invoke(damage.HitPoint);
             HealthChanged?.Invoke(CurrentHealth, MaxHealth);
             if (CurrentHealth > 0f)
@@ -78,6 +81,25 @@ namespace AnchorDefense
             Recovered?.Invoke();
         }
 
+        public void SetZoneMaxHealthMultiplier(float multiplier)
+        {
+            float clamped = Mathf.Clamp(multiplier, 1f, 10f);
+            if (Mathf.Approximately(zoneMaxHealthMultiplier, clamped)) return;
+
+            float healthRatio = MaxHealth > 0f ? CurrentHealth / MaxHealth : 1f;
+            zoneMaxHealthMultiplier = clamped;
+            MaxHealth = GetEffectiveMaxHealth();
+            if (IsAlive) CurrentHealth = Mathf.Clamp(MaxHealth * healthRatio, 0f, MaxHealth);
+            HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        }
+
+        public void Heal(float amount)
+        {
+            if (!IsAlive || amount <= 0f || CurrentHealth >= MaxHealth) return;
+            CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
+            HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        }
+
         private void OnDestroy()
         {
             if (runtimeStats != null)
@@ -88,13 +110,19 @@ namespace AnchorDefense
 
         private void HandleStatsChanged()
         {
-            float previousMaximum = MaxHealth;
-            MaxHealth = runtimeStats.MaxHealth;
+            float healthRatio = MaxHealth > 0f ? CurrentHealth / MaxHealth : 1f;
+            MaxHealth = GetEffectiveMaxHealth();
             if (IsAlive)
             {
-                CurrentHealth = Mathf.Clamp(CurrentHealth + MaxHealth - previousMaximum, 0f, MaxHealth);
+                CurrentHealth = Mathf.Clamp(MaxHealth * healthRatio, 0f, MaxHealth);
             }
             HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        }
+
+        private float GetEffectiveMaxHealth()
+        {
+            float baseMaximum = runtimeStats != null ? runtimeStats.MaxHealth : 1f;
+            return Mathf.Max(1f, baseMaximum * zoneMaxHealthMultiplier);
         }
     }
 }

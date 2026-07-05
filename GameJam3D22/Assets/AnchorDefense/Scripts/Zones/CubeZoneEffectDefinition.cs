@@ -7,7 +7,11 @@ namespace AnchorDefense
         None,
         TurretFireRateBoost,
         EnemySlowAndDamage,
-        TurretDamageBoost
+        TurretDamageBoost,
+        TurretHealthBoost,
+        EnemyVulnerability,
+        TurretRangeBoost,
+        TurretRepair
     }
 
     [CreateAssetMenu(menuName = "Anchor Defense/Zones/Zone Effect", fileName = "ZoneEffect")]
@@ -21,8 +25,12 @@ namespace AnchorDefense
         [field: SerializeField] public CubeZoneEffectType EffectType { get; private set; }
         [field: SerializeField, Range(0.1f, 2f)] public float TurretFireIntervalMultiplier { get; private set; } = 1f;
         [field: SerializeField, Min(1f)] public float TurretDamageMultiplier { get; private set; } = 1f;
+        [field: SerializeField, Min(1f)] public float TurretMaxHealthMultiplier { get; private set; } = 1f;
+        [field: SerializeField, Min(1f)] public float TurretRangeMultiplier { get; private set; } = 1f;
+        [field: SerializeField, Min(0f)] public float TurretHealingPerSecond { get; private set; }
         [field: SerializeField, Range(0.1f, 2f)] public float EnemySpeedMultiplier { get; private set; } = 1f;
         [field: SerializeField, Min(0f)] public float EnemyDamagePerSecond { get; private set; }
+        [field: SerializeField, Min(1f)] public float EnemyDamageTakenMultiplier { get; private set; } = 1f;
         [field: SerializeField] public UpgradeNodeDefinition UnlockRequirement { get; private set; }
 
         [field: Header("Effect Presentation")]
@@ -37,7 +45,11 @@ namespace AnchorDefense
         public void Configure(string id, string displayName, string description, Color color,
             CubeZoneEffectType effectType, float turretIntervalMultiplier,
             float turretDamageMultiplier, float enemyMovementMultiplier, float enemyDps,
-            UpgradeNodeDefinition unlockRequirement = null)
+            UpgradeNodeDefinition unlockRequirement = null,
+            float turretMaxHealthMultiplier = 1f,
+            float turretRangeMultiplier = 1f,
+            float turretHealingPerSecond = 0f,
+            float enemyDamageTakenMultiplier = 1f)
         {
             Id = id;
             DisplayName = displayName;
@@ -46,8 +58,12 @@ namespace AnchorDefense
             EffectType = effectType;
             TurretFireIntervalMultiplier = Mathf.Clamp(turretIntervalMultiplier, 0.1f, 2f);
             TurretDamageMultiplier = Mathf.Max(1f, turretDamageMultiplier);
+            TurretMaxHealthMultiplier = Mathf.Max(1f, turretMaxHealthMultiplier);
+            TurretRangeMultiplier = Mathf.Max(1f, turretRangeMultiplier);
+            TurretHealingPerSecond = Mathf.Max(0f, turretHealingPerSecond);
             EnemySpeedMultiplier = Mathf.Clamp(enemyMovementMultiplier, 0.1f, 2f);
             EnemyDamagePerSecond = Mathf.Max(0f, enemyDps);
+            EnemyDamageTakenMultiplier = Mathf.Max(1f, enemyDamageTakenMultiplier);
             UnlockRequirement = unlockRequirement;
         }
 #endif

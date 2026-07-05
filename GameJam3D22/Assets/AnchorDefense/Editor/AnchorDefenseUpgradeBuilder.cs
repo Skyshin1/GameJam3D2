@@ -84,6 +84,16 @@ namespace AnchorDefense.Editor
             intervalEffect.Configure(TurretRuntimeStat.FireInterval, 0.85f);
             TurretStatUpgradeEffect healthEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/IncreaseTurretHealth.asset");
             healthEffect.Configure(TurretRuntimeStat.MaxHealth, 1.3f);
+            TurretStatUpgradeEffect rangeEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/IncreaseTurretRange.asset");
+            rangeEffect.Configure(TurretRuntimeStat.Range, 1.2f);
+            TurretStatUpgradeEffect projectileSpeedEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/IncreaseProjectileSpeed.asset");
+            projectileSpeedEffect.Configure(TurretRuntimeStat.ProjectileSpeed, 1.3f);
+            TurretStatUpgradeEffect hitRadiusEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/IncreaseProjectileHitRadius.asset");
+            hitRadiusEffect.Configure(TurretRuntimeStat.ProjectileHitRadius, 1.35f);
+            TurretStatUpgradeEffect recoveryEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/ReduceDisableDuration.asset");
+            recoveryEffect.Configure(TurretRuntimeStat.DisableDuration, 0.7f);
+            TurretStatUpgradeEffect armorEffect = CreateOrLoad<TurretStatUpgradeEffect>(EffectFolder + "/ReduceTurretDamageTaken.asset");
+            armorEffect.Configure(TurretRuntimeStat.DamageTaken, 0.8f);
 
             UpgradeNodeDefinition innerNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/Ring01Capacity.asset");
             innerNode.Configure(
@@ -151,21 +161,74 @@ namespace AnchorDefense.Editor
                 null,
                 new UpgradeEffect[] { healthEffect });
 
+            UpgradeNodeDefinition rangeNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/TurretRange.asset");
+            rangeNode.Configure(
+                "turret.range.01", "深空测距", "扩展全体炮塔的索敌边界，射程提高 20%。",
+                "RNG", 14, false, null, new UpgradeEffect[] { rangeEffect });
+
+            UpgradeNodeDefinition projectileSpeedNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ProjectileSpeed.asset");
+            projectileSpeedNode.Configure(
+                "turret.projectile.speed", "磁轨加速", "强化炮弹推进场，所有炮弹飞行速度提高 30%。需要先激活深空测距。",
+                "VEL", 18, false, new[] { rangeNode }, new UpgradeEffect[] { projectileSpeedEffect });
+
+            UpgradeNodeDefinition hitRadiusNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ProjectileHitRadius.asset");
+            hitRadiusNode.Configure(
+                "turret.projectile.radius", "近炸引信", "扩大炮弹的命中判定半径 35%，提高对高速目标的命中稳定性。",
+                "HIT", 22, false, new[] { projectileSpeedNode }, new UpgradeEffect[] { hitRadiusEffect });
+
+            UpgradeNodeDefinition recoveryNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/TurretRecovery.asset");
+            recoveryNode.Configure(
+                "turret.recovery.01", "自律重启", "炮塔瘫痪后的自检流程加速，恢复时间缩短 30%。需要先激活锚甲协议。",
+                "RST", 18, false, new[] { healthNode }, new UpgradeEffect[] { recoveryEffect });
+
+            UpgradeNodeDefinition armorNode = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/TurretArmor.asset");
+            armorNode.Configure(
+                "turret.armor.01", "偏导护层", "全体炮塔受到的伤害降低 20%。需要先激活自律重启。",
+                "ARM", 26, false, new[] { recoveryNode }, new UpgradeEffect[] { armorEffect });
+
             UpgradeNodeDefinition zoneDamageFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneDamageFragment.asset");
             zoneDamageFragment.Configure(
                 "zone.fragment.damage",
                 "翠绿火控碎片",
-                "解锁绿色区域配置：处于该区域内的炮塔伤害提高 50%。解锁后可在区域配置界面中分配。",
+                "解锁绿色区域配置：处于该区域内的炮塔伤害提高 50%。解锁后可在锚域编织侧栏中分配。",
                 "GRN",
                 18,
                 false,
                 null,
                 null);
 
+            UpgradeNodeDefinition zoneHealthFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneHealthFragment.asset");
+            zoneHealthFragment.Configure(
+                "zone.fragment.health", "琥珀生命碎片",
+                "解锁黄色区域配置：区域内所有友方炮塔最大生命提高 50%。",
+                "YLW", 16, false, null, null);
+
+            UpgradeNodeDefinition zoneVulnerabilityFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneVulnerabilityFragment.asset");
+            zoneVulnerabilityFragment.Configure(
+                "zone.fragment.vulnerability", "紫晶裂解碎片",
+                "解锁紫色区域配置：区域内敌人受到的所有伤害提高 35%。需要先解锁翠绿火控碎片。",
+                "PUR", 22, false, new[] { zoneDamageFragment }, null);
+
+            UpgradeNodeDefinition zoneRangeFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneRangeFragment.asset");
+            zoneRangeFragment.Configure(
+                "zone.fragment.range", "橙色视界碎片",
+                "解锁橙色区域配置：区域内炮塔射程提高 35%。需要先解锁琥珀生命碎片。",
+                "ORG", 20, false, new[] { zoneHealthFragment }, null);
+
+            UpgradeNodeDefinition zoneRepairFragment = CreateOrLoad<UpgradeNodeDefinition>(NodeFolder + "/ZoneRepairFragment.asset");
+            zoneRepairFragment.Configure(
+                "zone.fragment.repair", "青色维修碎片",
+                "解锁青色区域配置：区域内仍在运作的炮塔每秒恢复 4 点生命。需要先解锁琥珀生命碎片。",
+                "CYN", 24, false, new[] { zoneHealthFragment }, null);
+
             UnityEngine.Object[] dirtyAssets =
             {
                 innerEffect, middleEffect, outerEffect, damageEffect, intervalEffect, healthEffect,
-                innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode, zoneDamageFragment
+                rangeEffect, projectileSpeedEffect, hitRadiusEffect, recoveryEffect, armorEffect,
+                innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode,
+                rangeNode, projectileSpeedNode, hitRadiusNode, recoveryNode, armorNode,
+                zoneDamageFragment, zoneHealthFragment, zoneVulnerabilityFragment,
+                zoneRangeFragment, zoneRepairFragment
             };
             for (int i = 0; i < dirtyAssets.Length; i++)
             {
@@ -173,7 +236,13 @@ namespace AnchorDefense.Editor
             }
 
             UpgradeTreeConfig tree = CreateOrLoad<UpgradeTreeConfig>(UpgradeTreePath);
-            tree.Configure(new[] { innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode, zoneDamageFragment });
+            tree.Configure(new[]
+            {
+                innerNode, middleNode, outerNode, damageNode, intervalNode, healthNode,
+                rangeNode, projectileSpeedNode, hitRadiusNode, recoveryNode, armorNode,
+                zoneDamageFragment, zoneHealthFragment, zoneVulnerabilityFragment,
+                zoneRangeFragment, zoneRepairFragment
+            });
             EditorUtility.SetDirty(tree);
             return tree;
         }
@@ -421,7 +490,16 @@ namespace AnchorDefense.Editor
             UpgradeNodeDefinition damage = config.FindNode("turret.damage.01");
             UpgradeNodeDefinition interval = config.FindNode("turret.interval.01");
             UpgradeNodeDefinition health = config.FindNode("turret.health.01");
+            UpgradeNodeDefinition range = config.FindNode("turret.range.01");
+            UpgradeNodeDefinition projectileSpeed = config.FindNode("turret.projectile.speed");
+            UpgradeNodeDefinition hitRadius = config.FindNode("turret.projectile.radius");
+            UpgradeNodeDefinition recovery = config.FindNode("turret.recovery.01");
+            UpgradeNodeDefinition armor = config.FindNode("turret.armor.01");
             UpgradeNodeDefinition zoneDamageFragment = config.FindNode("zone.fragment.damage");
+            UpgradeNodeDefinition zoneHealthFragment = config.FindNode("zone.fragment.health");
+            UpgradeNodeDefinition zoneVulnerabilityFragment = config.FindNode("zone.fragment.vulnerability");
+            UpgradeNodeDefinition zoneRangeFragment = config.FindNode("zone.fragment.range");
+            UpgradeNodeDefinition zoneRepairFragment = config.FindNode("zone.fragment.repair");
 
             Vector2 turretHub = new Vector2(0f, 330f);
             Vector2 innerPos = new Vector2(-230f, 420f);
@@ -430,8 +508,17 @@ namespace AnchorDefense.Editor
             Vector2 damagePos = new Vector2(95f, 480f);
             Vector2 intervalPos = new Vector2(285f, 585f);
             Vector2 healthPos = new Vector2(330f, 285f);
+            Vector2 rangePos = new Vector2(-640f, 350f);
+            Vector2 projectileSpeedPos = new Vector2(-440f, 230f);
+            Vector2 hitRadiusPos = new Vector2(-220f, 120f);
+            Vector2 recoveryPos = new Vector2(500f, 300f);
+            Vector2 armorPos = new Vector2(620f, 145f);
             Vector2 zoneHub = new Vector2(0f, -315f);
             Vector2 zoneDamagePos = new Vector2(0f, -510f);
+            Vector2 zoneHealthPos = new Vector2(-330f, -430f);
+            Vector2 zoneVulnerabilityPos = new Vector2(330f, -430f);
+            Vector2 zoneRangePos = new Vector2(-330f, -620f);
+            Vector2 zoneRepairPos = new Vector2(330f, -620f);
 
             CreateSectionLabel(treeContent, font, "TURRET ANCHOR PROTOCOLS  /  炮塔与轨道升级", new Vector2(0f, 665f), Cyan);
             CreateSectionLabel(treeContent, font, "CUBE FIELD FRAGMENTS  /  立方体区块功能解锁", new Vector2(0f, -85f), new Color(0.28f, 1f, 0.55f));
@@ -447,7 +534,16 @@ namespace AnchorDefense.Editor
             CreateLine(treeContent, turretHub, damagePos, Gold, 4f);
             CreateLine(treeContent, damagePos, intervalPos, Mint, 4f);
             CreateLine(treeContent, turretHub, healthPos, Mint, 4f);
+            CreateLine(treeContent, turretHub, rangePos, Cyan, 4f);
+            CreateLine(treeContent, rangePos, projectileSpeedPos, Cyan, 4f);
+            CreateLine(treeContent, projectileSpeedPos, hitRadiusPos, Cyan, 4f);
+            CreateLine(treeContent, healthPos, recoveryPos, Mint, 4f);
+            CreateLine(treeContent, recoveryPos, armorPos, Mint, 4f);
             CreateLine(treeContent, zoneHub, zoneDamagePos, new Color(0.25f, 1f, 0.45f), 4f);
+            CreateLine(treeContent, zoneHub, zoneHealthPos, new Color(1f, 0.82f, 0.18f), 4f);
+            CreateLine(treeContent, zoneDamagePos, zoneVulnerabilityPos, new Color(0.72f, 0.32f, 1f), 4f);
+            CreateLine(treeContent, zoneHealthPos, zoneRangePos, new Color(1f, 0.48f, 0.12f), 4f);
+            CreateLine(treeContent, zoneHealthPos, zoneRepairPos, new Color(0.12f, 0.92f, 1f), 4f);
 
             var views = new List<UpgradeNodeView>
             {
@@ -457,29 +553,17 @@ namespace AnchorDefense.Editor
                 CreateNode(treeContent, font, damagePos, damage, Gold),
                 CreateNode(treeContent, font, intervalPos, interval, Mint),
                 CreateNode(treeContent, font, healthPos, health, Mint),
-                CreateNode(treeContent, font, zoneDamagePos, zoneDamageFragment, new Color(0.25f, 1f, 0.45f))
+                CreateNode(treeContent, font, rangePos, range, Cyan),
+                CreateNode(treeContent, font, projectileSpeedPos, projectileSpeed, Cyan),
+                CreateNode(treeContent, font, hitRadiusPos, hitRadius, Cyan),
+                CreateNode(treeContent, font, recoveryPos, recovery, Mint),
+                CreateNode(treeContent, font, armorPos, armor, Mint),
+                CreateNode(treeContent, font, zoneDamagePos, zoneDamageFragment, new Color(0.25f, 1f, 0.45f)),
+                CreateNode(treeContent, font, zoneHealthPos, zoneHealthFragment, new Color(1f, 0.82f, 0.18f)),
+                CreateNode(treeContent, font, zoneVulnerabilityPos, zoneVulnerabilityFragment, new Color(0.72f, 0.32f, 1f)),
+                CreateNode(treeContent, font, zoneRangePos, zoneRangeFragment, new Color(1f, 0.48f, 0.12f)),
+                CreateNode(treeContent, font, zoneRepairPos, zoneRepairFragment, new Color(0.12f, 0.92f, 1f))
             };
-
-            Vector2[] turretPlaceholderPositions =
-            {
-                new Vector2(-640f, 350f), new Vector2(-340f, 270f), new Vector2(-120f, 590f),
-                new Vector2(470f, 500f), new Vector2(520f, 240f)
-            };
-            for (int i = 0; i < turretPlaceholderPositions.Length; i++)
-            {
-                CreateLine(treeContent, turretHub, turretPlaceholderPositions[i], new Color(0.12f, 0.2f, 0.3f, 0.7f), 2f);
-                views.Add(CreateNode(treeContent, font, turretPlaceholderPositions[i], null, new Color(0.2f, 0.3f, 0.42f)));
-            }
-            Vector2[] fieldPlaceholderPositions =
-            {
-                new Vector2(-330f, -430f), new Vector2(330f, -430f),
-                new Vector2(-230f, -610f), new Vector2(230f, -610f)
-            };
-            for (int i = 0; i < fieldPlaceholderPositions.Length; i++)
-            {
-                CreateLine(treeContent, zoneHub, fieldPlaceholderPositions[i], new Color(0.1f, 0.3f, 0.24f, 0.75f), 2f);
-                views.Add(CreateNode(treeContent, font, fieldPlaceholderPositions[i], null, new Color(0.16f, 0.34f, 0.3f)));
-            }
             CreateAnchorHub(treeContent, font, turretHub, "TURRET\nCORE", Cyan);
             CreateAnchorHub(treeContent, font, zoneHub, "FIELD\nCORE", new Color(0.25f, 1f, 0.55f));
 

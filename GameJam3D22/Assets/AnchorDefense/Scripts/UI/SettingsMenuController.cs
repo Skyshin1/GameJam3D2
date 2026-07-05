@@ -305,11 +305,24 @@ namespace AnchorDefense
             }
 
             brightnessSlider.onValueChanged.AddListener(_ => brightnessValue.text = brightnessSlider.value.ToString("+0.0;-0.0;0.0"));
-            masterVolumeSlider.onValueChanged.AddListener(_ => masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%");
-            musicVolumeSlider.onValueChanged.AddListener(_ => musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%");
-            soundEffectsVolumeSlider.onValueChanged.AddListener(_ => soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%");
+            masterVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
+            musicVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
+            soundEffectsVolumeSlider.onValueChanged.AddListener(_ => HandleAudioVolumeChanged());
             ringSensitivitySlider.onValueChanged.AddListener(_ => ringSensitivityValue.text = ringSensitivitySlider.value.ToString("0.00") + "×");
             cameraSensitivitySlider.onValueChanged.AddListener(_ => cameraSensitivityValue.text = cameraSensitivitySlider.value.ToString("0.00") + "×");
+        }
+
+        private void HandleAudioVolumeChanged()
+        {
+            masterVolumeValue.text = Mathf.RoundToInt(masterVolumeSlider.value * 100f) + "%";
+            musicVolumeValue.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f) + "%";
+            soundEffectsVolumeValue.text = Mathf.RoundToInt(soundEffectsVolumeSlider.value * 100f) + "%";
+
+            GameSettingsData settings = GameSettingsService.Current.Clone();
+            settings.masterVolume = masterVolumeSlider.value;
+            settings.musicVolume = musicVolumeSlider.value;
+            settings.soundEffectsVolume = soundEffectsVolumeSlider.value;
+            GameSettingsService.ApplyAndSave(settings);
         }
 
         private void Populate(GameSettingsData settings)

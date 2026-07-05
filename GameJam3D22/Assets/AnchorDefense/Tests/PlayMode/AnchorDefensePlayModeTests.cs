@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -58,6 +59,44 @@ namespace AnchorDefense.Tests
             Assert.That(rotator.LocalAxis, Is.EqualTo(Vector3.up));
 
             Object.DestroyImmediate(rotator.gameObject);
+        }
+
+        [UnityTest]
+        public IEnumerator AudioSlidersApplyImmediatelyInGameplaySettings()
+        {
+            GameSettingsService.ResetToDefaults();
+            AsyncOperation loadOperation = SceneManager.LoadSceneAsync("Gameplay");
+            Assert.That(loadOperation, Is.Not.Null);
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+            yield return null;
+
+            SettingsMenuController settingsMenu = Object.FindObjectOfType<SettingsMenuController>(true);
+            Assert.That(settingsMenu, Is.Not.Null);
+            settingsMenu.Open();
+
+            Slider masterVolume = GetSerializedField<Slider>(settingsMenu, "masterVolumeSlider");
+            Slider musicVolume = GetSerializedField<Slider>(settingsMenu, "musicVolumeSlider");
+            Slider soundEffectsVolume = GetSerializedField<Slider>(settingsMenu, "soundEffectsVolumeSlider");
+            Assert.That(masterVolume, Is.Not.Null);
+            Assert.That(musicVolume, Is.Not.Null);
+            Assert.That(soundEffectsVolume, Is.Not.Null);
+            AudioSource backgroundMusic = FindAudioSource("BackgroundMusic");
+            AudioSource pauseMenuAudio = FindAudioSource("PauseMenuUI");
+            Assert.That(backgroundMusic, Is.Not.Null);
+            Assert.That(pauseMenuAudio, Is.Not.Null);
+
+            masterVolume.value = 0.4f;
+            musicVolume.value = 0.2f;
+            soundEffectsVolume.value = 0.3f;
+            yield return null;
+
+            Assert.That(AudioListener.volume, Is.EqualTo(0.4f).Within(0.001f));
+            Assert.That(backgroundMusic.volume, Is.EqualTo(0.11f).Within(0.001f));
+            Assert.That(pauseMenuAudio.volume, Is.EqualTo(0.3f).Within(0.001f));
+            GameSettingsService.ResetToDefaults();
         }
 
 
@@ -411,6 +450,26 @@ namespace AnchorDefense.Tests
             Assert.That(turretHealth, Is.Not.Null);
             Assert.That(turretHealth.MaxHealth, Is.EqualTo(bootstrap.TurretStats.MaxHealth).Within(0.01f));
             Assert.That(bootstrap.TurretStats.DisableDuration, Is.EqualTo(10f).Within(0.01f));
+        }
+
+        private static T GetSerializedField<T>(object target, string fieldName) where T : class
+        {
+            FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null, fieldName);
+            return field.GetValue(target) as T;
+        }
+
+        private static AudioSource FindAudioSource(string objectName)
+        {
+            AudioSource[] sources = Object.FindObjectsOfType<AudioSource>(true);
+            for (int i = 0; i < sources.Length; i++)
+            {
+                if (sources[i].gameObject.name == objectName)
+                {
+                    return sources[i];
+                }
+            }
+            return null;
         }
     }
 }

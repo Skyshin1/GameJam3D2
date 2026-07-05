@@ -14,6 +14,12 @@ namespace AnchorDefense
 
         private TrailRenderer[] trails;
         private ParticleSystem[] particleSystems;
+        private Renderer[] renderers;
+        private Light[] lights;
+        private Color[] originalLightColors;
+        private float[] originalLightIntensities;
+        private Vector3 originalScale;
+        private MaterialPropertyBlock colorProperties;
 
         private Vector3 direction;
         private float damage;
@@ -24,7 +30,7 @@ namespace AnchorDefense
         private int targetSpawnVersion;
 
         public bool IsFlying => isFlying;
-        public TurretProjectileType ProjectileType { get; private set; }
+        public ProjectileDefinition Definition { get; private set; }
         public float Damage => damage;
         public EnemyController Target => target;
 
@@ -32,6 +38,18 @@ namespace AnchorDefense
         {
             trails = GetComponentsInChildren<TrailRenderer>(true);
             particleSystems = GetComponentsInChildren<ParticleSystem>(true);
+            renderers = GetComponentsInChildren<Renderer>(true);
+            lights = GetComponentsInChildren<Light>(true);
+            colorProperties = new MaterialPropertyBlock();
+            originalLightColors = new Color[lights.Length];
+            originalLightIntensities = new float[lights.Length];
+            originalScale = transform.localScale;
+
+            for (int i = 0; i < lights.Length; i++)
+            {
+                originalLightColors[i] = lights[i].color;
+                originalLightIntensities[i] = lights[i].intensity;
+            }
 
             if (trail == null && trails != null && trails.Length > 0)
             {
@@ -57,7 +75,7 @@ namespace AnchorDefense
             float projectileSpeed,
             float projectileHitRadius,
             float projectileLifetime,
-            TurretProjectileType type,
+            ProjectileDefinition definition,
             Action<ProjectileController> onRelease,
             Action<ProjectileController> onMoved = null)
         {
@@ -75,7 +93,8 @@ namespace AnchorDefense
             lifetime = projectileLifetime;
             releaseAction = onRelease;
             movedAction = onMoved;
-            ProjectileType = type;
+            Definition = definition;
+            ApplyDefinitionPresentation(definition);
 
             direction = target != null
                 ? (target.transform.position - position).normalized
@@ -106,7 +125,63 @@ namespace AnchorDefense
             targetSpawnVersion = 0;
             releaseAction = null;
             movedAction = null;
+            Definition = null;
+            transform.localScale = originalScale;
             StopAndClearVfx();
+        }
+
+        private void ApplyDefinitionPresentation(ProjectileDefinition definition)
+        {
+            transform.localScale = originalScale * (definition != null ? definition.VisualScaleMultiplier : 1f);
+            if (definition == null)
+            {
+                return;
+            }
+
+            Color color = definition.VisualColor;
+            if (definition.OverrideVisualColor)
+            {
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    Renderer visualRenderer = renderers[i];
+                    if (visualRenderer == null || visualRenderer is TrailRenderer)
+                    {
+                        continue;
+                    }
+
+                    if (visualRenderer is SpriteRenderer spriteRenderer)
+                    {
+                        spriteRenderer.color = color;
+                        continue;
+                    }
+
+                    visualRenderer.GetPropertyBlock(colorProperties);
+                    colorProperties.SetColor("_BaseColor", color);
+                    colorProperties.SetColor("_Color", color);
+                    visualRenderer.SetPropertyBlock(colorProperties);
+                }
+
+                for (int i = 0; i < trails.Length; i++)
+                {
+                    if (trails[i] == null) continue;
+                    trails[i].startColor = color;
+                    trails[i].endColor = new Color(color.r, color.g, color.b, 0f);
+                }
+
+                for (int i = 0; i < particleSystems.Length; i++)
+                {
+                    if (particleSystems[i] == null) continue;
+                    ParticleSystem.MainModule main = particleSystems[i].main;
+                    main.startColor = color;
+                }
+            }
+
+            for (int i = 0; i < lights.Length; i++)
+            {
+                if (lights[i] == null) continue;
+                lights[i].color = definition.OverrideVisualColor ? color : originalLightColors[i];
+                lights[i].intensity = originalLightIntensities[i] * definition.LightIntensityMultiplier;
+            }
         }
 
         private void Update()

@@ -29,6 +29,8 @@ MonoBehaviour:
     type: 3}
   <HitEffectPrefab>k__BackingField: {fileID: 0}
   <HitEffectColor>k__BackingField: {r: 1, g: 0.35, b: 0.08, a: 1}
+  <DefaultProjectile>k__BackingField: {fileID: 11400000, guid: d4f384f3b4f94b04c4737eeccf4f9334, type: 2}
+  <ProjectileFusionConfig>k__BackingField: {fileID: 0}
   <ProjectileBPrefab>k__BackingField: {fileID: 0}
   <FusedProjectilePrefab>k__BackingField: {fileID: 0}
   <FusionRadius>k__BackingField: 0.75

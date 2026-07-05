@@ -7,7 +7,8 @@ namespace AnchorDefense
         [SerializeField] private Transform firePoint;
         [SerializeField] private DirectionalSpriteRenderer directionalVisual;
         [SerializeField] private TurretHealth health;
-        [SerializeField] private TurretProjectileType projectileType = TurretProjectileType.A;
+        [SerializeField, Tooltip("The exact projectile asset fired by this turret. Leave empty to use TurretConfig.DefaultProjectile.")]
+        private ProjectileDefinition projectileDefinition;
         [SerializeField] private AudioSource fireAudioSource;
         [SerializeField] private AudioClip fireClip;
         [SerializeField, Range(0f, 1f)] private float fireVolume = 0.4f;
@@ -40,7 +41,7 @@ namespace AnchorDefense
         }
 
         public TurretHealth Health => health != null ? health : GetComponent<TurretHealth>();
-        public TurretProjectileType ProjectileType => projectileType;
+        public ProjectileDefinition ProjectileDefinition => projectileDefinition;
         public float ZoneFireIntervalMultiplier => zoneFireIntervalMultiplier;
         public float ZoneDamageMultiplier => zoneDamageMultiplier;
         public float ZoneRangeMultiplier => zoneRangeMultiplier;
@@ -60,9 +61,9 @@ namespace AnchorDefense
             health = turretHealth;
         }
 
-        public void ConfigureProjectileType(TurretProjectileType type)
+        public void ConfigureProjectile(ProjectileDefinition definition)
         {
-            projectileType = type == TurretProjectileType.Fused ? TurretProjectileType.A : type;
+            projectileDefinition = definition;
         }
 
 public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume = 0.4f, float windowSeconds = 0.2f, int maxSoundsPerWindow = 3, float repeatVolumeMultiplier = 0.6f)
@@ -127,7 +128,7 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
             if (cooldown <= 0f)
             {
                 projectileService.Fire(firePoint.position, currentTarget,
-                    runtimeStats.Damage * zoneDamageMultiplier, projectileType,
+                    runtimeStats.Damage * zoneDamageMultiplier, projectileDefinition,
                     runtimeStats.ProjectileSpeedMultiplier,
                     runtimeStats.ProjectileHitRadiusMultiplier);
                 PlayFireSound();

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e8d8ee538334c468b639932f87101d2, type: 3}
+  m_Name: Projectile_Directional
+  m_EditorClassIdentifier: 
+  projectileId: projectile_directional
+  displayName: Directional Projectile
+  prefab: {fileID: 9059230149801882794, guid: 6a9cd3d5ffc440d459ddcca29972c233, type: 3}
+  damageMultiplier: 1
+  speedMultiplier: 1
+  hitRadiusMultiplier: 1
+  lifetimeMultiplier: 1
+  overrideVisualColor: 0
+  visualColor: {r: 0.35, g: 1, b: 1, a: 1}
+  visualScaleMultiplier: 1
+  lightIntensityMultiplier: 1

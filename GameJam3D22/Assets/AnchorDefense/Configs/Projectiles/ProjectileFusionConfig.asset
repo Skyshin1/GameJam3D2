@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef26a41ad80c46ac9591cc999fbb38ce, type: 3}
+  m_Name: ProjectileFusionConfig
+  m_EditorClassIdentifier: 
+  recipes:
+  - inputA: {fileID: 11400000, guid: a1f051c0e1c648d191404bb9bb1c6001, type: 2}
+    inputB: {fileID: 11400000, guid: b2f162d1f2d749e2a2515ccaac2d7112, type: 2}
+    result: {fileID: 11400000, guid: c3f273e2a3e84af3b3626ddbbd3e8223, type: 2}
+    fusionRadius: 1.5
+    damageMultiplier: 1.35
+    resultSpeedMultiplier: 1.1
+    resultHitRadiusMultiplier: 1.5
+    resultLifetimeMultiplier: 1
+    fusionEffectPrefab: {fileID: 1501207461257158460, guid: db43b879890749f40bb21b4017ec477f,
+      type: 3}
+    fusionEffectColor: {r: 1, g: 0.78, b: 0.18, a: 1}
+    burstCount: 36
+    effectDuration: 0.9
+    minimumParticleSize: 0.12
+    maximumParticleSize: 0.38
+    minimumParticleSpeed: 2
+    maximumParticleSpeed: 6

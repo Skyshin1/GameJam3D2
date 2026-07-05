@@ -175,7 +175,7 @@ MonoBehaviour:
   firePoint: {fileID: 1652923229887962191}
   directionalVisual: {fileID: 0}
   health: {fileID: 3316561693930505521}
-  projectileType: 0
+  projectileDefinition: {fileID: 11400000, guid: a1f051c0e1c648d191404bb9bb1c6001, type: 2}
   fireAudioSource: {fileID: 4546975792119165550}
   fireClip: {fileID: 8300000, guid: 223092f4f64205547a9b7d4b03b5b2a2, type: 3}
   fireVolume: 0.4

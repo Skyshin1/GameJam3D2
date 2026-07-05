@@ -17,6 +17,8 @@ namespace AnchorDefense
         [SerializeField] private UpgradeTreeController upgradeTree;
         [SerializeField] private CubeZoneEditModeController zoneEditor;
 
+        private GameObject lastPauseMenuSelection;
+
         public bool IsPaused => panelRoot != null && panelRoot.activeSelf;
 
         public void ConfigureView(
@@ -50,47 +52,96 @@ namespace AnchorDefense
 
         private void Awake()
         {
-            resumeButton.onClick.AddListener(Resume);
-            settingsButton.onClick.AddListener(OpenSettings);
-            mainMenuButton.onClick.AddListener(ReturnToMainMenu);
-            gameFlow.StateChanged += HandleGameStateChanged;
-            panelRoot.SetActive(false);
+            if (resumeButton != null)
+            {
+                resumeButton.onClick.AddListener(Resume);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.AddListener(OpenSettings);
+            }
+
+            if (mainMenuButton != null)
+            {
+                mainMenuButton.onClick.AddListener(ReturnToMainMenu);
+            }
+
+            if (settingsMenu != null)
+            {
+                settingsMenu.Closed += HandleSettingsClosed;
+            }
+
+            if (gameFlow != null)
+            {
+                gameFlow.StateChanged += HandleGameStateChanged;
+            }
+
+            if (panelRoot != null)
+            {
+                panelRoot.SetActive(false);
+            }
         }
 
         private void Update()
         {
-            if (input == null || gameFlow == null || !gameFlow.IsPlaying ||
-                !input.Pause.WasPressedThisFrame())
+            if (input == null || gameFlow == null || !gameFlow.IsPlaying)
             {
                 return;
             }
 
-            if (settingsMenu != null && settingsMenu.IsOpen)
+            if (input.Pause.WasPressedThisFrame())
             {
-                settingsMenu.Close();
+                if (settingsMenu != null && settingsMenu.IsOpen)
+                {
+                    settingsMenu.Close();
+                    return;
+                }
+
+                if (zoneEditor != null && zoneEditor.IsEditing)
+                {
+                    zoneEditor.ExitFromExternal();
+                    return;
+                }
+
+                if (upgradeTree != null && upgradeTree.IsOpen)
+                {
+                    upgradeTree.CloseFromExternal();
+                    return;
+                }
+
+                SetPaused(!IsPaused);
                 return;
             }
 
-            if (zoneEditor != null && zoneEditor.IsEditing)
+            if (IsPaused && (settingsMenu == null || !settingsMenu.IsOpen))
             {
-                zoneEditor.ExitFromExternal();
-                return;
+                EnsurePauseMenuSelection();
             }
-
-            if (upgradeTree != null && upgradeTree.IsOpen)
-            {
-                upgradeTree.CloseFromExternal();
-                return;
-            }
-
-            SetPaused(!IsPaused);
         }
 
         private void OnDestroy()
         {
-            resumeButton.onClick.RemoveListener(Resume);
-            settingsButton.onClick.RemoveListener(OpenSettings);
-            mainMenuButton.onClick.RemoveListener(ReturnToMainMenu);
+            if (resumeButton != null)
+            {
+                resumeButton.onClick.RemoveListener(Resume);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.RemoveListener(OpenSettings);
+            }
+
+            if (mainMenuButton != null)
+            {
+                mainMenuButton.onClick.RemoveListener(ReturnToMainMenu);
+            }
+
+            if (settingsMenu != null)
+            {
+                settingsMenu.Closed -= HandleSettingsClosed;
+            }
+
             if (gameFlow != null)
             {
                 gameFlow.StateChanged -= HandleGameStateChanged;
@@ -104,20 +155,119 @@ namespace AnchorDefense
 
         private void OpenSettings()
         {
+            lastPauseMenuSelection = settingsButton != null
+                ? settingsButton.gameObject
+                : resumeButton != null
+                    ? resumeButton.gameObject
+                    : null;
+
             settingsMenu?.Open();
+        }
+
+        private void HandleSettingsClosed()
+        {
+            if (!IsPaused)
+            {
+                return;
+            }
+
+            SelectPauseMenuButton(lastPauseMenuSelection != null
+                ? lastPauseMenuSelection
+                : settingsButton != null
+                    ? settingsButton.gameObject
+                    : resumeButton != null
+                        ? resumeButton.gameObject
+                        : null);
         }
 
         private void SetPaused(bool paused)
         {
-            panelRoot.SetActive(paused);
+            if (panelRoot != null)
+            {
+                panelRoot.SetActive(paused);
+            }
+
             if (paused)
             {
-                EventSystem.current?.SetSelectedGameObject(resumeButton.gameObject);
+                lastPauseMenuSelection = resumeButton != null ? resumeButton.gameObject : null;
+                SelectPauseMenuButton(lastPauseMenuSelection);
             }
+            else
+            {
+                if (settingsMenu != null && settingsMenu.IsOpen)
+                {
+                    settingsMenu.Close();
+                }
+
+                EventSystem.current?.SetSelectedGameObject(null);
+            }
+
             if (gameFlow != null && gameFlow.IsPlaying)
             {
                 Time.timeScale = paused ? 0f : 1f;
             }
+        }
+
+        private void EnsurePauseMenuSelection()
+        {
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+            {
+                return;
+            }
+
+            GameObject selected = eventSystem.currentSelectedGameObject;
+
+            if (selected != null && selected.activeInHierarchy)
+            {
+                if (IsPauseMenuObject(selected))
+                {
+                    lastPauseMenuSelection = selected;
+                    return;
+                }
+            }
+
+            SelectPauseMenuButton(lastPauseMenuSelection != null
+                ? lastPauseMenuSelection
+                : resumeButton != null
+                    ? resumeButton.gameObject
+                    : null);
+        }
+
+        private bool IsPauseMenuObject(GameObject target)
+        {
+            if (target == null || panelRoot == null)
+            {
+                return false;
+            }
+
+            return target.transform == panelRoot.transform ||
+                   target.transform.IsChildOf(panelRoot.transform);
+        }
+
+        private void SelectPauseMenuButton(GameObject target)
+        {
+            if (target == null || !target.activeInHierarchy)
+            {
+                target = resumeButton != null ? resumeButton.gameObject : null;
+            }
+
+            if (target == null || !target.activeInHierarchy)
+            {
+                return;
+            }
+
+            lastPauseMenuSelection = target;
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+            {
+                return;
+            }
+
+            eventSystem.sendNavigationEvents = true;
+            eventSystem.SetSelectedGameObject(null);
+            eventSystem.SetSelectedGameObject(target);
         }
 
         private void HandleGameStateChanged(GameState state)
@@ -125,7 +275,13 @@ namespace AnchorDefense
             if (state == GameState.GameOver)
             {
                 settingsMenu?.Close();
-                panelRoot.SetActive(false);
+
+                if (panelRoot != null)
+                {
+                    panelRoot.SetActive(false);
+                }
+
+                EventSystem.current?.SetSelectedGameObject(null);
             }
         }
 

@@ -25,6 +25,9 @@ namespace AnchorDefense
         private float zoneFireIntervalMultiplier = 1f;
         private float zoneDamageMultiplier = 1f;
         private float zoneRangeMultiplier = 1f;
+        private float commandFireIntervalMultiplier = 1f;
+        private float commandDamageMultiplier = 1f;
+        private float commandBoostUntil;
 
         public void Initialize(
             TurretRuntimeStats turretStats,
@@ -45,6 +48,18 @@ namespace AnchorDefense
         public float ZoneFireIntervalMultiplier => zoneFireIntervalMultiplier;
         public float ZoneDamageMultiplier => zoneDamageMultiplier;
         public float ZoneRangeMultiplier => zoneRangeMultiplier;
+
+        public void ApplyCommandBoost(float fireIntervalMultiplier, float damageMultiplier, float duration)
+        {
+            commandFireIntervalMultiplier = Mathf.Min(commandFireIntervalMultiplier,
+                Mathf.Clamp(fireIntervalMultiplier, 0.05f, 1f));
+            commandDamageMultiplier = Mathf.Max(commandDamageMultiplier,
+                Mathf.Clamp(damageMultiplier, 1f, 3f));
+            commandBoostUntil = Mathf.Max(commandBoostUntil, Time.time + Mathf.Max(0f, duration));
+            if (runtimeStats != null)
+                cooldown = Mathf.Min(cooldown, runtimeStats.FireInterval *
+                    zoneFireIntervalMultiplier * commandFireIntervalMultiplier);
+        }
 
         public void ConfigureFirePoint(Transform projectileOrigin)
         {
@@ -103,6 +118,11 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
 
         private void Update()
         {
+            if (Time.time >= commandBoostUntil)
+            {
+                commandFireIntervalMultiplier = 1f;
+                commandDamageMultiplier = 1f;
+            }
             if (runtimeStats == null || firePoint == null || (health != null && !health.IsAlive))
             {
                 return;
@@ -128,11 +148,11 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
             if (cooldown <= 0f)
             {
                 projectileService.Fire(firePoint.position, currentTarget,
-                    runtimeStats.Damage * zoneDamageMultiplier, projectileDefinition,
+                    runtimeStats.Damage * zoneDamageMultiplier * commandDamageMultiplier, projectileDefinition,
                     runtimeStats.ProjectileSpeedMultiplier,
                     runtimeStats.ProjectileHitRadiusMultiplier);
                 PlayFireSound();
-                cooldown = runtimeStats.FireInterval * zoneFireIntervalMultiplier;
+                cooldown = runtimeStats.FireInterval * zoneFireIntervalMultiplier * commandFireIntervalMultiplier;
             }
         }
 

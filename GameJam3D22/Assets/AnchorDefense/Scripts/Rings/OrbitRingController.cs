@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace AnchorDefense
@@ -26,9 +27,11 @@ namespace AnchorDefense
         [SerializeField] private TurretSlot[] upgradeTurretSlots;
 
         private MaterialPropertyBlock propertyBlock;
+        private Coroutine commandRotation;
 
         public OrbitRingId RingId => ringId;
         public int ActiveTurretCount { get; private set; }
+        public bool IsCommandRotating => commandRotation != null;
 
         public void Configure(Renderer[] renderers, Color idleColor, Color highlightColor)
         {
@@ -154,7 +157,144 @@ namespace AnchorDefense
 
         public void RotateByDrag(float horizontalPixels, float sensitivity)
         {
+            StopCommandRotation();
             transform.Rotate(Vector3.up, -horizontalPixels * sensitivity, Space.Self);
+        }
+
+        public void RotateByCommand(float degrees, float duration)
+        {
+            StopCommandRotation();
+            commandRotation = StartCoroutine(AnimateCommandRotation(degrees, duration));
+        }
+
+        public void RotateContinuouslyByCommand(float degreesPerSecond, float duration)
+        {
+            StopCommandRotation();
+            commandRotation = StartCoroutine(AnimateContinuousRotation(degreesPerSecond, duration));
+        }
+
+        public void DefendByCommand(float maximumDegreesPerSecond, float duration)
+        {
+            StopCommandRotation();
+            commandRotation = StartCoroutine(AnimateTacticalRotation(
+                Mathf.Abs(maximumDegreesPerSecond), duration));
+        }
+
+        public void StopCommandRotation()
+        {
+            if (commandRotation == null) return;
+            StopCoroutine(commandRotation);
+            commandRotation = null;
+        }
+
+        private void OnDisable() => StopCommandRotation();
+
+        private IEnumerator AnimateContinuousRotation(float degreesPerSecond, float duration)
+        {
+            float elapsed = 0f;
+            while (duration <= 0f || elapsed < duration)
+            {
+                float step = duration <= 0f ? Time.deltaTime :
+                    Mathf.Min(Time.deltaTime, duration - elapsed);
+                transform.Rotate(Vector3.up, degreesPerSecond * step, Space.Self);
+                elapsed += step;
+                yield return null;
+            }
+            commandRotation = null;
+        }
+
+        private IEnumerator AnimateTacticalRotation(float maximumDegreesPerSecond, float duration)
+        {
+            float elapsed = 0f;
+            float reassessIn = 0f;
+            float remainingAngle = 0f;
+            bool scanning = false;
+            while (duration <= 0f || elapsed < duration)
+            {
+                float step = duration <= 0f ? Time.deltaTime :
+                    Mathf.Min(Time.deltaTime, duration - elapsed);
+                elapsed += step;
+                reassessIn -= step;
+                if (reassessIn <= 0f)
+                {
+                    reassessIn = 0.2f;
+                    scanning = !TryFindThreatAlignment(out remainingAngle);
+                }
+
+                float turn;
+                if (scanning)
+                {
+                    turn = -maximumDegreesPerSecond * 0.5f * step;
+                }
+                else
+                {
+                    turn = Mathf.Clamp(remainingAngle,
+                        -maximumDegreesPerSecond * step, maximumDegreesPerSecond * step);
+                    remainingAngle -= turn;
+                }
+                transform.Rotate(Vector3.up, turn, Space.Self);
+                yield return null;
+            }
+            commandRotation = null;
+        }
+
+        private bool TryFindThreatAlignment(out float angle)
+        {
+            angle = 0f;
+            EnemyController[] enemies = FindObjectsOfType<EnemyController>(false);
+            TurretController[] turrets = GetComponentsInChildren<TurretController>(false);
+            if (enemies.Length == 0 || turrets.Length == 0) return false;
+
+            Vector3 origin = transform.position;
+            Vector3 axis = transform.up;
+            EnemyController nearestEnemy = null;
+            float nearestDistance = float.PositiveInfinity;
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                EnemyController enemy = enemies[i];
+                if (enemy == null || !enemy.IsAlive) continue;
+                float distance = (enemy.transform.position - origin).sqrMagnitude;
+                if (distance >= nearestDistance) continue;
+                nearestDistance = distance;
+                nearestEnemy = enemy;
+            }
+            if (nearestEnemy == null) return false;
+
+            Vector3 enemyDirection = Vector3.ProjectOnPlane(
+                nearestEnemy.transform.position - origin, axis);
+            if (enemyDirection.sqrMagnitude < 0.01f) return false;
+            float smallestAngle = float.PositiveInfinity;
+            for (int i = 0; i < turrets.Length; i++)
+            {
+                TurretController turret = turrets[i];
+                if (turret == null || !turret.gameObject.activeInHierarchy) continue;
+                Vector3 turretDirection = Vector3.ProjectOnPlane(
+                    turret.transform.position - origin, axis);
+                if (turretDirection.sqrMagnitude < 0.01f) continue;
+                float candidate = Vector3.SignedAngle(turretDirection, enemyDirection, axis);
+                if (Mathf.Abs(candidate) >= smallestAngle) continue;
+                smallestAngle = Mathf.Abs(candidate);
+                angle = candidate;
+            }
+            return !float.IsPositiveInfinity(smallestAngle);
+        }
+
+        private IEnumerator AnimateCommandRotation(float degrees, float duration)
+        {
+            float elapsed = 0f;
+            float previous = 0f;
+            duration = Mathf.Max(0.05f, duration);
+            while (elapsed < duration)
+            {
+                elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+                float progress = elapsed / duration;
+                progress = progress * progress * (3f - 2f * progress);
+                float current = degrees * progress;
+                transform.Rotate(Vector3.up, current - previous, Space.Self);
+                previous = current;
+                yield return null;
+            }
+            commandRotation = null;
         }
 
         public void SetSelected(bool selected)

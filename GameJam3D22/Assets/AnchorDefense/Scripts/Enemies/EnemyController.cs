@@ -28,6 +28,8 @@ namespace AnchorDefense
         private float zoneSpeedMultiplier = 1f;
         private float zoneDamagePerSecond;
         private float zoneDamageTakenMultiplier = 1f;
+        private float commandSlowMultiplier = 1f;
+        private float commandSlowUntil;
 
         private float orbitAngle;
         private float orbitBobPhase;
@@ -50,6 +52,12 @@ namespace AnchorDefense
         public float ZoneSpeedMultiplier => zoneSpeedMultiplier;
         public float ZoneDamagePerSecond => zoneDamagePerSecond;
         public float ZoneDamageTakenMultiplier => zoneDamageTakenMultiplier;
+
+        public void ApplyCommandSlow(float multiplier, float duration)
+        {
+            commandSlowMultiplier = Mathf.Min(commandSlowMultiplier, Mathf.Clamp(multiplier, 0.05f, 1f));
+            commandSlowUntil = Mathf.Max(commandSlowUntil, Time.time + Mathf.Max(0f, duration));
+        }
 
         public event Action<EnemyController> Killed;
 
@@ -123,6 +131,8 @@ namespace AnchorDefense
             zoneSpeedMultiplier = 1f;
             zoneDamagePerSecond = 0f;
             zoneDamageTakenMultiplier = 1f;
+            commandSlowMultiplier = 1f;
+            commandSlowUntil = 0f;
 
             transform.localScale = Vector3.one * config.Size;
             SetColor(config.BaseColor);
@@ -166,6 +176,8 @@ namespace AnchorDefense
             zoneSpeedMultiplier = 1f;
             zoneDamagePerSecond = 0f;
             zoneDamageTakenMultiplier = 1f;
+            commandSlowMultiplier = 1f;
+            commandSlowUntil = 0f;
         }
 
         private void Update()
@@ -174,6 +186,8 @@ namespace AnchorDefense
             {
                 return;
             }
+
+            if (Time.time >= commandSlowUntil) commandSlowMultiplier = 1f;
 
             if (zoneDamagePerSecond > 0f)
             {
@@ -212,7 +226,7 @@ namespace AnchorDefense
                 directionalVisual?.SetWorldDirection(direction);
                 singleSpriteVisual?.SetWorldDirection(direction);
 
-                transform.position += direction * (moveSpeed * zoneSpeedMultiplier * Time.deltaTime);
+                transform.position += direction * (moveSpeed * zoneSpeedMultiplier * commandSlowMultiplier * Time.deltaTime);
                 transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
             }
 
@@ -265,13 +279,13 @@ namespace AnchorDefense
                 ? orbitAxis.normalized
                 : Vector3.up;
 
-            orbitAngle += config.OrbitAngularSpeed * zoneSpeedMultiplier * Time.deltaTime;
+            orbitAngle += config.OrbitAngularSpeed * zoneSpeedMultiplier * commandSlowMultiplier * Time.deltaTime;
 
             orbitBobPhase +=
                 config.OrbitBobFrequency *
                 Mathf.PI *
                 2f *
-                zoneSpeedMultiplier *
+                zoneSpeedMultiplier * commandSlowMultiplier *
                 Time.deltaTime;
 
             Quaternion orbitRotation = Quaternion.AngleAxis(orbitAngle, orbitAxis);
@@ -346,7 +360,7 @@ namespace AnchorDefense
 
             if (distance > config.RangedStopRadius)
             {
-                transform.position += coreDirection * (moveSpeed * zoneSpeedMultiplier * Time.deltaTime);
+                transform.position += coreDirection * (moveSpeed * zoneSpeedMultiplier * commandSlowMultiplier * Time.deltaTime);
             }
 
             TurretHealth target = turretRegistry?.FindNearestOperational(transform.position);

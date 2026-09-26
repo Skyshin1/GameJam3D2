@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b83c4c7279a3147ac86ad98c7f9ae2, type: 3}
+  m_Name: TurretPowerField
+  m_EditorClassIdentifier:
+  <Id>k__BackingField: power_field
+  <DisplayName>k__BackingField: 火力增幅
+  <ModelDescription>k__BackingField: 让目标区域内的炮塔在指令场持续期间提高子弹伤害。
+  <Keywords>k__BackingField:
+  - 炮塔伤害
+  - 火力
+  - 威力
+  - 强化
+  <Icon>k__BackingField: {fileID: 0}
+  <TargetPolicy>k__BackingField: 3
+  <Effect>k__BackingField: {fileID: 11400000, guid: 41634c105c1845b2acf9902c3c82b768, type: 2}
+  <VfxPrefab>k__BackingField: {fileID: 3499291209962302545, guid: 1e2fdcf002659074fbc87fe7e7d76059, type: 3}
+  <VfxLifetime>k__BackingField: 2
+  <UnlockRequirement>k__BackingField: {fileID: 0}

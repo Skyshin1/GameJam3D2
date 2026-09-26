@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d784d117026b7a54091b66e326063f71, type: 3}
+  m_Name: AICommandConfig
+  m_EditorClassIdentifier: 
+  <DefaultBaseUrl>k__BackingField: https://api.deepseek.com
+  <DefaultModel>k__BackingField: deepseek-flash
+  <Temperature>k__BackingField: 0.1
+  <TimeoutSeconds>k__BackingField: 12
+  <CommandCost>k__BackingField: 10
+  <MaximumInputLength>k__BackingField: 120
+  <MaximumOperations>k__BackingField: 6
+  <CommandFieldDuration>k__BackingField: 6
+  <OperationStaggerSeconds>k__BackingField: 0.25
+  <FieldMarkerPrefab>k__BackingField: {fileID: 714260370100001, guid: f88481c30e7048f1ba05fd82d45c8403,
+    type: 3}
+  <Skills>k__BackingField:
+  - {fileID: 11400000, guid: 792f4340185230346844e10d50a783f4, type: 2}
+  - {fileID: 11400000, guid: 945f1df89a3f87f4d9548e1527f9031f, type: 2}
+  - {fileID: 11400000, guid: 48b1c6bd025b09940b908b9036990477, type: 2}
+  - {fileID: 11400000, guid: 3db776a2ebd947f0a829662cc0f1aa20, type: 2}
+  - {fileID: 11400000, guid: 8e93d51fc10842cb83ce381ca2852355, type: 2}
+  - {fileID: 11400000, guid: fa0d2f65f0454290a18262424a05d50b, type: 2}
+  - {fileID: 11400000, guid: 49d86721411148d6ab2f09ea029a3f07, type: 2}

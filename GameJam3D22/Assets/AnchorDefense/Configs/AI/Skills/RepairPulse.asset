@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b83c4c7279a3147ac86ad98c7f9ae2, type: 3}
+  m_Name: RepairPulse
+  m_EditorClassIdentifier: 
+  <Id>k__BackingField: repair_pulse
+  <DisplayName>k__BackingField: "\u4FEE\u590D\u8109\u51B2"
+  <ModelDescription>k__BackingField: "\u6CBB\u7597\u6280\u80FD\uFF0C\u6062\u590D\u76EE\u6807\u533A\u57DF\u5185\u6240\u6709\u5B58\u6D3B\u70AE\u5854\u7684\u751F\u547D\uFF0C\u9002\u5408\u53D7\u635F\u70AE\u5854\u96C6\u4E2D\u7684\u533A\u57DF\u3002"
+  <Keywords>k__BackingField:
+  - "\u4FEE\u590D"
+  - "\u6CBB\u7597"
+  - "\u6062\u590D"
+  - "\u70AE\u5854"
+  - "\u751F\u547D"
+  <Icon>k__BackingField: {fileID: 0}
+  <TargetPolicy>k__BackingField: 1
+  <Effect>k__BackingField: {fileID: 11400000, guid: 32e38edfa4d45db44bd68f62c416fae6,
+    type: 2}
+  <VfxPrefab>k__BackingField: {fileID: 3499291209962302545, guid: 1e2fdcf002659074fbc87fe7e7d76059,
+    type: 3}
+  <VfxLifetime>k__BackingField: 2.5
+  <UnlockRequirement>k__BackingField: {fileID: 0}

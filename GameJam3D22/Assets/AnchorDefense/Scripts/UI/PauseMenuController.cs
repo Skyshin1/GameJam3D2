@@ -90,7 +90,8 @@ namespace AnchorDefense
                 return;
             }
 
-            if (input.Pause.WasPressedThisFrame())
+            if (input.Pause.WasPressedThisFrame() &&
+                !input.ShouldSuppressShortcut(input.Pause))
             {
                 if (settingsMenu != null && settingsMenu.IsOpen)
                 {

@@ -138,7 +138,8 @@ namespace AnchorDefense
 
         private void Update()
         {
-            if (input != null && input.ToggleUpgrade.WasPressedThisFrame())
+            if (input != null && input.ToggleUpgrade.WasPressedThisFrame() &&
+                !input.ShouldSuppressShortcut(input.ToggleUpgrade))
             {
                 TogglePanel();
             }

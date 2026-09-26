@@ -214,6 +214,33 @@ namespace AnchorDefense
                     keyboardZone.Configure("Gameplay", "ToggleZoneEdit", "Keyboard&Mouse", keyboardButton, keyboardText);
                     rows.Add(keyboardZone);
                     rows.Add(CloneBindingButton(keyboardZone, "ToggleZoneEdit", "Gamepad", -150f));
+
+                    float commandY = newY - 58f;
+                    CloneNearestLabel(pauseRow.RebindButton.transform.parent, pauseRect, commandY, "锚核指令终端");
+
+                    GameObject commandClone = Instantiate(
+                        pauseRow.RebindButton.gameObject,
+                        pauseRow.RebindButton.transform.parent);
+                    commandClone.name = "ToggleAICommand Keyboard Rebind";
+
+                    RectTransform commandRect = commandClone.transform as RectTransform;
+                    if (commandRect != null)
+                    {
+                        commandRect.sizeDelta = new Vector2(230f, 42f);
+                        commandRect.anchoredPosition = new Vector2(-430f, commandY);
+                    }
+
+                    InputRebindRow keyboardCommand = commandClone.GetComponent<InputRebindRow>();
+                    Button commandButton = commandClone.GetComponent<Button>();
+                    Text commandText = commandClone.GetComponentInChildren<Text>();
+                    if (keyboardCommand != null)
+                    {
+                        keyboardCommand.Configure(
+                            "CommandConsole", "Toggle", "Keyboard&Mouse", commandButton, commandText);
+                        rows.Add(keyboardCommand);
+                        rows.Add(CloneBindingButton(
+                            keyboardCommand, "CommandConsole", "Toggle", "Gamepad", -150f));
+                    }
                 }
             }
 
@@ -262,6 +289,16 @@ namespace AnchorDefense
             string group,
             float x)
         {
+            return CloneBindingButton(source, "Gameplay", action, group, x);
+        }
+
+        private static InputRebindRow CloneBindingButton(
+            InputRebindRow source,
+            string mapName,
+            string action,
+            string group,
+            float x)
+        {
             if (source == null || source.RebindButton == null)
             {
                 return null;
@@ -290,7 +327,7 @@ namespace AnchorDefense
 
             if (row != null)
             {
-                row.Configure("Gameplay", action, group, button, text);
+                row.Configure(mapName, action, group, button, text);
             }
 
             return row;

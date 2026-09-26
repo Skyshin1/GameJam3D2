@@ -127,7 +127,8 @@ namespace AnchorDefense
                 InitializeOrbitMode(cameraOrbitMode);
             }
 
-            if (input.CycleCamera.WasPressedThisFrame())
+            if (input.CycleCamera.WasPressedThisFrame() &&
+                !input.ShouldSuppressShortcut(input.CycleCamera))
             {
                 CycleCameraOrbitMode();
             }
@@ -140,7 +141,8 @@ namespace AnchorDefense
 
         private void HandleGamepadInput()
         {
-            if (input.CycleRing.WasPressedThisFrame())
+            if (input.CycleRing.WasPressedThisFrame() &&
+                !input.ShouldSuppressShortcut(input.CycleRing))
             {
                 SelectNextRing();
             }

@@ -82,7 +82,8 @@ namespace AnchorDefense
             }
 
             if (input == null || input.ToggleZoneEdit == null ||
-                !input.ToggleZoneEdit.WasPressedThisFrame()) return;
+                !input.ToggleZoneEdit.WasPressedThisFrame() ||
+                input.ShouldSuppressShortcut(input.ToggleZoneEdit)) return;
 
             if (IsEditing) ExitEditMode();
             else EnterEditMode();

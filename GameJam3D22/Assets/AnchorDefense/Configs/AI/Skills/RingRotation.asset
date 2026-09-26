@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b83c4c7279a3147ac86ad98c7f9ae2, type: 3}
+  m_Name: RingRotation
+  m_EditorClassIdentifier:
+  <Id>k__BackingField: rotate_ring
+  <DisplayName>k__BackingField: "\u661F\u73AF\u8C03\u5EA6"
+  <ModelDescription>k__BackingField: "操控已有星环，持续调整轨道炮塔方位；默认持续接管直到玩家停止或手动控制。可指定第一、第二、第三轨道及旋转方向；只有明确要求单次转动并停止才使用 once。"
+  <Keywords>k__BackingField:
+  - "\u8F68\u9053"
+  - "\u661F\u73AF"
+  - "\u65CB\u8F6C"
+  - "\u8F6C\u52A8\u661F\u73AF"
+  - "\u65CB\u8F6C\u8F68\u9053"
+  <Icon>k__BackingField: {fileID: 0}
+  <TargetPolicy>k__BackingField: 2
+  <Effect>k__BackingField: {fileID: 11400000, guid: e9c0a19179ea4d3c9da82193e42a35a2, type: 2}
+  <VfxPrefab>k__BackingField: {fileID: 0}
+  <VfxLifetime>k__BackingField: 0.8
+  <UnlockRequirement>k__BackingField: {fileID: 0}

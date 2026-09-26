@@ -11,6 +11,7 @@ namespace AnchorDefense
         [SerializeField] private TurretConfig turretConfig;
         [SerializeField] private EndlessModeConfig endlessModeConfig;
         [SerializeField] private UpgradeTreeConfig upgradeTreeConfig;
+        [SerializeField] private AICommandConfig aiCommandConfig;
 
         [Header("Scene References")]
         [SerializeField] private Camera gameplayCamera;
@@ -30,6 +31,7 @@ namespace AnchorDefense
         public TurretRegistry TurretRegistry { get; private set; }
         public ProjectileService ProjectileService { get; private set; }
         public UpgradeSystem UpgradeSystem { get; private set; }
+        public AICommandService AICommandService { get; private set; }
 
         public void Configure(
             CoreConfig newCoreConfig,
@@ -127,6 +129,20 @@ namespace AnchorDefense
             upgradeTree.ConfigureZoneEditor(zoneEditor);
             FindObjectOfType<PauseMenuController>(true)?.ConfigureZoneEditor(zoneEditor);
 
+            IAICommandProvider aiProvider = new OpenAICompatibleCommandProvider(aiCommandConfig);
+            AICommandService = new AICommandService(
+                aiCommandConfig,
+                aiProvider,
+                KillWallet,
+                UpgradeSystem,
+                zoneGrid,
+                core.transform,
+                gameplayCamera,
+                gameFlow,
+                rings);
+            FindObjectOfType<AICommandConsoleController>(true)?.Initialize(
+                AICommandService, inputController, gameFlow);
+
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();
             initialized = true;
@@ -139,6 +155,7 @@ namespace AnchorDefense
                 core.Died -= gameFlow.EndGame;
             }
             UpgradeSystem?.Dispose();
+            AICommandService?.Dispose();
         }
 
         private bool ValidateReferences()

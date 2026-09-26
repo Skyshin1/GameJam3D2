@@ -47,6 +47,13 @@ namespace AnchorDefense
             return zoneCollider != null && zoneCollider.bounds.Contains(worldPosition);
         }
 
+        public float SqrDistanceTo(Vector3 worldPosition)
+        {
+            return zoneCollider != null
+                ? zoneCollider.bounds.SqrDistance(worldPosition)
+                : (transform.position - worldPosition).sqrMagnitude;
+        }
+
         public void ApplySize(float cubeSize)
         {
             float size = Mathf.Max(1f, cubeSize);

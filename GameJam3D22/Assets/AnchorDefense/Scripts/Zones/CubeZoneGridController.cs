@@ -176,6 +176,100 @@ namespace AnchorDefense
             return cubeId >= 0 && cubeId < cubeEffects.Length ? cubeEffects[cubeId] : null;
         }
 
+        public bool TryGetActorsInZone(int cubeId, List<EnemyController> enemies,
+            List<TurretHealth> turrets, out float missingTurretHealth)
+        {
+            if (enemies == null) throw new ArgumentNullException(nameof(enemies));
+            if (turrets == null) throw new ArgumentNullException(nameof(turrets));
+            enemies.Clear();
+            turrets.Clear();
+            missingTurretHealth = 0f;
+
+            CubeZoneVolume cube = GetCubeById(cubeId);
+            if (cube == null) return false;
+
+            if (enemyRegistry != null)
+            {
+                IReadOnlyList<EnemyController> activeEnemies = enemyRegistry.ActiveEnemies;
+                for (int i = 0; i < activeEnemies.Count; i++)
+                {
+                    EnemyController enemy = activeEnemies[i];
+                    if (enemy != null && enemy.IsAlive && cube.Contains(enemy.transform.position))
+                    {
+                        enemies.Add(enemy);
+                    }
+                }
+            }
+
+            if (turretRegistry != null)
+            {
+                IReadOnlyList<TurretHealth> registeredTurrets = turretRegistry.Turrets;
+                for (int i = 0; i < registeredTurrets.Count; i++)
+                {
+                    TurretHealth turret = registeredTurrets[i];
+                    if (turret == null || !turret.gameObject.activeInHierarchy ||
+                        !cube.Contains(turret.transform.position))
+                    {
+                        continue;
+                    }
+
+                    turrets.Add(turret);
+                    if (turret.IsAlive)
+                    {
+                        missingTurretHealth += Mathf.Max(0f, turret.MaxHealth - turret.CurrentHealth);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public bool TryGetRuntimeSnapshot(int cubeId, out CubeZoneRuntimeSnapshot snapshot)
+        {
+            var enemies = new List<EnemyController>();
+            var turrets = new List<TurretHealth>();
+            if (!TryGetActorsInZone(cubeId, enemies, turrets, out float missingHealth))
+            {
+                snapshot = default;
+                return false;
+            }
+
+            int damagedTurrets = 0;
+            for (int i = 0; i < turrets.Count; i++)
+            {
+                TurretHealth turret = turrets[i];
+                if (turret != null && turret.IsAlive && turret.CurrentHealth < turret.MaxHealth)
+                {
+                    damagedTurrets++;
+                }
+            }
+
+            CubeZoneVolume cube = GetCubeById(cubeId);
+            snapshot = new CubeZoneRuntimeSnapshot(cubeId, cube.GridPosition, cube.transform.position,
+                enemies.Count, turrets.Count, damagedTurrets, missingHealth, GetAssignedEffect(cubeId));
+            return true;
+        }
+
+        // Used by one-shot command targeting when enemies are just outside all eight cubes.
+        // This does not change the persistent zone layout or zone effect membership.
+        public float GetEnemyPressureNearZone(int cubeId)
+        {
+            CubeZoneVolume cube = GetCubeById(cubeId);
+            if (cube == null || enemyRegistry == null) return 0f;
+
+            float halfSize = config != null ? config.CubeSize * 0.5f : 5.25f;
+            float scaleSquared = Mathf.Max(1f, halfSize * halfSize);
+            float pressure = 0f;
+            IReadOnlyList<EnemyController> activeEnemies = enemyRegistry.ActiveEnemies;
+            for (int i = 0; i < activeEnemies.Count; i++)
+            {
+                EnemyController enemy = activeEnemies[i];
+                if (enemy == null || !enemy.IsAlive) continue;
+                pressure += 1f / (1f + cube.SqrDistanceTo(enemy.transform.position) / scaleSquared);
+            }
+            return pressure;
+        }
+
         public void AssignEffect(int cubeId, CubeZoneEffectDefinition effect)
         {
             CubeZoneVolume cube = GetCubeById(cubeId);

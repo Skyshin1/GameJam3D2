@@ -37,5 +37,16 @@ namespace AnchorDefense
             Changed?.Invoke(TotalKills, AvailableKills);
             return true;
         }
+
+        public void RefundAvailable(int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            AvailableKills += amount;
+            Changed?.Invoke(TotalKills, AvailableKills);
+        }
     }
 }

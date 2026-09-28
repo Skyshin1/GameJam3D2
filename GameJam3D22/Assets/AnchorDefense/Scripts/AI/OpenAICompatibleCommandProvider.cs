@@ -32,6 +32,7 @@ namespace AnchorDefense
             try
             {
                 payload = SerializeRequest(commandRequest, settings, config);
+
             }
             catch (Exception exception)
             {
@@ -40,6 +41,7 @@ namespace AnchorDefense
 
             using var request = new UnityWebRequest(BuildEndpoint(settings.BaseUrl), UnityWebRequest.kHttpVerbPOST);
             request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(payload));
+            Debug.Log(payload);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.timeout = Mathf.Max(1, Mathf.CeilToInt(config.TimeoutSeconds));
             request.SetRequestHeader("Content-Type", "application/json");
@@ -93,7 +95,7 @@ namespace AnchorDefense
                 : new ChatCompletionRequest();
             body.model = providerSettings.Model;
             body.temperature = commandConfig.Temperature;
-            body.max_tokens = 512;
+            body.max_tokens = 2048;
             body.stream = false;
             body.messages = new[]
             {
@@ -117,6 +119,9 @@ namespace AnchorDefense
                     return AIProviderResult.Fail(AIProviderError.InvalidResponse, "模型没有返回命令");
                 }
 
+                Debug.Log(response.choices.Length);
+                Debug.Log(response.choices[0].message.content);
+
                 ChatChoice choice = response.choices[0];
                 if (string.Equals(choice.finish_reason, "length", StringComparison.Ordinal))
                 {
@@ -129,13 +134,12 @@ namespace AnchorDefense
                     return AIProviderResult.Fail(AIProviderError.InvalidResponse,
                         "模型返回了空内容，请重试");
                 }
-                if (!AICommandJsonValidator.HasExactTopLevelFields(content))
+                if (!AICommandJsonValidator.TryParse(content, out AIParsedCommand command))
                 {
                     return AIProviderResult.Fail(AIProviderError.InvalidResponse,
                         "模型未按约定返回技能指令");
                 }
 
-                AIParsedCommand command = JsonUtility.FromJson<AIParsedCommand>(content);
                 return command != null
                     ? AIProviderResult.Ok(command)
                     : AIProviderResult.Fail(AIProviderError.InvalidResponse, "模型命令无法解析");

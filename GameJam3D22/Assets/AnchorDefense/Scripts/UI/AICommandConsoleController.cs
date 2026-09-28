@@ -57,6 +57,7 @@ namespace AnchorDefense
             if (service != null)
             {
                 service.BusyChanged += HandleBusyChanged;
+                service.ExecutionUpdated += HandleExecutionUpdated;
                 service.Wallet.Changed += HandleWalletChanged;
             }
             if (gameFlow != null) gameFlow.StateChanged += HandleGameStateChanged;
@@ -120,6 +121,7 @@ namespace AnchorDefense
             if (service != null)
             {
                 service.BusyChanged -= HandleBusyChanged;
+                service.ExecutionUpdated -= HandleExecutionUpdated;
                 service.Wallet.Changed -= HandleWalletChanged;
             }
             if (gameFlow != null) gameFlow.StateChanged -= HandleGameStateChanged;
@@ -163,7 +165,7 @@ namespace AnchorDefense
             {
                 if (inputField != null) inputField.text = string.Empty;
                 if (resultText != null)
-                    resultText.text = result.ZoneId >= 0
+                    resultText.text = result.Operations.Count > 0 ? result.OperationSummary : result.ZoneId >= 0
                         ? $"{result.OperationSummary ?? result.Skill.DisplayName}  /  C{result.ZoneId + 1:00}"
                         : result.Skill.DisplayName;
                 if (resultIcon != null)
@@ -176,6 +178,13 @@ namespace AnchorDefense
             if (IsOpen) inputField?.ActivateInputField();
             if (result.Succeeded && IsOpen)
                 autoCloseRoutine = StartCoroutine(CloseAfterResult());
+        }
+
+        private void HandleExecutionUpdated(AICommandExecutionResult result)
+        {
+            if (resultText != null) resultText.text = result.OperationSummary;
+            SetStatus($"星核：{result.Message}", result.Succeeded);
+            if (!result.Succeeded) CancelAutoClose();
         }
 
         private IEnumerator CloseAfterResult()

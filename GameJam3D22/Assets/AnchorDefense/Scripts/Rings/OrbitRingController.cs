@@ -28,6 +28,7 @@ namespace AnchorDefense
 
         private MaterialPropertyBlock propertyBlock;
         private Coroutine commandRotation;
+        private AIParsedCommand commandOwner;
 
         public OrbitRingId RingId => ringId;
         public int ActiveTurretCount { get; private set; }
@@ -173,6 +174,33 @@ namespace AnchorDefense
             commandRotation = StartCoroutine(AnimateContinuousRotation(degreesPerSecond, duration));
         }
 
+        public void RotateRepeatedlyByCommand(float degrees, float duration, int count)
+        {
+            if (count < 1 || count > 20) throw new System.ArgumentOutOfRangeException(nameof(count));
+            StopCommandRotation();
+            commandRotation = StartCoroutine(AnimateRepeatedRotation(degrees, duration, count));
+        }
+
+        private IEnumerator AnimateRepeatedRotation(float degrees, float duration, int count)
+        {
+            duration = Mathf.Max(0.05f, duration);
+            for (int iteration = 0; iteration < count; iteration++)
+            {
+                float elapsed = 0f;
+                float previous = 0f;
+                while (elapsed < duration)
+                {
+                    elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+                    float progress = elapsed / duration;
+                    float current = degrees * progress * progress * (3f - 2f * progress);
+                    transform.Rotate(Vector3.up, current - previous, Space.Self);
+                    previous = current;
+                    yield return null;
+                }
+            }
+            commandRotation = null;
+        }
+
         public void DefendByCommand(float maximumDegreesPerSecond, float duration)
         {
             StopCommandRotation();
@@ -182,9 +210,17 @@ namespace AnchorDefense
 
         public void StopCommandRotation()
         {
+            commandOwner = null;
             if (commandRotation == null) return;
             StopCoroutine(commandRotation);
             commandRotation = null;
+        }
+
+        public void ClaimCommandOwnership(AIParsedCommand command) => commandOwner = command;
+
+        public void StopCommandRotationIfOwned(AIParsedCommand command)
+        {
+            if (ReferenceEquals(commandOwner, command)) StopCommandRotation();
         }
 
         private void OnDisable() => StopCommandRotation();

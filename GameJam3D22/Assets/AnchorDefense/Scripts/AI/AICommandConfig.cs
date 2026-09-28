@@ -7,13 +7,14 @@ namespace AnchorDefense
     {
         [field: Header("DeepSeek / OpenAI-Compatible API")]
         [field: SerializeField] public string DefaultBaseUrl { get; private set; } = "https://api.deepseek.com";
-        [field: SerializeField] public string DefaultModel { get; private set; } = "deepseek-flash";
+        [field: SerializeField] public string DefaultModel { get; private set; } = "deepseek-v4-pro";
         [field: SerializeField, Range(0f, 1f)] public float Temperature { get; private set; } = 0.1f;
         [field: SerializeField, Min(1f)] public float TimeoutSeconds { get; private set; } = 12f;
 
         [field: Header("Gameplay")]
         [field: SerializeField, Min(0)] public int CommandCost { get; private set; } = 10;
         [field: SerializeField, Min(1)] public int MaximumInputLength { get; private set; } = 120;
+        //optional
         [field: SerializeField, Range(1, 8)] public int MaximumOperations { get; private set; } = 6;
         [field: SerializeField, Min(0.1f)] public float CommandFieldDuration { get; private set; } = 6f;
         [field: SerializeField, Range(0f, 1.5f)] public float OperationStaggerSeconds { get; private set; } = 0.25f;

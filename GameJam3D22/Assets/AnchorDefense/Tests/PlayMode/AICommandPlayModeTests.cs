@@ -454,7 +454,7 @@ namespace AnchorDefense.Tests
                 });
 
                 Assert.That(payload, Does.Contain("\"thinking\":{\"type\":\"disabled\"}"));
-                Assert.That(payload, Does.Contain("\"max_tokens\":512"));
+                Assert.That(payload, Does.Contain("\"max_tokens\":2048"));
                 Assert.That(payload, Does.Contain("\"json_object\""));
 
                 string otherProviderPayload = (string)serialize.Invoke(null, new object[]

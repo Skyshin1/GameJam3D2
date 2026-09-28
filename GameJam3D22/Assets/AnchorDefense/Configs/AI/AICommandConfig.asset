@@ -16,7 +16,7 @@ MonoBehaviour:
   <DefaultModel>k__BackingField: deepseek-flash
   <Temperature>k__BackingField: 0.1
   <TimeoutSeconds>k__BackingField: 12
-  <CommandCost>k__BackingField: 10
+  <CommandCost>k__BackingField: 1
   <MaximumInputLength>k__BackingField: 120
   <MaximumOperations>k__BackingField: 6
   <CommandFieldDuration>k__BackingField: 6

@@ -27,6 +27,34 @@ namespace AnchorDefense
         private float strength;
         private bool[] activated;
         private bool[] failed;
+        private AICommandOperation[] plannedOperations;
+        private bool externallyActivated;
+        private float[] activationTimes;
+        public bool HasProducedEffect { get; private set; }
+        public System.Action<System.Exception> ExecutionFailed;
+
+        public void Prepare(CubeZoneGridController zoneGrid, Transform coreTransform,
+            GameFlowController flow, int targetZoneId, AICommandOperation[] plan,
+            float lifetime, int budgetOperations, OrbitRingController[] orbitRings)
+        {
+            plannedOperations = plan;
+            externallyActivated = true;
+            Initialize(zoneGrid, coreTransform, flow, targetZoneId,
+                System.Array.ConvertAll(plan, operation => operation.Skill), lifetime, 0f,
+                null, orbitRings);
+            strength = 1f / Mathf.Max(1, budgetOperations);
+            enabled = false;
+        }
+
+        public void ActivateOperation(AICommandOperation operation)
+        {
+            int index = System.Array.IndexOf(plannedOperations, operation);
+            if (index < 0) throw new System.InvalidOperationException("操作不属于此区域指令场");
+            enabled = true;
+            Activate(index);
+            if (failed[index]) throw new System.InvalidOperationException("区域技能激活失败");
+            ApplyToCurrentActors(0f);
+        }
 
         public void Initialize(CubeZoneGridController zoneGrid, Transform coreTransform,
             GameFlowController flow, int targetZoneId, ActiveSkillDefinition[] commandOperations,
@@ -46,6 +74,7 @@ namespace AnchorDefense
             duration = remaining;
             staggerSeconds = Mathf.Clamp(operationStaggerSeconds, 0f, 1.5f);
             strength = 1f / Mathf.Max(1, operations.Length);
+            activationTimes = new float[operations.Length];
             activated = new bool[operations.Length];
             failed = new bool[operations.Length];
             enemyApplications = new HashSet<long>[operations.Length];
@@ -55,8 +84,11 @@ namespace AnchorDefense
                 enemyApplications[i] = new HashSet<long>();
                 turretApplications[i] = new HashSet<int>();
             }
-            ActivateReadyOperations();
-            ApplyToCurrentActors(0f);
+            if (!externallyActivated)
+            {
+                ActivateReadyOperations();
+                ApplyToCurrentActors(0f);
+            }
         }
 
         private void Update()
@@ -70,12 +102,13 @@ namespace AnchorDefense
 
             remaining -= Time.deltaTime;
             elapsed += Time.deltaTime;
-            if (remaining <= 0f)
+            if (remaining <= 0f && (!externallyActivated ||
+                System.Array.TrueForAll(activated, value => value)))
             {
                 Destroy(gameObject);
                 return;
             }
-            ActivateReadyOperations();
+            if (!externallyActivated) ActivateReadyOperations();
             ApplyToCurrentActors(Time.deltaTime);
         }
 
@@ -84,26 +117,37 @@ namespace AnchorDefense
             for (int i = 0; i < operations.Length; i++)
             {
                 if (activated[i] || elapsed < i * staggerSeconds) continue;
-                activated[i] = true;
-                try
-                {
-                    ActiveSkillEffect effect = operations[i] != null ? operations[i].Effect : null;
-                    if (effect != null)
-                    {
-                        grid.TryGetActorsInZone(zoneId, enemies, turrets, out _);
-                        var context = new ActiveSkillContext(zoneId, grid.GetCubeById(zoneId),
-                            core, enemies, turrets, duration);
-                        effect.ApplyOnActivation(context, playerText, rings, parsedCommand);
-                    }
-                }
-                catch (System.Exception exception)
-                {
-                    Debug.LogException(exception);
-                    failed[i] = true;
-                }
-                try { SpawnVfx(operations[i]); }
-                catch (System.Exception exception) { Debug.LogException(exception); }
+                Activate(i);
             }
+        }
+
+        private void Activate(int i)
+        {
+            if (activated[i]) return;
+            activated[i] = true;
+            activationTimes[i] = elapsed;
+            if (externallyActivated) remaining = Mathf.Max(remaining, duration);
+            try
+            {
+                ActiveSkillEffect effect = operations[i] != null ? operations[i].Effect : null;
+                if (effect != null)
+                {
+                    grid.TryGetActorsInZone(zoneId, enemies, turrets, out _);
+                    var context = new ActiveSkillContext(zoneId, grid.GetCubeById(zoneId),
+                        core, enemies, turrets, duration);
+                    effect.ApplyOnActivation(context, plannedOperations != null ? plannedOperations[i].Source : playerText,
+                        rings, plannedOperations != null ? plannedOperations[i].Parameters : parsedCommand);
+                    HasProducedEffect = true;
+                }
+            }
+            catch (System.Exception exception)
+            {
+                failed[i] = true;
+                if (externallyActivated) throw;
+                Debug.LogException(exception);
+            }
+            try { SpawnVfx(operations[i]); }
+            catch (System.Exception exception) { Debug.LogException(exception); }
         }
 
         private void ApplyToCurrentActors(float deltaTime)
@@ -117,6 +161,13 @@ namespace AnchorDefense
                 ActiveSkillEffect effect = operations[operationIndex] != null
                     ? operations[operationIndex].Effect : null;
                 if (effect == null || !activated[operationIndex] || failed[operationIndex]) continue;
+                float operationDelta = deltaTime;
+                if (externallyActivated)
+                {
+                    float activeElapsed = elapsed - activationTimes[operationIndex];
+                    operationDelta = Mathf.Min(deltaTime, Mathf.Max(0f, duration - activeElapsed + deltaTime));
+                    if (activeElapsed >= duration && operationDelta <= 0f) continue;
+                }
 
                 try
                 {
@@ -126,7 +177,10 @@ namespace AnchorDefense
                         if (enemy == null || !enemy.IsAlive) continue;
                         long key = ((long)enemy.GetInstanceID() << 32) ^ (uint)enemy.SpawnVersion;
                         if (effect.RepeatWhileInside || enemyApplications[operationIndex].Add(key))
-                            effect.ApplyToEnemy(enemy, context, strength, deltaTime);
+                        {
+                            HasProducedEffect = true;
+                            effect.ApplyToEnemy(enemy, context, strength, operationDelta);
+                        }
                     }
 
                     for (int i = 0; i < turrets.Count; i++)
@@ -135,13 +189,22 @@ namespace AnchorDefense
                         if (turret == null || !turret.IsAlive) continue;
                         if (effect.RepeatWhileInside ||
                             turretApplications[operationIndex].Add(turret.GetInstanceID()))
-                            effect.ApplyToTurret(turret, context, strength, deltaTime);
+                        {
+                            HasProducedEffect = true;
+                            effect.ApplyToTurret(turret, context, strength, operationDelta);
+                        }
                     }
                 }
                 catch (System.Exception exception)
                 {
                     Debug.LogException(exception);
                     failed[operationIndex] = true;
+                    if (externallyActivated)
+                    {
+                        enabled = false;
+                        ExecutionFailed?.Invoke(exception);
+                        return;
+                    }
                 }
             }
         }

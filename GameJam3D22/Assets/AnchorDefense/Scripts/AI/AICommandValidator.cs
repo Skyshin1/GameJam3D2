@@ -9,7 +9,7 @@ namespace AnchorDefense
     {
         public bool TryNormalize(AIParsedCommand command, string playerText,
             IReadOnlyList<ActiveSkillDefinition> skills, int maximumOperations,
-            out AICommandOperation[] operations, out string error)
+            out AICommandOperation[] operations, out string error, AIGameCapabilityCatalog catalog = null)
         {
             operations = null;
             error = "模型没有返回有效命令";
@@ -55,7 +55,7 @@ namespace AnchorDefense
             int previousPosition = 0;
             foreach (AICommandGroup group in groups)
             {
-                if (group == null || (group.type != "区域" && group.type != "星环") ||
+                if (group == null || (group.type != "区域" && group.type != "星环" && group.type != "升级") ||
                     group.addSkill == null || group.operations == null || group.operations.Length == 0)
                 { error = "指令分组无效"; return false; }
                 foreach (AICommandItem item in group.operations)
@@ -67,6 +67,20 @@ namespace AnchorDefense
                     if (position < 0)
                     { error = "操作原文不存在或顺序不匹配，未扣指令点"; return false; }
                     previousPosition = position;
+                    if (group.type == "升级")
+                    {
+                        if (spec.action != "purchase_upgrade" || spec.mode != null || spec.count.HasValue || spec.selector != null)
+                        { error = "升级类型与操作不匹配"; return false; }
+                        if (IsNegatedSource(playerText, item.source, position, false))
+                        { error = "操作与玩家的否定指令冲突，未扣指令点"; return false; }
+                        if (catalog == null) { error = "升级功能不可用"; return false; }
+                        string upgradeClause = GetClause(playerText, position, item.source.Length);
+                        if (!catalog.TryResolve(upgradeClause, spec.index, out UpgradeNodeDefinition node, out error)) return false;
+                        normalized.Add(new AICommandOperation { Type = group.type, Source = item.source, Upgrade = node });
+                        continue;
+                    }
+                    if (AIGameCapabilityCatalog.HasUpgradeIntent(item.source))
+                    { error = "升级与技能操作类型不匹配，未扣指令点"; return false; }
                     ActiveSkillDefinition skill = FindSkill(spec.action, skills);
                     if (skill == null)
                     { error = "模型选择了不存在或尚未解锁的操作"; return false; }
@@ -79,6 +93,7 @@ namespace AnchorDefense
                         { action = "compose", operation_ids = new[] { skill.Id } };
                     if (ring)
                     {
+                        if (spec.selector != null) { error = "星环操作不接受区域选择条件"; return false; }
                         if (!HasRingControlIntent(item.source))
                         { error = "原文没有操控星环的意图，未扣指令点"; return false; }
                         if (spec.index != null && spec.index != "01" && spec.index != "02" && spec.index != "03")
@@ -97,23 +112,25 @@ namespace AnchorDefense
                     }
                     else
                     {
+                        if (spec.selector != null && !spec.selector.IsValid)
+                        { error = "区域选择条件无效"; return false; }
                         if (spec.mode != null || spec.count.HasValue ||
                             (spec.index != null && !TryParseZoneId(spec.index, out _)))
                         { error = "区域参数无效"; return false; }
                         // A fragment such as '攻击' taken from '攻击 C02' must not erase
                         // the explicit player target and let automatic scoring choose C01.
-                        int clauseStart = position;
-                        int clauseEnd = position + item.source.Length;
-                        while (clauseStart > 0 && "，,、；;。\n".IndexOf(playerText[clauseStart - 1]) < 0) clauseStart--;
-                        while (clauseEnd < playerText.Length && "，,、；;。\n".IndexOf(playerText[clauseEnd]) < 0) clauseEnd++;
-                        string clause = playerText.Substring(clauseStart, clauseEnd - clauseStart);
+                        string clause = GetClause(playerText, position, item.source.Length);
+                        AITargetSelector clauseSelector = AITargetSelector.FromSource(clause);
+                        if (clauseSelector != null && clauseSelector.Key != AITargetSelector.FromSource(item.source)?.Key)
+                        { error = "操作原文遗漏了玩家指定的区域选择条件，未扣指令点"; return false; }
                         const string targetWords = @"(?i)C\d+|这里|这块|选中|当前区域|左上|左下|右上|右下|左侧|左边|左区|右侧|右边|右区|上方|上侧|上区|下方|下侧|下区";
                         if (Regex.IsMatch(clause, targetWords) && !Regex.IsMatch(item.source, targetWords))
                         { error = "操作原文遗漏了玩家指定的区域，未扣指令点"; return false; }
                         parameters.target_zone_id = spec.index;
                     }
                     normalized.Add(new AICommandOperation
-                        { Type = group.type, Source = item.source, Skill = skill, Parameters = parameters });
+                        { Type = group.type, Source = item.source, Skill = skill, Parameters = parameters,
+                            Selector = ring ? null : AITargetSelector.FromSource(item.source) ?? spec.selector });
                 }
             }
             if (normalized.Count == 0 || normalized.Count > Math.Max(1, maximumOperations))
@@ -128,6 +145,23 @@ namespace AnchorDefense
             for (int i = 0; skills != null && i < skills.Count; i++)
                 if (skills[i] != null && skills[i].Effect != null && skills[i].Id == id) return skills[i];
             return null;
+        }
+
+        private static string GetClause(string text, int position, int length)
+        {
+            int start = position;
+            int end = position + length;
+            while (start > 0 && "，,、；;。\n".IndexOf(text[start - 1]) < 0)
+            {
+                if (start >= 2 && text.Substring(start - 2, 2) == "然后") break;
+                start--;
+            }
+            while (end < text.Length && "，,、；;。\n".IndexOf(text[end]) < 0)
+            {
+                if (end + 2 <= text.Length && text.Substring(end, 2) == "然后") break;
+                end++;
+            }
+            return text.Substring(start, end - start);
         }
 
         public static bool HasRingControlIntent(string text)
@@ -156,14 +190,14 @@ namespace AnchorDefense
         // rejects an obviously supported combination. Uses asset keywords, not hard-coded IDs.
         public bool TryResolveComposableIntent(string playerText,
             IReadOnlyList<ActiveSkillDefinition> availableSkills, int maximumOperations,
-            out AIParsedCommand command)
+            out AIParsedCommand command, AIGameCapabilityCatalog catalog = null)
         {
             command = null;
             if (string.IsNullOrWhiteSpace(playerText) || availableSkills == null) return false;
             string text = playerText.Trim();
             var groups = new List<AICommandGroup>();
             var compatibilityIds = new List<string>();
-            string[] clauses = Regex.Split(text, @"[，,、；;。\\n]|然后");
+            string[] clauses = Regex.Split(text, @"[，,、；;。\n]|然后");
             // A finite ring rotation often uses a comma between its angle and count.
             bool areaAction = false;
             foreach (ActiveSkillDefinition skill in availableSkills)
@@ -179,6 +213,16 @@ namespace AnchorDefense
                 string clause = rawClause.Trim();
                 if (clause.Length == 0) continue;
                 int position = text.IndexOf(clause, StringComparison.Ordinal);
+                if (AIGameCapabilityCatalog.HasUpgradeIntent(clause))
+                {
+                    if (HasRingControlIntent(clause) || Regex.IsMatch(clause,
+                        @"(?:并|再|随后)(?:发动)?(?:攻击|治疗|减速)|(?:攻击|治疗|减速)\s*C\d")) return false;
+                    if (catalog == null || IsNegatedSource(text, clause, position, false) ||
+                        !catalog.TryResolve(clause, null, out UpgradeNodeDefinition node, out _)) return false;
+                    groups.Add(new AICommandGroup { type = "升级", operations = new[] { new AICommandItem
+                        { source = clause, operate = new AIOperate { action = "purchase_upgrade", index = node.Id } } } });
+                    continue;
+                }
                 var matches = new List<KeyValuePair<int, ActiveSkillDefinition>>();
                 foreach (ActiveSkillDefinition skill in availableSkills)
                 {

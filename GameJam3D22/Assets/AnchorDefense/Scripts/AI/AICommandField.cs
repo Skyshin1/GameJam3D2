@@ -30,8 +30,16 @@ namespace AnchorDefense
         private AICommandOperation[] plannedOperations;
         private bool externallyActivated;
         private float[] activationTimes;
+        private AICommandFieldMarker presentation;
+        private Camera gameplayCamera;
+        private readonly Dictionary<(int id, int version, int style), AICommandActorFeedback> actorFeedback =
+            new Dictionary<(int, int, int), AICommandActorFeedback>();
+        private readonly List<(int id, int version, int style)> expiredFeedback = new List<(int, int, int)>();
         public bool HasProducedEffect { get; private set; }
         public System.Action<System.Exception> ExecutionFailed;
+
+        public void SetPresentation(AICommandFieldMarker marker, Camera view)
+        { presentation = marker; gameplayCamera = view; }
 
         public void Prepare(CubeZoneGridController zoneGrid, Transform coreTransform,
             GameFlowController flow, int targetZoneId, AICommandOperation[] plan,
@@ -146,7 +154,15 @@ namespace AnchorDefense
                 if (externallyActivated) throw;
                 Debug.LogException(exception);
             }
-            try { SpawnVfx(operations[i]); }
+            try
+            {
+                if (presentation != null && !failed[i])
+                {
+                    presentation.gameObject.SetActive(true);
+                    presentation.NotifyActivation(operations[i]);
+                }
+                SpawnVfx(operations[i]);
+            }
             catch (System.Exception exception) { Debug.LogException(exception); }
         }
 
@@ -179,7 +195,15 @@ namespace AnchorDefense
                         if (effect.RepeatWhileInside || enemyApplications[operationIndex].Add(key))
                         {
                             HasProducedEffect = true;
+                            Renderer visual = effect is AreaDamageSkillEffect ? AICommandActorFeedback.VisualFor(enemy.transform) : null;
+                            Vector3 impact = AICommandActorFeedback.FrontPosition(enemy.transform, visual, gameplayCamera);
                             effect.ApplyToEnemy(enemy, context, strength, operationDelta);
+                            if (effect is AreaDamageSkillEffect damage && damage.Damage * strength > 0f)
+                                ShowActorFeedback(enemy.transform, enemy, 1, effect, impact);
+                            else if (effect is EnemySlowSkillEffect slow && slow.SpeedMultiplier < 1f && strength > 0f)
+                                ShowActorFeedback(enemy.transform, enemy, 3, effect, enemy.transform.position);
+                            else if (effect is EnemyRepulsionSkillEffect repulsion && repulsion.Distance * strength > 0f)
+                                ShowActorFeedback(enemy.transform, enemy, 4, effect, enemy.transform.position);
                         }
                     }
 
@@ -191,7 +215,13 @@ namespace AnchorDefense
                             turretApplications[operationIndex].Add(turret.GetInstanceID()))
                         {
                             HasProducedEffect = true;
+                            float healthBefore = turret.CurrentHealth;
                             effect.ApplyToTurret(turret, context, strength, operationDelta);
+                            if (effect is TurretRepairSkillEffect && turret.CurrentHealth > healthBefore)
+                                ShowActorFeedback(turret.transform, null, 2, effect, turret.transform.position);
+                            else if (effect is TurretBoostSkillEffect boost && turret.GetComponent<TurretController>() != null &&
+                                (boost.FireIntervalMultiplier < 1f || boost.DamageMultiplier > 1f) && strength > 0f)
+                                ShowActorFeedback(turret.transform, null, 4, effect, turret.transform.position);
                         }
                     }
                 }
@@ -211,6 +241,8 @@ namespace AnchorDefense
 
         private void SpawnVfx(ActiveSkillDefinition operation)
         {
+            // Built-in skills now signal on affected actors, rather than spawning a large central cloud.
+            if (operation != null && AICommandActorFeedback.Supports(operation.Effect)) return;
             if (operation == null || operation.VfxPrefab == null) return;
             CubeZoneVolume zone = grid != null ? grid.GetCubeById(zoneId) : null;
             if (zone == null) return;
@@ -229,6 +261,39 @@ namespace AnchorDefense
             ParticleSystem[] particles = instance.GetComponentsInChildren<ParticleSystem>(true);
             for (int i = 0; i < particles.Length; i++) particles[i].Play(true);
             Destroy(instance, lifetime);
+        }
+
+        private void ShowActorFeedback(Transform actor, EnemyController enemy, int style, ActiveSkillEffect effect, Vector3 position)
+        {
+            try { RefreshActorFeedback(actor, enemy, style, effect, position); }
+            catch (System.Exception exception)
+            { Debug.LogWarning("单位反馈显示失败：" + exception.Message); }
+        }
+
+        private void RefreshActorFeedback(Transform actor, EnemyController enemy, int style, ActiveSkillEffect effect, Vector3 position)
+        {
+            var key = (actor.GetInstanceID(), enemy != null ? enemy.SpawnVersion : 0, style);
+            if (actorFeedback.TryGetValue(key, out AICommandActorFeedback existing) && existing != null)
+            {
+                if (style == 1) existing.transform.position = position;
+                existing.Refresh();
+                return;
+            }
+            if (actorFeedback.Count > 64)
+            {
+                expiredFeedback.Clear();
+                foreach (var pair in actorFeedback) if (pair.Value == null) expiredFeedback.Add(pair.Key);
+                foreach (var expired in expiredFeedback) actorFeedback.Remove(expired);
+            }
+            var cue = new GameObject("Command Actor Feedback");
+            cue.transform.SetParent(transform, false);
+            AICommandActorFeedback feedback = cue.AddComponent<AICommandActorFeedback>();
+            float size = presentation != null ? presentation.ActorCueWorldSize : 0.9f;
+            Renderer visual = AICommandActorFeedback.VisualFor(actor);
+            if (visual != null) size = Mathf.Clamp(Mathf.Max(visual.bounds.size.x, visual.bounds.size.y, visual.bounds.size.z) * 1.35f, size, size * 3f);
+            feedback.Initialize(actor, enemy, gameplayCamera, style, AICommandActorFeedback.ColorFor(effect), position,
+                size, presentation != null ? presentation.ActorCueOpacity : 0.9f, presentation != null ? presentation.SignalMaterial : null);
+            actorFeedback[key] = feedback;
         }
     }
 }

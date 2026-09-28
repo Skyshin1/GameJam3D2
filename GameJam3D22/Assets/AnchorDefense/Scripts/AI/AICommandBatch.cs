@@ -13,11 +13,13 @@ namespace AnchorDefense
         private GameFlowController flow;
         private OrbitRingController[] rings;
         private KillResourceWallet wallet;
+        private UpgradeSystem upgrades;
         private int cost;
         private bool paid;
         private bool started;
         private bool finished;
         private bool producedEffect;
+        private bool producedCommandEffect;
         private float elapsed;
         private float stagger;
         private int next;
@@ -27,20 +29,21 @@ namespace AnchorDefense
         public void Prepare(AICommandOperation[] plan, CubeZoneGridController grid,
             Transform core, GameFlowController gameFlow, OrbitRingController[] orbitRings,
             AICommandConfig config, Camera camera, KillResourceWallet commandWallet,
-            Action<AICommandExecutionResult> onProgress)
+            Action<AICommandExecutionResult> onProgress, UpgradeSystem upgradeSystem = null)
         {
             operations = plan;
             flow = gameFlow;
             rings = orbitRings;
             wallet = commandWallet;
+            upgrades = upgradeSystem;
             cost = config.CommandCost;
             stagger = config.OperationStaggerSeconds;
             progress = onProgress;
-            int budget = Array.FindAll(plan, operation => !operation.IsStop).Length;
+            int budget = Array.FindAll(plan, operation => !operation.IsUpgrade && !operation.IsStop).Length;
             var perZone = new Dictionary<int, List<AICommandOperation>>();
             foreach (AICommandOperation operation in plan)
             {
-                if (operation.Skill.Effect.IsWorldOperation) continue;
+                if (operation.IsUpgrade || operation.Skill.Effect.IsWorldOperation) continue;
                 if (!perZone.TryGetValue(operation.ZoneId, out List<AICommandOperation> zoneOperations))
                 {
                     zoneOperations = new List<AICommandOperation>();
@@ -62,9 +65,12 @@ namespace AnchorDefense
                 {
                     GameObject marker = Instantiate(config.FieldMarkerPrefab, fieldObject.transform);
                     marker.name = "Anchor Command Field Marker";
-                    marker.GetComponent<AICommandFieldMarker>()?.Initialize(
+                    AICommandFieldMarker markerPresentation = marker.GetComponent<AICommandFieldMarker>();
+                    markerPresentation?.Initialize(
                         Array.ConvertAll(pair.Value.ToArray(), operation => operation.Skill),
-                        grid.Config != null ? grid.Config.CubeSize : 10.5f, stagger, camera);
+                        grid.Config != null ? grid.Config.CubeSize : 10.5f, stagger, camera,
+                        config.CommandFieldDuration, true);
+                    field.SetPresentation(markerPresentation, camera);
                     // Presentation starts with the first operation, after the charge succeeds.
                     marker.SetActive(false);
                 }
@@ -103,12 +109,21 @@ namespace AnchorDefense
                 AICommandOperation operation = operations[next];
                 try
                 {
-                    if (operation.Skill.Effect.IsWorldOperation)
+                    if (operation.IsUpgrade)
+                    {
+                        if (!upgrades.TryPurchase(operation.Upgrade))
+                            throw new InvalidOperationException(AIGameCapabilityCatalog.PurchaseFailure(upgrades, operation.Upgrade));
+                        producedEffect = true;
+                    }
+                    else if (!operation.Skill.IsUnlocked(upgrades))
+                        throw new InvalidOperationException(operation.Skill.DisplayName + "尚未解锁");
+                    else if (operation.Skill.Effect.IsWorldOperation)
                     {
                         if (operation.Ring == null || !operation.Ring.gameObject.activeInHierarchy)
                             throw new InvalidOperationException("指定星环已不可用");
                         operation.Skill.Effect.ApplyOnActivation(null, operation.Source, rings, operation.Parameters);
                         producedEffect = true;
+                        producedCommandEffect = true;
                     }
                     else
                     {
@@ -117,6 +132,7 @@ namespace AnchorDefense
                         field.ActivateOperation(operation);
                         if (finished) return;
                         producedEffect |= field.HasProducedEffect;
+                        producedCommandEffect |= field.HasProducedEffect;
                         foreach (Transform child in field.transform)
                             if (child.name == "Anchor Command Field Marker") child.gameObject.SetActive(true);
                     }
@@ -125,6 +141,9 @@ namespace AnchorDefense
                 }
                 catch (Exception exception)
                 {
+                    // Native purchases commit cost and ownership before applying effects.
+                    if (operation.IsUpgrade && upgrades.GetState(operation.Upgrade) == UpgradeNodeState.Purchased)
+                    { operation.Executed = true; producedEffect = true; operation.Description += "（已购买，应用效果失败）"; }
                     Debug.LogException(exception);
                     Fail(exception.Message);
                     return;
@@ -144,16 +163,17 @@ namespace AnchorDefense
         {
             if (finished) return;
             foreach (AICommandField field in fields.Values)
-                if (field != null) producedEffect |= field.HasProducedEffect;
+                if (field != null)
+                { producedEffect |= field.HasProducedEffect; producedCommandEffect |= field.HasProducedEffect; }
             finished = true;
             CleanupFields();
             // Stop only controls started by this batch that still own the same ring generation.
             foreach (AICommandOperation operation in operations)
                 if (operation.Executed && !operation.IsStop && operation.Ring != null)
                     operation.Ring.StopCommandRotationIfOwned(operation.Parameters);
-            if (paid && !producedEffect) wallet.RefundAvailable(cost);
+            if (paid && !producedCommandEffect) wallet.RefundAvailable(cost);
             Publish(AICommandOutcome.ExecutionFailed, producedEffect ?
-                $"部分执行后失败：{message}；剩余操作已取消" :
+                $"部分执行后失败：{message}；剩余操作已取消" + (paid && !producedCommandEffect ? "；未生效的指令费用已返还" : "") :
                 $"执行失败：{message}；" + (paid ? "指令点已返还" : "未扣指令点"));
             Destroy(gameObject);
         }

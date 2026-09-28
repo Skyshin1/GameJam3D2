@@ -118,7 +118,8 @@ namespace AnchorDefense.Tests
                 Camera camera = cameraObject.AddComponent<Camera>();
                 Assert.DoesNotThrow(() => marker.Initialize(
                     new ActiveSkillDefinition[0], 10f, 0.25f, camera));
-                LineRenderer[] segments = markerObject.GetComponentsInChildren<LineRenderer>();
+                LineRenderer[] segments = System.Array.FindAll(markerObject.GetComponentsInChildren<LineRenderer>(),
+                    line => line.transform.parent == marker.transform);
                 Assert.That(segments, Has.Length.EqualTo(24));
                 for (int i = 0; i < segments.Length; i++)
                     Assert.That(segments[i].positionCount, Is.EqualTo(2));

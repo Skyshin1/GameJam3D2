@@ -2,34 +2,48 @@ using UnityEngine;
 
 namespace AnchorDefense
 {
-    // Presentation only: corner flash, soft additive mist and a floating skill badge.
+    // Presentation only: prismatic scan, breathing corners and twinkling stars.
     // Gameplay and targeting stay in AICommandField; this object has no collider.
     public sealed class AICommandFieldMarker : MonoBehaviour
     {
         [SerializeField] private LineRenderer[] cornerSegments;
-        [SerializeField] private Transform badgeRoot;
-        [SerializeField] private SpriteRenderer badgeIcon;
-        [SerializeField] private Sprite fallbackIcon;
+        [SerializeField, HideInInspector] private Transform badgeRoot;
+        [SerializeField, HideInInspector] private SpriteRenderer badgeIcon;
         [SerializeField] private Material cornerMaterial;
 
-        [Header("Command Mist — additive, no collider")]
-        [SerializeField] private Material mistMaterial;
-        [SerializeField, Range(8, 48)] private int mistPuffCount = 28;
-        [SerializeField, Range(0f, 0.7f)] private float mistOpacity = 0.32f;
-        [SerializeField] private Color mistColor = new Color(0.18f, 0.8f, 1f, 1f);
-        [SerializeField, Min(0.1f)] private float mistFlashDuration = 0.8f;
+        [Header("Starlight Burst")]
+        [SerializeField] private Material signalMaterial;
+        [SerializeField, Min(0.1f)] private float starBurstDuration = 0.75f;
+        [SerializeField, Range(0f, 1f)] private float starBurstOpacity = 0.5f;
+        [SerializeField, Range(0f, 0.5f)] private float cornerBreathAmount = 0.18f;
+        [SerializeField, Min(0.1f)] private float endingFadeDuration = 0.45f;
+
+        [Header("Prismatic Scan")]
+        [UnityEngine.Serialization.FormerlySerializedAs("scanDuration")]
+        [SerializeField, Min(0.1f)] private float scanSweepDuration = 0.9f;
+        [UnityEngine.Serialization.FormerlySerializedAs("scanOpacity")]
+        [SerializeField, Range(0f, 1f)] private float scanSweepOpacity = 0.38f;
+        [SerializeField, Range(0f, 1f)] private float cornerColorVariation = 0.6f;
+
+        [Header("Twinkling Stars")]
+        [SerializeField, Range(0, 128)] private int starCount = 42;
+        [SerializeField, Min(0.01f)] private float starWorldSize = 0.3f;
+        [SerializeField, Range(0f, 1f)] private float starOpacity = 0.85f;
+        [SerializeField, Range(0f, 2f)] private float starDriftSpeed = 0.35f;
+
+        [Header("Actor Feedback")]
+        [SerializeField, Min(0.1f)] private float actorCueWorldSize = 0.9f;
+        [SerializeField, Range(0f, 1f)] private float actorCueOpacity = 0.9f;
+        public Material SignalMaterial => signalMaterial != null ? signalMaterial : runtimeSignalMaterial;
+        public float ActorCueWorldSize => actorCueWorldSize;
+        public float ActorCueOpacity => actorCueOpacity;
 
         [Header("Cube Corners")]
         [SerializeField, Range(0.05f, 0.4f)] private float cornerLengthRatio = 0.18f;
         [SerializeField, Min(0.005f)] private float lineWidth = 0.055f;
         [SerializeField] private Color flashColor = new Color(0.55f, 0.95f, 1f, 0.78f);
-        [SerializeField] private Color restingColor = new Color(0.35f, 0.78f, 1f, 0.055f);
+        [SerializeField] private Color restingColor = new Color(0.35f, 0.78f, 1f, 0.13f);
         [SerializeField, Min(0.05f)] private float flashDuration = 0.6f;
-
-        [Header("Floating Skill Icon")]
-        [SerializeField, Min(0.05f)] private float badgeVisibleDuration = 1.35f;
-        [SerializeField, Min(0.01f)] private float badgeWorldSize = 1.5f;
-        [SerializeField, Min(0f)] private float badgeOffset = 0.45f;
 
         private ActiveSkillDefinition[] operations;
         private Camera gameplayCamera;
@@ -38,33 +52,60 @@ namespace AnchorDefense
         private float cubeSize;
         private int shownOperation = -1;
         private bool initialized;
-        private Mesh mistMesh;
-        private MeshRenderer mistRenderer;
-        private Material runtimeMistMaterial;
-        private Vector3[] mistVertices;
-        private Vector3[] mistCenters;
-        private Vector2[] mistUv;
-        private int[] mistTriangles;
-        // Unity may deserialize MonoBehaviours without retaining field initializers.
-        private MaterialPropertyBlock mistProperties;
+        private Mesh burstMesh;
+        private MeshRenderer burstRenderer;
+        private Material runtimeSignalMaterial;
+        private MaterialPropertyBlock burstProperties;
+        private float burstStarted;
+        private float endsAt;
+        private float fieldDuration;
+        private bool drivenByField;
+        private Color burstColor = new Color(0.35f, 0.88f, 1f);
+        private AICommandStarfield stars;
+        private MeshRenderer scanRenderer;
+        private MaterialPropertyBlock scanProperties;
 
         public void Initialize(ActiveSkillDefinition[] commandOperations, float targetCubeSize,
-            float staggerSeconds, Camera camera)
+            float staggerSeconds, Camera camera, float lifetime = 6f, bool externallyDriven = false)
         {
             operations = commandOperations;
             operationStagger = Mathf.Max(0f, staggerSeconds);
             gameplayCamera = camera;
             cubeSize = Mathf.Max(0.1f, targetCubeSize);
+            fieldDuration = Mathf.Max(0.1f, lifetime);
+            drivenByField = externallyDriven;
             elapsed = 0f;
             shownOperation = -1;
+            endsAt = fieldDuration;
+            burstStarted = float.NegativeInfinity;
             initialized = true;
             if (cornerSegments == null || cornerSegments.Length != 24)
                 cornerSegments = GetComponentsInChildren<LineRenderer>(true);
             if (cornerSegments.Length != 24) CreateRuntimeCornerSegments();
-            if (badgeRoot == null || badgeIcon == null) CreateRuntimeBadge();
+            HideLegacyBadge();
             SetCornerGeometry();
-            CreateMist();
-            ShowOperation(0);
+            CreateBurst();
+            CreateScan();
+            if (stars == null && SignalMaterial != null)
+            {
+                var starObject = new GameObject("Command Starlight");
+                starObject.transform.SetParent(transform, false);
+                stars = starObject.AddComponent<AICommandStarfield>();
+                stars.Initialize(SignalMaterial, starCount, cubeSize, starWorldSize, starOpacity, starDriftSpeed);
+            }
+            if (!drivenByField && operations != null && operations.Length > 0)
+                NotifyActivation(operations[0]);
+            RefreshPresentation();
+        }
+
+        // Called only after the real operation activates, including operations delayed by other groups.
+        public void NotifyActivation(ActiveSkillDefinition operation)
+        {
+            if (!initialized || operation == null) return;
+            shownOperation = operations != null ? System.Array.IndexOf(operations, operation) : -1;
+            burstColor = AICommandActorFeedback.ColorFor(operation.Effect);
+            burstStarted = elapsed;
+            endsAt = elapsed + fieldDuration;
             RefreshPresentation();
         }
 
@@ -72,101 +113,87 @@ namespace AnchorDefense
         {
             if (!initialized) return;
             elapsed += Time.deltaTime;
-            if (operations != null && operations.Length > 0)
+            if (!drivenByField && operations != null && operations.Length > 0)
             {
                 int index = operationStagger <= 0f ? operations.Length - 1 :
                     Mathf.Clamp(Mathf.FloorToInt(elapsed / operationStagger), 0, operations.Length - 1);
-                ShowOperation(index);
+                if (index != shownOperation) NotifyActivation(operations[index]);
             }
             RefreshPresentation();
         }
 
         private void OnDestroy()
         {
-            if (mistMesh != null) Destroy(mistMesh);
-            if (runtimeMistMaterial != null) Destroy(runtimeMistMaterial);
+            if (burstMesh != null) Destroy(burstMesh);
+            if (runtimeSignalMaterial != null) Destroy(runtimeSignalMaterial);
         }
 
-        private void CreateMist()
+        private void CreateBurst()
         {
-            if (mistRenderer != null) return;
-            Material source = mistMaterial;
+            if (burstRenderer != null) return;
+            Material source = signalMaterial;
             if (source == null)
             {
-                Shader shader = Shader.Find("AnchorDefense/AICommandMist");
+                Shader shader = Shader.Find("AnchorDefense/AICommandSignal");
                 if (shader == null) return;
-                runtimeMistMaterial = new Material(shader);
-                source = runtimeMistMaterial;
+                runtimeSignalMaterial = new Material(shader);
+                source = runtimeSignalMaterial;
             }
-            GameObject mist = new GameObject("Command Mist", typeof(MeshFilter), typeof(MeshRenderer));
-            mist.transform.SetParent(transform, false);
-            mistRenderer = mist.GetComponent<MeshRenderer>();
-            mistRenderer.sharedMaterial = source;
-            mistRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            mistRenderer.receiveShadows = false;
-            mistRenderer.allowOcclusionWhenDynamic = false;
-            int count = Mathf.Clamp(mistPuffCount, 8, 48);
-            mistVertices = new Vector3[count * 4];
-            mistCenters = new Vector3[count];
-            mistUv = new Vector2[count * 4];
-            mistTriangles = new int[count * 6];
-            for (int i = 0; i < count; i++)
-            {
-                // Deterministic positions keep the visual stable while the field is active.
-                mistCenters[i] = new Vector3(Hash(i * 3 + 1), Hash(i * 3 + 2),
-                    Hash(i * 3 + 3)) * (cubeSize * 0.68f);
-                int v = i * 4;
-                mistUv[v] = new Vector2(0f, 0f);
-                mistUv[v + 1] = new Vector2(1f, 0f);
-                mistUv[v + 2] = new Vector2(0f, 1f);
-                mistUv[v + 3] = new Vector2(1f, 1f);
-                int t = i * 6;
-                mistTriangles[t] = v;
-                mistTriangles[t + 1] = v + 2;
-                mistTriangles[t + 2] = v + 1;
-                mistTriangles[t + 3] = v + 2;
-                mistTriangles[t + 4] = v + 3;
-                mistTriangles[t + 5] = v + 1;
-            }
-            mistMesh = new Mesh { name = "AI Command Mist Quads" };
-            mistMesh.MarkDynamic();
-            mistMesh.vertices = mistVertices;
-            mistMesh.uv = mistUv;
-            mistMesh.triangles = mistTriangles;
-            mist.GetComponent<MeshFilter>().sharedMesh = mistMesh;
-            mistMesh.bounds = new Bounds(Vector3.zero, Vector3.one * cubeSize * 2f);
+            GameObject plane = new GameObject("Command Starburst", typeof(MeshFilter), typeof(MeshRenderer));
+            plane.transform.SetParent(transform, false);
+            plane.transform.localScale = Vector3.one * cubeSize * 1.15f;
+            burstMesh = AICommandActorFeedback.CreateQuad("AI Command Starlight Burst");
+            plane.GetComponent<MeshFilter>().sharedMesh = burstMesh;
+            burstRenderer = plane.GetComponent<MeshRenderer>();
+            burstRenderer.sharedMaterial = source;
+            burstRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            burstRenderer.receiveShadows = false;
+            burstProperties = new MaterialPropertyBlock();
         }
 
-        private static float Hash(int seed)
+        private void UpdateBurst()
         {
-            float value = Mathf.Sin(seed * 78.233f) * 43758.5453f;
-            return (value - Mathf.Floor(value)) * 2f - 1f;
+            if (burstRenderer == null) return;
+            float t = (elapsed - burstStarted) / Mathf.Max(0.1f, starBurstDuration);
+            burstRenderer.enabled = t >= 0f && t < 1f;
+            if (!burstRenderer.enabled) return;
+            Camera view = gameplayCamera != null ? gameplayCamera : Camera.main;
+            if (view != null) burstRenderer.transform.rotation = view.transform.rotation;
+            burstRenderer.transform.localPosition = Vector3.up * cubeSize * t * 0.025f;
+            burstProperties.SetColor("_TintColor", Color.Lerp(burstColor, new Color(0.6f, 0.83f, 1f), 0.75f));
+            burstProperties.SetFloat("_Style", 0f);
+            burstProperties.SetFloat("_Progress", t);
+            burstProperties.SetFloat("_Opacity", starBurstOpacity * Mathf.Sin(t * Mathf.PI));
+            burstRenderer.SetPropertyBlock(burstProperties);
         }
 
-        private void UpdateMist(Camera camera)
+        private void CreateScan()
         {
-            if (mistMesh == null || mistRenderer == null || camera == null) return;
-            Vector3 right = transform.InverseTransformDirection(camera.transform.right);
-            Vector3 up = transform.InverseTransformDirection(camera.transform.up);
-            for (int i = 0; i < mistCenters.Length; i++)
-            {
-                float phase = elapsed * (0.7f + (i % 5) * 0.12f) + i * 1.7f;
-                Vector3 center = mistCenters[i] + Vector3.up * (Mathf.Sin(phase) * cubeSize * 0.045f);
-                float radius = cubeSize * (0.12f + (i % 4) * 0.025f);
-                int v = i * 4;
-                mistVertices[v] = center - right * radius - up * radius;
-                mistVertices[v + 1] = center + right * radius - up * radius;
-                mistVertices[v + 2] = center - right * radius + up * radius;
-                mistVertices[v + 3] = center + right * radius + up * radius;
-            }
-            mistMesh.vertices = mistVertices;
-            float flash = 1f - Mathf.Clamp01(elapsed / mistFlashDuration);
-            float pulse = 0.88f + Mathf.Sin(elapsed * 2.7f) * 0.12f;
-            if (mistProperties == null) mistProperties = new MaterialPropertyBlock();
-            mistProperties.Clear();
-            mistProperties.SetColor("_TintColor", mistColor);
-            mistProperties.SetFloat("_Opacity", mistOpacity * (pulse + flash * 1.1f));
-            mistRenderer.SetPropertyBlock(mistProperties);
+            if (scanRenderer != null || SignalMaterial == null) return;
+            var plane = new GameObject("Command Scan", typeof(MeshFilter), typeof(MeshRenderer));
+            plane.transform.SetParent(transform, false);
+            plane.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            plane.transform.localScale = Vector3.one * cubeSize * 0.98f;
+            plane.GetComponent<MeshFilter>().sharedMesh = burstMesh;
+            scanRenderer = plane.GetComponent<MeshRenderer>();
+            scanRenderer.sharedMaterial = SignalMaterial;
+            scanRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            scanRenderer.receiveShadows = false;
+            scanProperties = new MaterialPropertyBlock();
+        }
+
+        private void UpdateScan(float activationAge)
+        {
+            if (scanRenderer == null) return;
+            float progress = activationAge / Mathf.Max(0.1f, scanSweepDuration);
+            scanRenderer.enabled = progress >= 0f && progress < 1f;
+            if (!scanRenderer.enabled) return;
+            scanRenderer.transform.localPosition = Vector3.up * Mathf.Lerp(cubeSize * 0.48f, -cubeSize * 0.48f, progress);
+            scanProperties.SetFloat("_Style", 6f);
+            scanProperties.SetFloat("_Progress", progress);
+            scanProperties.SetFloat("_Opacity", scanSweepOpacity * Mathf.Sin(progress * Mathf.PI));
+            scanProperties.SetColor("_TintColor", Color.white);
+            scanRenderer.SetPropertyBlock(scanProperties);
         }
 
         private void SetCornerGeometry()
@@ -215,63 +242,45 @@ namespace AnchorDefense
             }
         }
 
-        private void CreateRuntimeBadge()
+        private void HideLegacyBadge()
         {
-            GameObject badge = new GameObject("Skill Icon Badge");
-            badge.transform.SetParent(transform, false);
-            badgeRoot = badge.transform;
-            GameObject icon = new GameObject("Skill Icon", typeof(SpriteRenderer));
-            icon.transform.SetParent(badgeRoot, false);
-            badgeIcon = icon.GetComponent<SpriteRenderer>();
-            badgeIcon.sortingOrder = 90;
-        }
-
-        private void ShowOperation(int index)
-        {
-            if (operations == null || operations.Length == 0 || index == shownOperation) return;
-            shownOperation = index;
-            if (badgeIcon != null)
-            {
-                Sprite icon = operations[index] != null ? operations[index].Icon : null;
-                badgeIcon.sprite = icon != null ? icon : fallbackIcon;
-                badgeIcon.gameObject.SetActive(badgeIcon.sprite != null);
-            }
+            if (badgeRoot != null) badgeRoot.gameObject.SetActive(false);
+            if (badgeIcon != null) badgeIcon.enabled = false;
         }
 
         private void RefreshPresentation()
         {
-            float flash = 1f - Mathf.Clamp01(elapsed / flashDuration);
-            flash = flash * flash * (0.83f + 0.17f * Mathf.Sin(elapsed * 32f));
-            Color current = Color.Lerp(restingColor, flashColor, flash);
-            if (cornerSegments != null)
+            float activationAge = elapsed - burstStarted;
+            float flash = 0f;
+            if (!float.IsInfinity(activationAge) && activationAge >= 0f)
             {
+                flash = 1f - Mathf.Clamp01(activationAge / flashDuration);
+                flash = flash * flash * (0.83f + 0.17f * Mathf.Sin(activationAge * 32f));
+            }
+            float remaining = Mathf.Max(0f, endsAt - elapsed);
+            float ending = 1f - Mathf.Clamp01(remaining / endingFadeDuration);
+            float endingFlash = Mathf.Sin(ending * Mathf.PI) * 0.65f;
+            Color current = Color.Lerp(restingColor, flashColor, Mathf.Max(flash, endingFlash));
+            if (flash <= 0f && ending <= 0f)
+                current.a *= 1f + Mathf.Sin(elapsed * 2f) * cornerBreathAmount;
+            current.a *= Mathf.Clamp01(remaining / Mathf.Min(0.22f, endingFadeDuration));
+            if (cornerSegments != null)
                 for (int i = 0; i < cornerSegments.Length; i++)
                 {
                     LineRenderer line = cornerSegments[i];
                     if (line == null) continue;
-                    line.startColor = current;
-                    line.endColor = current;
+                    Color color = Color.Lerp(current, AICommandStarfield.Palette(i / 24f + elapsed * 0.012f), cornerColorVariation);
+                    color.a = current.a;
+                    line.startColor = color;
+                    Color tip = Color.Lerp(color, AICommandStarfield.Palette(i / 24f + 0.08f), 0.25f);
+                    tip.a = color.a;
+                    line.endColor = tip;
                 }
-            }
 
+            UpdateBurst();
+            UpdateScan(activationAge);
             Camera currentCamera = gameplayCamera != null ? gameplayCamera : Camera.main;
-            UpdateMist(currentCamera);
-            if (badgeRoot == null || badgeIcon == null || badgeIcon.sprite == null) return;
-            if (currentCamera != null)
-            {
-                Transform cameraTransform = currentCamera.transform;
-                badgeRoot.position = transform.position +
-                    cameraTransform.right * (cubeSize * 0.36f + badgeOffset) +
-                    cameraTransform.up * (cubeSize * 0.34f + badgeOffset);
-                badgeRoot.rotation = cameraTransform.rotation;
-            }
-            float spriteSize = Mathf.Max(badgeIcon.sprite.bounds.size.x,
-                badgeIcon.sprite.bounds.size.y);
-            badgeIcon.transform.localScale = Vector3.one * (badgeWorldSize / Mathf.Max(0.01f, spriteSize));
-            float lastActivation = operations != null
-                ? Mathf.Max(0, operations.Length - 1) * operationStagger : 0f;
-            float remaining = Mathf.Clamp01((lastActivation + badgeVisibleDuration - elapsed) / 0.35f);
-            badgeIcon.color = new Color(1f, 1f, 1f, remaining);
+            if (stars != null) stars.Present(currentCamera, elapsed, activationAge, remaining, endingFadeDuration);
         }
 
 #if UNITY_EDITOR
@@ -281,7 +290,7 @@ namespace AnchorDefense
             cornerSegments = segments;
             badgeRoot = badge;
             badgeIcon = icon;
-            fallbackIcon = fallback;
+            HideLegacyBadge();
             cornerMaterial = material;
             cubeSize = Mathf.Max(0.1f, previewCubeSize);
             SetCornerGeometry();

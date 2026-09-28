@@ -96,21 +96,26 @@ MonoBehaviour:
   - {fileID: 8443355956779863877}
   badgeRoot: {fileID: 2328706724073286085}
   badgeIcon: {fileID: 2899539725210257441}
-  fallbackIcon: {fileID: 21300000, guid: 06880ad744de2a548a65cf415512493c, type: 3}
   cornerMaterial: {fileID: 2100000, guid: ba7a056de36440b5b83c36b59e124ab0, type: 2}
-  mistMaterial: {fileID: 2100000, guid: 493fafdd88584022a218c4413f90a86c, type: 2}
-  mistPuffCount: 28
-  mistOpacity: 0.32
-  mistColor: {r: 0.18, g: 0.8, b: 1, a: 1}
-  mistFlashDuration: 0.8
+  signalMaterial: {fileID: 2100000, guid: 3b1081e19ae3476f9f5495b22c815e6b, type: 2}
+  starBurstDuration: 0.75
+  starBurstOpacity: 0.5
+  cornerBreathAmount: 0.18
+  endingFadeDuration: 0.45
+  scanSweepDuration: 0.9
+  scanSweepOpacity: 0.38
+  cornerColorVariation: 0.6
+  starCount: 42
+  starWorldSize: 0.3
+  starOpacity: 0.85
+  starDriftSpeed: 0.35
+  actorCueWorldSize: 0.9
+  actorCueOpacity: 0.9
   cornerLengthRatio: 0.18
   lineWidth: 0.055
   flashColor: {r: 0.55, g: 0.95, b: 1, a: 0.78}
-  restingColor: {r: 0.35, g: 0.78, b: 1, a: 0.055}
+  restingColor: {r: 0.35, g: 0.78, b: 1, a: 0.13}
   flashDuration: 0.6
-  badgeVisibleDuration: 1.35
-  badgeWorldSize: 1.5
-  badgeOffset: 0.45
 --- !u!1 &371272587138784121
 GameObject:
   m_ObjectHideFlags: 0
@@ -1026,7 +1031,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2328706724073286085
 Transform:
   m_ObjectHideFlags: 0

@@ -166,12 +166,14 @@ namespace AnchorDefense
                 if (inputField != null) inputField.text = string.Empty;
                 if (resultText != null)
                     resultText.text = result.Operations.Count > 0 ? result.OperationSummary : result.ZoneId >= 0
-                        ? $"{result.OperationSummary ?? result.Skill.DisplayName}  /  C{result.ZoneId + 1:00}"
-                        : result.Skill.DisplayName;
+                        ? $"{result.OperationSummary ?? result.Skill?.DisplayName}  /  C{result.ZoneId + 1:00}"
+                        : result.Skill?.DisplayName ?? result.Message;
                 if (resultIcon != null)
                 {
-                    resultIcon.sprite = result.Skill.Icon;
-                    resultIcon.gameObject.SetActive(result.Skill.Icon != null);
+                    Sprite icon = result.Skill != null ? result.Skill.Icon :
+                        result.Operations.Count > 0 ? result.Operations[0].Upgrade?.Icon : null;
+                    resultIcon.sprite = icon;
+                    resultIcon.gameObject.SetActive(icon != null);
                 }
             }
             RefreshBalance();
@@ -218,7 +220,7 @@ namespace AnchorDefense
             if (balanceText == null) return;
             int available = service?.Wallet != null ? service.Wallet.AvailableKills : 0;
             int cost = service != null ? service.CommandCost : 10;
-            balanceText.text = $"指令点 {available} · -{cost}";
+            balanceText.text = $"指令点 {available} · 技能 -{cost}";
         }
 
         private void SetStatus(string message, bool success)

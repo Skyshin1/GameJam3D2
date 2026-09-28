@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace AnchorDefense.Tests
 {
-    public sealed class AICommandProtocolPlayModeTests
+    public sealed partial class AICommandProtocolPlayModeTests
     {
         private readonly List<Object> owned = new List<Object>();
         private AICommandService service;
@@ -25,6 +25,8 @@ namespace AnchorDefense.Tests
         private ActiveSkillDefinition rotate;
         private OrbitRingController[] rings;
         private EnemyRegistry enemies;
+        private TurretRegistry turrets;
+        private UpgradeSystem upgrades;
 
         [SetUp]
         public void SetUp()
@@ -48,7 +50,8 @@ namespace AnchorDefense.Tests
             }
             grid.Configure(zones, cubes);
             enemies = new EnemyRegistry();
-            grid.Initialize(enemies, new TurretRegistry(), core);
+            turrets = new TurretRegistry();
+            grid.Initialize(enemies, turrets, core);
             strike = Skill("anchor_strike", "攻击", Asset<AreaDamageSkillEffect>(), new[] { "攻击", "轰击" });
             repair = Skill("repair_pulse", "治疗", Asset<TurretRepairSkillEffect>(), new[] { "治疗", "修复" });
             slow = Skill("slow_field", "减速", Asset<EnemySlowSkillEffect>(), new[] { "减速", "迟缓" });
@@ -71,6 +74,8 @@ namespace AnchorDefense.Tests
         {
             service?.Dispose();
             service = null;
+            upgrades?.Dispose();
+            upgrades = null;
             foreach (AICommandBatch batch in Object.FindObjectsOfType<AICommandBatch>())
                 Object.DestroyImmediate(batch.gameObject);
             for (int i = owned.Count - 1; i >= 0; i--)
@@ -99,7 +104,7 @@ namespace AnchorDefense.Tests
         private AICommandExecutionResult Submit(AIParsedCommand command, string text)
         {
             service = new AICommandService(config, new MockAICommandProvider(command), wallet,
-                null, grid, core, camera, flow, rings);
+                upgrades, grid, core, camera, flow, rings);
             return service.Submit(text).GetAwaiter().GetResult();
         }
 

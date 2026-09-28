@@ -48,6 +48,7 @@ namespace AnchorDefense
         public string index;
         public string mode;
         public int? count;
+        public AITargetSelector selector;
     }
 
     // A validated operation carries its own source and parameters, never the whole sentence.
@@ -56,13 +57,16 @@ namespace AnchorDefense
         public string Type;
         public string Source;
         public ActiveSkillDefinition Skill;
+        public UpgradeNodeDefinition Upgrade;
+        public AITargetSelector Selector;
         public AIParsedCommand Parameters;
         public int ZoneId = -1;
         public OrbitRingController Ring;
         public bool StopsAllRings;
         public string Description;
         public bool Executed;
-        public bool IsStop => Skill.Effect.IsWorldOperation && Parameters.RingMode == "stop";
+        public bool IsUpgrade => Upgrade != null;
+        public bool IsStop => Skill != null && Skill.Effect.IsWorldOperation && Parameters.RingMode == "stop";
     }
 
     public sealed class AICommandRequest
@@ -195,7 +199,7 @@ namespace AnchorDefense
             {
                 if (!(groupValue is Dictionary<string, object> group) ||
                     !HasKeys(group, "type", "operations", "addSkill") ||
-                    !(group["type"] is string type) || (type != "区域" && type != "星环") ||
+                    !(group["type"] is string type) || (type != "区域" && type != "星环" && type != "升级") ||
                     !(group["addSkill"] is Dictionary<string, object> reserved) || reserved.Count != 0 ||
                     !(group["operations"] is List<object> items) || items.Count == 0) return false;
                 var parsedItems = new List<AICommandItem>();
@@ -205,11 +209,20 @@ namespace AnchorDefense
                         !HasKeys(item, "operate", "source") ||
                         !(item["source"] is string source) || string.IsNullOrWhiteSpace(source) ||
                         !(item["operate"] is Dictionary<string, object> op) ||
-                        !HasKeys(op, type == "区域" ? new[] { "action", "index" } :
-                            new[] { "action", "index", "mode", "count" }) ||
+                        !HasKeys(op, type == "星环" ? new[] { "action", "index", "mode", "count" } :
+                            type == "区域" && op.ContainsKey("selector") ? new[] { "action", "index", "selector" } :
+                            new[] { "action", "index" }) ||
                         !(op["action"] is string id) || string.IsNullOrWhiteSpace(id) ||
                         (op["index"] != null && !(op["index"] is string))) return false;
                     var spec = new AIOperate { action = id, index = op["index"] as string };
+                    if (op.ContainsKey("selector"))
+                    {
+                        if (!(op["selector"] is Dictionary<string, object> selector) ||
+                            !HasKeys(selector, "metric", "order") ||
+                            !(selector["metric"] is string metric) || !(selector["order"] is string order)) return false;
+                        spec.selector = new AITargetSelector { metric = metric, order = order };
+                        if (!spec.selector.IsValid) return false;
+                    }
                     if (type == "星环")
                     {
                         if (!(op["mode"] is string mode) ||

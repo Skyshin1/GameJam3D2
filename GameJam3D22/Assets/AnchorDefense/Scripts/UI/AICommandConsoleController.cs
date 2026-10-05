@@ -28,6 +28,8 @@ namespace AnchorDefense
         private Coroutine autoCloseRoutine;
         private AICommandExecutionResult lastResult;
         private AICompanionService companion;
+        private CatCourierLayout courier;
+        public event System.Action<string, bool, bool> CompanionMessage;
         private UnityEngine.InputSystem.Keyboard imeKeyboard;
         private bool imeComposing;
         private int imeCommitFrame = -10;
@@ -53,12 +55,13 @@ namespace AnchorDefense
             if (resultText != null) resultText.text = string.Empty;
             if (resultIcon != null) resultIcon.gameObject.SetActive(false);
             if (!systemMessage) portraitMotion?.React(!concerned);
+            CompanionMessage?.Invoke(message, systemMessage, concerned);
         }
         public void OpenForRescue()
         {
             CancelAutoClose();
             panelRoot.SetActive(true);
-            openButton.gameObject.SetActive(false);
+            openButton.gameObject.SetActive(GetComponent<CatCourierLayout>() != null);
             companion.ConversationOpen = true;
             if (input != null) input.IsTextEntryActive = true;
             inputField?.ActivateInputField();
@@ -113,6 +116,7 @@ namespace AnchorDefense
 
         private void Awake()
         {
+            courier = GetComponent<CatCourierLayout>();
             if (assistantPortrait == null && panelRoot != null)
                 assistantPortrait = panelRoot.GetComponentInChildren<AICommandAssistantMotion>(true)
                     ?.GetComponent<Image>();
@@ -126,7 +130,7 @@ namespace AnchorDefense
                 openButton.image.preserveAspect = true;
             }
             openButton?.GetComponent<AICommandAssistantMotion>()?.CaptureAppearance();
-            openButton?.onClick.AddListener(Open);
+            openButton?.onClick.AddListener(ToggleCourier);
             closeButton?.onClick.AddListener(Close);
             submitButton?.onClick.AddListener(SubmitFromUi);
             if (panelRoot != null) panelRoot.SetActive(false);
@@ -171,7 +175,7 @@ namespace AnchorDefense
             if (companion != null) companion.BusyChanged -= HandleBusyChanged;
             GameLocalization.LanguageChanged -= RefreshLanguage;
             CancelAutoClose();
-            openButton?.onClick.RemoveListener(Open);
+            openButton?.onClick.RemoveListener(ToggleCourier);
             closeButton?.onClick.RemoveListener(Close);
             submitButton?.onClick.RemoveListener(SubmitFromUi);
             if (service != null)
@@ -189,7 +193,7 @@ namespace AnchorDefense
             if (!initialized || gameFlow == null || !gameFlow.IsPlaying || Time.timeScale <= 0f) return;
             CancelAutoClose();
             panelRoot.SetActive(true);
-            openButton.gameObject.SetActive(false);
+            openButton.gameObject.SetActive(courier != null);
             portraitMotion?.SetMood(AICommandAssistantMood.Listening);
             if (input != null) input.IsTextEntryActive = true;
             inputField?.ActivateInputField();
@@ -220,6 +224,13 @@ namespace AnchorDefense
             OpenChanged?.Invoke(false);
         }
 
+        private void ToggleCourier() { if (IsOpen && courier != null) Close(); else Open(); }
+        public void CloseAfterCompanionReply()
+        {
+            if (courier == null || !IsOpen || (companion != null && companion.RescuePending)) return;
+            CancelAutoClose(); autoCloseRoutine = StartCoroutine(CloseAfterResult());
+        }
+
         private async void SubmitFromUi()
         {
             if (companion != null)
@@ -228,10 +239,13 @@ namespace AnchorDefense
                 if (imeComposing || Time.frameCount <= imeCommitFrame + 1) return;
                 string playerText = inputField != null ? inputField.text : string.Empty;
                 if (string.IsNullOrWhiteSpace(playerText)) return;
-                if (inputField != null) inputField.text = string.Empty;
                 ShowCompanionMessage(GameLocalization.T("正在回应…", "Thinking…"), true);
                 await companion.Submit(playerText);
-                if (this != null && IsOpen) inputField?.ActivateInputField();
+                if (this != null && IsOpen)
+                {
+                    if (inputField != null && inputField.text == playerText) inputField.text = string.Empty;
+                    inputField?.ActivateInputField();
+                }
                 return;
             }
             if (service == null || service.IsBusy) return;
@@ -294,7 +308,7 @@ namespace AnchorDefense
             busy = busy || (companion != null && companion.IsBusy) || (service != null && service.IsBusy);
             if (submitButton != null) submitButton.interactable = !busy;
             if (inputField != null) inputField.interactable = !busy;
-            if (loadingVisual != null) loadingVisual.SetActive(busy);
+            if (loadingVisual != null) loadingVisual.SetActive(busy && courier == null);
             if (busy) portraitMotion?.SetMood(AICommandAssistantMood.Thinking);
         }
 

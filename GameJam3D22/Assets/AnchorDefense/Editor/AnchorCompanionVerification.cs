@@ -60,6 +60,7 @@ namespace AnchorDefense.Editor
             if (stage != null && stage.scene.isDirty)
             { File.WriteAllText(Status, "Blocked: save the open prefab before running tests."); return; }
             AnchorCompanionInstaller.Install();
+            CatCourierInstaller.Install();
             Register();
             SessionState.SetBool("AnchorCompanionTests", true);
             SessionState.SetBool("AnchorCompanionLiveAuthorized", live);

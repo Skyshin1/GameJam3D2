@@ -35,7 +35,7 @@ namespace AnchorDefense.Tests
             preview.orthographic = true; preview.clearFlags = CameraClearFlags.SolidColor;
             preview.backgroundColor = new Color(0.045f, 0.06f, 0.12f); preview.cullingMask = 1 << 5;
             preview.enabled = false; canvas.worldCamera = preview;
-            Vector2Int[] sizes = { new Vector2Int(1920, 1080), new Vector2Int(1920, 1200), new Vector2Int(2560, 1080) };
+            Vector2Int[] sizes = { new Vector2Int(1280, 720), new Vector2Int(1920, 1080), new Vector2Int(1920, 1200), new Vector2Int(2560, 1080), new Vector2Int(3440, 1440) };
             foreach (bool english in new[] { false, true })
             {
                 GameLocalization.SetLanguage(english ? GameLanguage.English : GameLanguage.SimplifiedChinese);
@@ -46,15 +46,32 @@ namespace AnchorDefense.Tests
                     preview.targetTexture = texture;
                     view.GetType().GetMethod("Show", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, new object[] {
                         new CompanionSpeech { Text = english ? "Our planet is counting on us. Those invaders picked the wrong team!" : "我们的星球可不是软柿子。一起把这些外星捣蛋鬼赶回去！", Purpose = CompanionPurpose.Chatter } });
-                    Canvas.ForceUpdateCanvases(); yield return null;
+                    Canvas.ForceUpdateCanvases(); yield return new WaitForSecondsRealtime(.3f);
                     view.GetType().GetMethod("AdvanceBubble", BindingFlags.NonPublic | BindingFlags.Instance)
                         .Invoke(view, new object[] { Time.unscaledTime + 60f });
                     TMP_Text speech = root.transform.Find("Companion Chat Bubble/Companion Speech").GetComponent<TMP_Text>();
-                    speech.ForceMeshUpdate(); Assert.That(speech.isTextOverflowing, Is.False);
+                    speech.ForceMeshUpdate();
+                    Assert.That(speech.overflowMode, Is.EqualTo(TextOverflowModes.Page));
+                    var courier = root.GetComponent<CatCourierLayout>();
+                    Assert.That(courier, Is.Not.Null);
+                    Assert.That(courier.portrait.expressions.Length, Is.EqualTo(6));
+                    foreach (var paper in root.GetComponentsInChildren<CourierPaperGraphic>(true))
+                        Assert.That(paper.GetComponent<CanvasRenderer>(), Is.Not.Null, paper.transform.parent.name);
+                    Assert.That(courier.bubble.GetComponent<CanvasGroup>().alpha, Is.GreaterThan(.95f));
+                    AssertInsideCourierCanvas(rect, courier.cat);
+                    AssertInsideCourierCanvas(rect, courier.bubble);
                     CaptureCompanionPreview(preview, texture, $"bubble-{(english ? "en" : "zh")}-{size.x}x{size.y}");
                     view.GetType().GetMethod("OnRescue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, new object[] { true });
                     console.ShowCompanionMessage(english ? "The core is in trouble. Want me to clear the invaders?" : "核心快撑不住了，要我帮你把敌人清走吗？", false);
-                    Canvas.ForceUpdateCanvases(); yield return null;
+                    console.InputField.text = english ? "Help me protect our planet!" : "小猫，帮我保护星球！";
+                    Canvas.ForceUpdateCanvases(); yield return new WaitForSecondsRealtime(.3f);
+                    view.GetType().GetMethod("AdvanceBubble", BindingFlags.NonPublic | BindingFlags.Instance)
+                        .Invoke(view, new object[] { Time.unscaledTime + 60f });
+                    Canvas.ForceUpdateCanvases();
+                    AssertInputVisible(console.InputField);
+                    AssertInsideCourierCanvas(rect, courier.inputStrip);
+                    AssertInsideCourierCanvas(rect, courier.rescueChoices);
+                    Assert.That(courier.cat.gameObject.activeSelf, Is.True, "Cat stays visible during rescue.");
                     CaptureCompanionPreview(preview, texture, $"rescue-{(english ? "en" : "zh")}-{size.x}x{size.y}");
                     foreach (TMP_Text text in root.transform.Find("Companion Rescue Choices").GetComponentsInChildren<TMP_Text>())
                     { text.ForceMeshUpdate(); Assert.That(text.isTextOverflowing, Is.False, text.name); }
@@ -62,6 +79,41 @@ namespace AnchorDefense.Tests
                     preview.targetTexture = null; texture.Release();
                 }
             }
+        }
+        private static void AssertInsideCourierCanvas(RectTransform canvas, RectTransform element)
+        {
+            var corners = new Vector3[4]; element.GetWorldCorners(corners);
+            foreach (Vector3 corner in corners)
+            {
+                Vector3 local = canvas.InverseTransformPoint(corner);
+                Assert.That(local.x, Is.InRange(canvas.rect.xMin - 1f, canvas.rect.xMax + 1f), element.name);
+                Assert.That(local.y, Is.InRange(canvas.rect.yMin - 1f, canvas.rect.yMax + 1f), element.name);
+            }
+        }
+        [UnityTest]
+        public IEnumerator CourierRescueShowsCatAndChoicesAndDeclinesWithoutStuckPause()
+        {
+            var companion = Companion(new CompanionMock(), out var health);
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/AnchorDefense/Prefabs/UI/AICommandConsoleUI.prefab");
+            var root = Object.Instantiate(prefab); owned.Add(root);
+            var console = root.GetComponent<AICommandConsoleController>();
+            var view = root.GetComponent<AICompanionView>();
+            var courier = root.GetComponent<CatCourierLayout>();
+            console.Initialize(service, null, flow); console.AttachCompanion(companion); view.Initialize(companion, console, null);
+            health.ApplyDamage(health.MaxHealth * .71f);
+            yield return null;
+            Assert.That(companion.RescuePending, Is.True);
+            Assert.That(courier.cat.gameObject.activeInHierarchy, Is.True);
+            Assert.That(courier.portrait.Worried, Is.True);
+            Assert.That(courier.rescueChoices.gameObject.activeSelf, Is.True);
+            Assert.That(courier.bubble.gameObject.activeSelf, Is.True);
+            Assert.That(console.IsOpen, Is.True);
+            root.transform.Find("Companion Rescue Choices/Decline Rescue").GetComponent<Button>().onClick.Invoke();
+            yield return null;
+            Assert.That(companion.RescuePending, Is.False);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
+            Assert.That(console.IsOpen, Is.False);
+            Assert.That(courier.rescueChoices.gameObject.activeSelf, Is.False);
         }
         [TestCase("一起守护星球，我们能赢！")]
         [TestCase("Together we can protect our planet!")]
@@ -94,10 +146,13 @@ namespace AnchorDefense.Tests
             advance.Invoke(view, new object[] { start + 26f });
             Assert.That(bubble.activeSelf, Is.True, "Reading time starts after the final character.");
             advance.Invoke(view, new object[] { start + 28f });
+            advance.Invoke(view, new object[] { start + 28.3f });
             Assert.That(bubble.activeSelf, Is.False);
             show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter } });
             Assert.That(text.maxVisibleCharacters, Is.Zero, "Replacement starts a fresh reveal.");
             typeof(AICompanionView).GetMethod("OnConsoleOpen", flags).Invoke(view, new object[] { true });
+            // The courier keeps replies separate from the input strip; disabling still cancels them.
+            typeof(AICompanionView).GetMethod("OnDisable", flags).Invoke(view, null);
             advance.Invoke(view, new object[] { start + 50f });
             Assert.That(bubble.activeSelf, Is.False, "Cancelled bubbles must not reappear.");
             settings.typewriterEnabled = false;
@@ -105,7 +160,58 @@ namespace AnchorDefense.Tests
             Assert.That(text.maxVisibleCharacters, Is.EqualTo(int.MaxValue));
             settings.typewriterEnabled = true;
             show.Invoke(view, new object[] { new CompanionSpeech { Text = message, SystemMessage = true } });
-            Assert.That(text.maxVisibleCharacters, Is.EqualTo(int.MaxValue), "System errors are immediate.");
+            Assert.That(text.maxVisibleCharacters, Is.Zero, "Local cat prompts also use the typewriter.");
+            foreach (CompanionPurpose purpose in System.Enum.GetValues(typeof(CompanionPurpose)))
+            {
+                show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = purpose } });
+                Assert.That(text.maxVisibleCharacters, Is.Zero, purpose.ToString());
+                advance.Invoke(view, new object[] { Time.unscaledTime + .55f });
+                Assert.That(text.maxVisibleCharacters, Is.EqualTo(5), purpose.ToString());
+            }
+        }
+
+        private static void AssertInputVisible(TMP_InputField field)
+        {
+            field.ForceLabelUpdate(); field.textComponent.ForceMeshUpdate();
+            Assert.That(field.textViewport.rect.height, Is.GreaterThan(35f), "Input needs a full line of vertical space.");
+            Assert.That(field.textComponent.maxVisibleCharacters, Is.GreaterThan(1000), "Typing animation must not hide player input.");
+            int visible = 0;
+            foreach (var character in field.textComponent.textInfo.characterInfo)
+            {
+                if (!character.isVisible) continue;
+                visible++;
+                Vector3 min = field.textViewport.InverseTransformPoint(field.textComponent.transform.TransformPoint(character.bottomLeft));
+                Vector3 max = field.textViewport.InverseTransformPoint(field.textComponent.transform.TransformPoint(character.topRight));
+                Assert.That(min.y, Is.GreaterThanOrEqualTo(field.textViewport.rect.yMin - 1f));
+                Assert.That(max.y, Is.LessThanOrEqualTo(field.textViewport.rect.yMax + 1f));
+            }
+            Assert.That(visible, Is.GreaterThan(5), "Typed text must generate visible glyphs, not only an ellipsis.");
+        }
+
+        [UnityTest]
+        public IEnumerator CourierInputRemainsReadableWhileTypingAndAfterReopening()
+        {
+            var companion = Companion(new CompanionMock(), out _);
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/AnchorDefense/Prefabs/UI/AICommandConsoleUI.prefab");
+            var root = Object.Instantiate(prefab); owned.Add(root);
+            var console = root.GetComponent<AICommandConsoleController>();
+            var view = root.GetComponent<AICompanionView>();
+            console.Initialize(service, null, flow); console.AttachCompanion(companion); view.Initialize(companion, console, null);
+            if (UnityEngine.EventSystems.EventSystem.current == null) Create("UI Events").AddComponent<UnityEngine.EventSystems.EventSystem>();
+            foreach (string phrase in new[] { "小猫帮我保护星球", "Help our planet", "<hello>小猫123" })
+            {
+                console.Open(); console.InputField.text = string.Empty;
+                yield return null;
+                foreach (char character in phrase)
+                    console.InputField.ProcessEvent(new Event { type = EventType.KeyDown, character = character });
+                console.InputField.ForceLabelUpdate();
+                Canvas.ForceUpdateCanvases(); yield return null;
+                Assert.That(console.InputField.text, Is.EqualTo(phrase));
+                AssertInputVisible(console.InputField);
+                console.Opener.onClick.Invoke();
+                console.Open(); yield return null;
+                AssertInputVisible(console.InputField);
+            }
         }
 
         private static void CaptureCompanionPreview(Camera camera, RenderTexture texture, string name)

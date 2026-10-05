@@ -30,6 +30,8 @@ namespace AnchorDefense
         private float revealStartedAt, revealSpeed, readingSeconds;
         private int revealCharacters;
         private bool revealing;
+        private CatCourierLayout courier;
+        private int pageStart;
         private Canvas canvas;
         private int normalSortingOrder;
         private AICommandAssistantMotion dockMotion;
@@ -50,6 +52,12 @@ namespace AnchorDefense
             UpgradeTreeController upgradeTree)
         {
             service = companion; console = commandConsole; tree = upgradeTree;
+            courier = GetComponent<CatCourierLayout>();
+            if (courier != null)
+            {
+                courier.Initialize(service, console);
+                console.CompanionMessage += ShowConsoleMessage;
+            }
             gameObject.AddComponent<AICompanionFontFallback>().Initialize(glyphFallback);
             canvas = GetComponent<Canvas>(); normalSortingOrder = canvas.sortingOrder;
             dockMotion = console.Opener.GetComponent<AICommandAssistantMotion>();
@@ -77,7 +85,12 @@ namespace AnchorDefense
                 rescueFlash.gameObject.SetActive(false);
                 return;
             }
+            if (courier != null && bubble.gameObject.activeSelf && !float.IsInfinity(hideAt) &&
+                RectTransformUtility.RectangleContainsScreenPoint(bubble, Mouse.current?.position.ReadValue() ?? new Vector2(-1,-1),
+                    canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera)) hideAt += Time.unscaledDeltaTime;
             AdvanceBubble(Time.unscaledTime);
+            if (courier != null && displayedNode != null && service.RecommendedNode != displayedNode)
+                recommendationButton.gameObject.SetActive(false);
             if (service.RescuePending && Gamepad.current != null)
             {
                 if (Gamepad.current.dpad.left.wasPressedThisFrame) EventSystem.current?.SetSelectedGameObject(acceptButton.gameObject);
@@ -87,6 +100,7 @@ namespace AnchorDefense
         private void LateUpdate()
         {
             if (service == null) return;
+            if (courier != null) { courier.ApplyLayout(); return; }
             if (bubble.gameObject.activeSelf) KeepOnScreen(bubble);
             if (console.IsOpen) KeepOnScreen(console.PanelRect);
             if (rescueChoices.activeSelf)
@@ -103,7 +117,7 @@ namespace AnchorDefense
             if (this == null || service == null) return;
             revealing = false;
             speechText.maxVisibleCharacters = int.MaxValue;
-            if (console.IsOpen)
+            if (console.IsOpen && courier == null)
             {
                 console.ShowCompanionMessage(speech.Text, speech.SystemMessage,
                     speech.Purpose == CompanionPurpose.RescueQuestion || speech.Purpose == CompanionPurpose.RescueAnswer);
@@ -111,37 +125,57 @@ namespace AnchorDefense
                 return;
             }
             speechText.text = speech.Text;
-            displayedNode = speech.Recommendation;
+            speechText.pageToDisplay = 1; pageStart = 0;
+            displayedNode = speech.Recommendation != null ? speech.Recommendation :
+                courier != null && service.RecommendedNode == displayedNode ? displayedNode : null;
             recommendationButton.gameObject.SetActive(displayedNode != null);
             if (displayedNode != null)
             {
-                recommendationText.text = displayedNode.LocalizedDisplayName;
+                recommendationText.text = displayedNode.LocalizedDisplayName + " · " + displayedNode.KillCost;
                 recommendationIcon.sprite = displayedNode.Icon;
                 recommendationIcon.enabled = displayedNode.Icon != null;
             }
-            float width = Mathf.Min(420f, ((RectTransform)transform).rect.width - 130f);
+            float width = courier != null ? courier.AvailableBubbleWidth : Mathf.Min(420f, ((RectTransform)transform).rect.width - 130f);
+            if (courier != null) width = Mathf.Min(width, Mathf.Max(240f, speechText.GetPreferredValues(speech.Text).x + 40f));
             float textHeight = speechText.GetPreferredValues(speech.Text, width - 36f, 600f).y;
             bubble.sizeDelta = new Vector2(width, Mathf.Clamp(textHeight + (displayedNode != null ? 78f : 32f), 88f, 240f));
-            speechText.rectTransform.offsetMin = new Vector2(18f, displayedNode != null ? 62f : 16f);
+            if (courier != null) bubble.sizeDelta = new Vector2(width, 102f);
+            speechText.rectTransform.offsetMin = new Vector2(20f, courier == null && displayedNode != null ? 62f : 18f);
             speechText.rectTransform.offsetMax = new Vector2(-18f, -16f);
             bubble.gameObject.SetActive(true);
+            if (courier != null) courier.Present(bubble.sizeDelta);
             readingSeconds = Mathf.Max(config.bubbleSeconds, speech.Text.Length * 0.065f);
             // Layout uses the complete string; revealing characters must not move the bubble.
             speechText.ForceMeshUpdate();
             revealCharacters = speechText.textInfo.characterCount;
+            if (courier != null && speechText.textInfo.pageCount > 1)
+                revealCharacters = speechText.textInfo.pageInfo[0].lastCharacterIndex + 1;
             revealSpeed = Mathf.Max(1f, config.typewriterCharactersPerSecond);
             revealStartedAt = Time.unscaledTime;
-            revealing = config.typewriterEnabled && !speech.SystemMessage && revealCharacters > 0;
+            // All visible cat messages share the reveal, including rescue prompts
+            // and local operation feedback. Never apply it to the player's input.
+            revealing = config.typewriterEnabled && revealCharacters > 0;
             speechText.maxVisibleCharacters = revealing ? 0 : int.MaxValue;
             hideAt = revealing ? float.PositiveInfinity : Time.unscaledTime + readingSeconds;
             dockMotion?.React(speech.Purpose != CompanionPurpose.RescueQuestion);
+            if (courier != null)
+            {
+                if (!speech.SystemMessage) courier.portrait.React(speech.Purpose != CompanionPurpose.RescueQuestion);
+                if (!speech.SystemMessage && (speech.Purpose == CompanionPurpose.PlayerTurn || speech.Purpose == CompanionPurpose.CommandResult))
+                    console.CloseAfterCompanionReply();
+            }
+        }
+        private void ShowConsoleMessage(string text, bool system, bool concerned)
+        {
+            Show(new CompanionSpeech { Text = text, SystemMessage = system,
+                Purpose = concerned ? CompanionPurpose.RescueQuestion : CompanionPurpose.PlayerTurn });
         }
         private void AdvanceBubble(float now)
         {
             if (!bubble.gameObject.activeSelf) { revealing = false; return; }
             if (revealing)
             {
-                int visible = Mathf.Clamp(Mathf.FloorToInt((now - revealStartedAt) * revealSpeed), 0, revealCharacters);
+                int visible = Mathf.Clamp(pageStart + Mathf.FloorToInt((now - revealStartedAt) * revealSpeed), pageStart, revealCharacters);
                 speechText.maxVisibleCharacters = visible;
                 if (visible >= revealCharacters)
                 {
@@ -150,7 +184,19 @@ namespace AnchorDefense
                     hideAt = now + readingSeconds;
                 }
             }
-            if (!revealing && now >= hideAt) bubble.gameObject.SetActive(false);
+            if (!revealing && now >= hideAt)
+            {
+                if (courier != null && speechText.pageToDisplay < speechText.textInfo.pageCount)
+                {
+                    int page = speechText.pageToDisplay++;
+                    pageStart = speechText.textInfo.pageInfo[page].firstCharacterIndex;
+                    revealCharacters = speechText.textInfo.pageInfo[page].lastCharacterIndex + 1;
+                    revealStartedAt = now; revealing = config.typewriterEnabled;
+                    speechText.maxVisibleCharacters = revealing ? pageStart : int.MaxValue;
+                    hideAt = revealing ? float.PositiveInfinity : now + readingSeconds;
+                }
+                else if (courier == null || courier.DismissBubble(now)) bubble.gameObject.SetActive(false);
+            }
         }
         private void OnDisable()
         {
@@ -160,6 +206,7 @@ namespace AnchorDefense
         }
         private void OnConsoleOpen(bool open)
         {
+            if (courier != null) { courier.ApplyLayout(); return; }
             if (!open) return;
             revealing = false;
             bubble.gameObject.SetActive(false);
@@ -218,6 +265,7 @@ namespace AnchorDefense
         {
             if (service != null) { service.Speech -= Show; service.RescueChanged -= OnRescue; service.RescueVisual -= Flash; }
             if (console != null) console.OpenChanged -= OnConsoleOpen;
+            if (console != null) console.CompanionMessage -= ShowConsoleMessage;
             GameLocalization.LanguageChanged -= RefreshLabels;
         }
     }

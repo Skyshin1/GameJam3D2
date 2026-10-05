@@ -1,5 +1,20 @@
 # 星核助手：陪伴对话配置
 
+## 猫咪通信员界面
+
+当前使用趴边猫咪、撕纸便笺和独立输入纸条。新美术 `Art/UI/CatCourierExpressions.png` 为透明的六表情图集，通过图像生成制作；原有美术不覆盖。六格依次是待机、眨眼、倾听、思考、得意、担心。
+
+- `AICommandConsoleUI.prefab` 根对象的 `Cat Courier Layout` 配置气泡最大宽度、输入条最大宽度和 `Reduced Motion`（减少动态）。
+- `Open Command Console → Cat Courier Portrait → Expressions` 绑定六张表情，后续可以分别替换。待机只偶尔眨眼，倾听/思考/救场切换表情。
+- `Companion Chat Bubble → Courier Paper` 是独立可编辑的纸边图形，可以调整纸色、描边色和宽度。文字按页显示，鼠标悬停保留阅读时间。
+- `Recommended Upgrade` 是独立的技能贴纸，名称、图标和费用来自推荐节点；点击仍然仅定位、不购买。
+- `Command Panel` 是窄输入条，原来的大标题、大头像和大回复底板保留为隐藏对象，不删除美术引用。收到正常回复后且没有新输入时自动收起。
+- `Courier Log Button / Courier Log` 展开本局最近六条交流，可滚动阅读；不自动弹开。
+- 救场依旧暂停并显示输入与两个快捷选项。接受、拒绝、关闭和异常处理规则不变。
+- 整组界面限制在安全区域，区域编辑侧栏打开时停靠左下；其他暂停面板打开时隐藏，救场除外。
+
+首次导入可运行 `Tools → Anchor Defense → AI → Install Cat Courier UI`。只升级助手预制体一次，之后不反复覆盖美术调整；不要在预制体存在未保存编辑时执行安装。
+
 ## 在哪里改
 
 - 总配置：`Assets/AnchorDefense/Configs/AI/AICompanionConfig.asset`。
@@ -32,13 +47,15 @@
 
 想更频繁闲聊，可把 Chatter Minimum / Maximum 调为 5 / 10 秒；推荐间隔单独用 Recommendation Interval（例如 20 秒）。这里只是发起机会，实际出现还需等待接口返回，忙碌或暂停时可能跳过。降低间隔会增加 API 用量。Recommendation Lifetime 不是推荐间隔，而是用于判断玩家是否采纳建议的有效期。修改配置资产时退出 Play 模式，避免运行时改值退出后丢失。
 
-逐字效果只用于头像旁气泡，展开的输入面板和救场快捷回答不受影响。气泡先按全文排版再逐字展示，不跳动；新消息替换旧消息时从头显示，打开输入面板或切换语言后旧气泡不会继续冒出。动画使用真实时间，不影响战斗或输入。
+所有猫咪新消息（闲聊、推荐、操作反馈、救场及本地提示）共用逐字效果，暂停救场时也会继续显示；玩家输入、快捷按钮文字和历史记录不套用此效果。气泡先按全文排版再逐字展示，不跳动；新消息替换时从头显示，切换语言后旧气泡取消。动画使用真实时间，不影响战斗或输入。
+
+输入条单独配置文字裁切范围，长文字由输入框横向滚动，不使用省略模式。`Courier Paper` 的 `Stationery Details / Paw Stamp / Tape Color / Accent Color` 可调整胶带、折角和猫爪印装饰，不改变文字点击区域。
 
 普通聊天、建议和救场不花游戏内击杀点，但仍会产生供应商的 API 用量；主动闲聊每 8～18 秒一次，试玩时可以把间隔调大以降低调用频率。不会自动重试。
 
 ## 美术如何替换
 
-助手头像目前复用项目的手绘猫咪炮手 `Assets/AnchorDefense/Art/UI/maomao.png`。展开面板和右下角入口均在 `AICommandConsoleUI.prefab` 中绑定，原有呼吸、摇摆和反馈动画继续生效；不覆盖原来的星核图片。
+旧版手绘猫咪炮手 `Assets/AnchorDefense/Art/UI/maomao.png` 和原星核图片均保留。当前猫咪通信员使用本文顶部说明的六表情图集，在 `AICommandConsoleUI.prefab` 的 `Cat Courier Portrait` 中绑定；待机不持续摇摆，只保留眨眼与状态反馈。
 
 打开 `AICommandConsoleUI.prefab`：
 

@@ -86,7 +86,8 @@ namespace AnchorDefense.Tests
             show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter } });
             Assert.That(text.text, Is.EqualTo(message), "Keep complete text for stable wrapping.");
             Assert.That(text.maxVisibleCharacters, Is.Zero);
-            advance.Invoke(view, new object[] { start + 0.5f });
+            // Stay away from the exact float boundary (4.999999 may floor to 4).
+            advance.Invoke(view, new object[] { start + 0.55f });
             Assert.That(text.maxVisibleCharacters, Is.EqualTo(5));
             advance.Invoke(view, new object[] { start + 20f });
             Assert.That(text.maxVisibleCharacters, Is.EqualTo(int.MaxValue));

@@ -204,6 +204,51 @@ namespace AnchorDefense.Tests
             Assert.That(wallet.AvailableKills, Is.EqualTo(10));
         }
 
+        [TestCase("攻击最密集的地方")]
+        [TestCase("攻击敌人最集中的位置")]
+        [TestCase("Attack the most crowded area")]
+        [TestCase("Attack the densest cluster")]
+        [TestCase("攻击敌人")]
+        public void EnemyTargetCountWinsOverOutsidePressureAndModelGuess(string source)
+        {
+            strike.Configure("anchor_strike", "攻击", "test", new[] { "攻击" },
+                ActiveSkillTargetPolicy.EnemyRichZone, Asset<AreaDamageSkillEffect>());
+            CubeZoneVolume first = grid.GetCubeById(0), second = grid.GetCubeById(1);
+            AddTargetEnemy(first.transform.position);
+            AddTargetEnemy(first.transform.position + Vector3.right * 0.1f);
+            AddTargetEnemy(second.transform.position);
+            Bounds bounds = second.GetComponent<BoxCollider>().bounds;
+            for (int i = 0; i < 40; i++)
+                AddTargetEnemy(new Vector3(bounds.center.x, bounds.max.y + 1f, bounds.center.z));
+            Assert.That(grid.GetEnemyPressureNearZone(1), Is.GreaterThan(grid.GetEnemyPressureNearZone(0)));
+            Assert.That(grid.TryGetRuntimeSnapshot(0, out var firstSnapshot), Is.True);
+            Assert.That(firstSnapshot.EnemyCount, Is.EqualTo(2));
+            Assert.That(grid.TryGetRuntimeSnapshot(1, out var secondSnapshot), Is.True);
+            Assert.That(secondSnapshot.EnemyCount, Is.EqualTo(1));
+            var result = Submit(Command(Group("区域", Item("anchor_strike", "C02", source))), source);
+            Assert.That(result.Succeeded, Is.True, result.Message);
+            Assert.That(result.Operations[0].ZoneId, Is.Zero, "Actual hittable count must win over model ID and outside pressure.");
+        }
+
+        private EnemyController AddTargetEnemy(Vector3 position)
+        {
+            var enemy = Create("Target selection enemy").AddComponent<EnemyController>();
+            enemy.Initialize(Asset<EnemyConfig>(), null, 1f, 0f, _ => { }, null, null);
+            enemy.transform.position = position;
+            enemies.Register(enemy);
+            return enemy;
+        }
+
+        [TestCase("攻击最密集的地方")]
+        [TestCase("Attack the most crowded area")]
+        public void DensityPhrasingSelectsEnemyCount(string source)
+        {
+            var selector = AITargetSelector.FromSource(source);
+            Assert.That(selector, Is.Not.Null);
+            Assert.That(selector.metric, Is.EqualTo("enemy_count"));
+            Assert.That(selector.order, Is.EqualTo("desc"));
+        }
+
         [Test]
         public void EveryGroupContributesToTheGlobalOperationLimit()
         {

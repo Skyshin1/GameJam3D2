@@ -10,7 +10,7 @@ namespace AnchorDefense.Editor
     {
         private const string Root = "Assets/AnchorDefense";
         private const string ConsolePath = Root + "/Prefabs/UI/AICommandConsoleUI.prefab";
-        private const string PortraitPath = Root + "/Art/UI/AnchorAssistant.png";
+        private const string PortraitPath = Root + "/Art/UI/maomao.png";
         private const string OldMarkerPath = Root + "/Prefabs/VFX/AICommandFieldMarker.prefab";
         private const string CornerMarkerPath = Root + "/Prefabs/VFX/AICommandCornerMarker.prefab";
         private const string CornerMaterialPath = Root + "/Art/Materials/M_AICommandCorners.mat";

@@ -442,6 +442,7 @@ namespace AnchorDefense
         {
             bestContext = null;
             float bestScore = float.NegativeInfinity;
+            float bestPressure = float.NegativeInfinity;
             int selectedId = grid.SelectedCube != null ? grid.SelectedCube.CubeId : -1;
             bool mentionsEnemyPressure = System.Text.RegularExpressions.Regex.IsMatch(playerText,
                 @"\b(?:too many enemies|lots of enemies|enemy swarm|enemy pressure|many monsters)\b",
@@ -452,6 +453,7 @@ namespace AnchorDefense
             {
                 if (!TryCreateContext(zoneId, out ActiveSkillContext candidate)) continue;
                 float score = 0f;
+                float pressure = 0f;
                 bool targetsEnemies = mentionsEnemyPressure;
                 for (int i = 0; i < operations.Length; i++)
                 {
@@ -471,12 +473,19 @@ namespace AnchorDefense
                 }
                 else
                 {
-                    if (targetsEnemies) score += grid.GetEnemyPressureNearZone(zoneId);
-                    if (zoneId == selectedId) score += 0.001f;
+                    // Count actual hittable enemies first. Nearby enemies outside the volume
+                    // must never outweigh a larger group inside another valid skill volume.
+                    if (targetsEnemies)
+                    {
+                        score = candidate.Enemies.Count;
+                        pressure = grid.GetEnemyPressureNearZone(zoneId);
+                    }
                 }
-                if (score > bestScore || (selector != null && score == bestScore && zoneId == selectedId))
+                if (score > bestScore || (score == bestScore &&
+                    (pressure > bestPressure || (pressure == bestPressure && zoneId == selectedId))))
                 {
                     bestScore = score;
+                    bestPressure = pressure;
                     bestContext = candidate;
                 }
             }

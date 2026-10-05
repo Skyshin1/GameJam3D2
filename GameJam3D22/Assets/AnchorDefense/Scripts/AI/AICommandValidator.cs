@@ -123,7 +123,7 @@ namespace AnchorDefense
                         AITargetSelector clauseSelector = AITargetSelector.FromSource(clause);
                         if (clauseSelector != null && clauseSelector.Key != AITargetSelector.FromSource(item.source)?.Key)
                         { error = "操作原文遗漏了玩家指定的区域选择条件，未扣指令点"; return false; }
-                        const string targetWords = @"(?i)C\d+|这里|这块|选中|当前区域|左上|左下|右上|右下|左侧|左边|左区|右侧|右边|右区|上方|上侧|上区|下方|下侧|下区";
+                        const string targetWords = @"(?i)C\d+|这里|这块|选中|当前区域|左上|左下|右上|右下|左侧|左边|左区|右侧|右边|右区|上方|上侧|上区|下方|下侧|下区|前方|后方|\b(?:here|this zone|selected zone|current zone|left|right|upper|top|lower|bottom|front|back)\b";
                         if (Regex.IsMatch(clause, targetWords) && !Regex.IsMatch(item.source, targetWords))
                         { error = "操作原文遗漏了玩家指定的区域，未扣指令点"; return false; }
                         parameters.target_zone_id = spec.index;
@@ -167,6 +167,12 @@ namespace AnchorDefense
         public static bool HasRingControlIntent(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return false;
+            const string englishRing = @"(?:\b(?:inner|middle|outer|first|second|third|1st|2nd|3rd)\s+)?\b(?:orbit(?:al)?\s+)?(?:ring|track)s?\b";
+            const string englishVerb = @"\b(?:rotate|rotating|spin|spinning|turn|control|operate|manage|take over|stop|halt|pause)\b";
+            if (Regex.IsMatch(text, englishVerb + @"(?:\s+(?:all|the|my|this|first|second|third|inner|middle|outer|1st|2nd|3rd))*\s+" + englishRing,
+                    RegexOptions.IgnoreCase) ||
+                Regex.IsMatch(text, englishRing + @"(?:\s+(?:continuously|clockwise|counterclockwise|counter-clockwise))*\s+" + englishVerb,
+                    RegexOptions.IgnoreCase)) return true;
             string subject = @"(?:星环|轨道|[内中外]环|[内中外]轨|第[一二三四五六七八九\d]+(?:条|个)?(?:星环|轨道|轨|环)|[一二三\d]+号(?:星环|轨道|轨|环))";
             string verb = @"(?:旋转|转动|操作|操控|控制|接管|调度|停止|停下|不再转|别转|转(?!角)|结束)";
             // Adjacent verb/subject expressions avoid treating '攻击轨道附近的敌人' as control.
@@ -181,9 +187,9 @@ namespace AnchorDefense
             string scope = playerText.Substring(start, position - start) + source;
             if (ring && RingRotationSkillEffect.IsExplicitStop(scope)) return false;
             if (ring && (RingRotationSkillEffect.TryReadRepeatCount(source, out _) ||
-                Regex.IsMatch(source, "转一下|就停|后停")))
-                return Regex.IsMatch(scope, "不要|别|禁止|取消|不想|不许|不能");
-            return Regex.IsMatch(scope, "不要|别|禁止|取消|不想|不许|不能|停止|停下");
+                Regex.IsMatch(source, "转一下|就停|后停|\\b(?:once|one time|just one turn)\\b", RegexOptions.IgnoreCase)))
+                return Regex.IsMatch(scope, "不要|别|禁止|取消|不想|不许|不能|\\b(?:don't|do not|never|cancel|without)\\b", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(scope, "不要|别|禁止|取消|不想|不许|不能|停止|停下|\\b(?:don't|do not|never|cancel|without|stop)\\b", RegexOptions.IgnoreCase);
         }
 
         // Conservative local fallback for simple phrases when cloud JSON is malformed or
@@ -197,14 +203,15 @@ namespace AnchorDefense
             string text = playerText.Trim();
             var groups = new List<AICommandGroup>();
             var compatibilityIds = new List<string>();
-            string[] clauses = Regex.Split(text, @"[，,、；;。\n]|然后");
+            string[] clauses = Regex.Split(text, @"[，,、；;。\n]|然后|\bthen\b", RegexOptions.IgnoreCase);
             // A finite ring rotation often uses a comma between its angle and count.
             bool areaAction = false;
             foreach (ActiveSkillDefinition skill in availableSkills)
                 if (skill != null && skill.Effect != null && !skill.Effect.IsWorldOperation &&
-                    skill.Keywords != null && Array.Exists(skill.Keywords, keyword =>
+                    Array.Exists(skill.RecognitionKeywords, keyword =>
                         !string.IsNullOrWhiteSpace(keyword) && keyword.Length >= 2 &&
-                        !IsSharedKeyword(keyword, availableSkills) && text.Contains(keyword))) areaAction = true;
+                        !IsSharedKeyword(keyword, availableSkills) &&
+                        text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)) areaAction = true;
             if (!areaAction && HasRingControlIntent(text) &&
                 RingRotationSkillEffect.TryReadRepeatCount(text, out _)) clauses = new[] { text };
 
@@ -232,16 +239,18 @@ namespace AnchorDefense
                     {
                         if (!HasRingControlIntent(clause)) continue;
                         firstMatch = Regex.Match(clause,
-                            "旋转|转动|操作|操控|控制|接管|调度|停止|停下|不再转|别转|转|结束").Index;
+                            "旋转|转动|操作|操控|控制|接管|调度|停止|停下|不再转|别转|转|结束|\\b(?:rotate|rotating|spin|spinning|turn|control|operate|manage|take over|stop|halt|pause)\\b",
+                            RegexOptions.IgnoreCase).Index;
                     }
                     else
                     {
-                        for (int j = 0; skill.Keywords != null && j < skill.Keywords.Length && j < 3; j++)
+                        string[] recognition = skill.RecognitionKeywords;
+                        for (int j = 0; j < recognition.Length; j++)
                         {
-                            string keyword = skill.Keywords[j];
+                            string keyword = recognition[j];
                             if (string.IsNullOrWhiteSpace(keyword) || keyword.Length < 2 ||
                                 IsSharedKeyword(keyword, availableSkills)) continue;
-                            int keywordPosition = clause.IndexOf(keyword, StringComparison.Ordinal);
+                            int keywordPosition = clause.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
                             if (keywordPosition >= 0) firstMatch = Math.Min(firstMatch, keywordPosition);
                         }
                     }
@@ -283,11 +292,11 @@ namespace AnchorDefense
             int count = 0;
             for (int i = 0; i < availableSkills.Count; i++)
             {
-                string[] keywords = availableSkills[i] != null ? availableSkills[i].Keywords : null;
+                string[] keywords = availableSkills[i] != null ? availableSkills[i].RecognitionKeywords : null;
                 if (keywords == null) continue;
-                for (int j = 0; j < keywords.Length && j < 3; j++)
+                for (int j = 0; j < keywords.Length; j++)
                 {
-                    if (!string.Equals(keyword, keywords[j], StringComparison.Ordinal)) continue;
+                    if (!string.Equals(keyword, keywords[j], StringComparison.OrdinalIgnoreCase)) continue;
                     count++;
                     break;
                 }
@@ -310,14 +319,15 @@ namespace AnchorDefense
             for (int i = 0; i < availableSkills.Count; i++)
             {
                 ActiveSkillDefinition skill = availableSkills[i];
-                if (skill == null || skill.Effect == null || skill.Keywords == null) continue;
+                if (skill == null || skill.Effect == null) continue;
                 if (skill.Effect.IsWorldOperation && !HasRingControlIntent(text)) continue;
                 bool matches = false;
-                for (int j = 0; j < skill.Keywords.Length; j++)
+                string[] recognition = skill.RecognitionKeywords;
+                for (int j = 0; j < recognition.Length; j++)
                 {
-                    string keyword = skill.Keywords[j];
+                    string keyword = recognition[j];
                     if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length >= 2 &&
-                        text.StartsWith(keyword, StringComparison.Ordinal))
+                        text.StartsWith(keyword, StringComparison.OrdinalIgnoreCase))
                     {
                         matches = true;
                         break;
@@ -495,6 +505,8 @@ namespace AnchorDefense
 
         private static bool HasExplicitLocation(string text)
         {
+            if (Regex.IsMatch(text, @"\b(?:left|right|upper|top|lower|bottom|front|back|here|selected zone|current zone)\b",
+                    RegexOptions.IgnoreCase)) return true;
             string[] locationWords = { "左", "右", "上方", "下方", "前方", "后方", "这里", "这块", "选中" };
             for (int i = 0; i < locationWords.Length; i++)
             {

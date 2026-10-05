@@ -26,6 +26,7 @@ namespace AnchorDefense
         private AICommandAssistantMotion portraitMotion;
         private bool initialized;
         private Coroutine autoCloseRoutine;
+        private AICommandExecutionResult lastResult;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
@@ -61,9 +62,11 @@ namespace AnchorDefense
                 service.Wallet.Changed += HandleWalletChanged;
             }
             if (gameFlow != null) gameFlow.StateChanged += HandleGameStateChanged;
+            GameLocalization.LanguageChanged += RefreshLanguage;
             RefreshBalance();
             SetStatus(service != null && service.IsConfigured
-                ? "星核：想让我帮你做什么？" : "星核：还没有连上 AI 服务。", false);
+                ? GameLocalization.T("星核：想让我帮你做什么？", "Core: How can I help?")
+                : GameLocalization.T("星核：还没有连上 AI 服务。", "Core: The AI service is not connected."), false);
             HandleBusyChanged(false);
         }
 
@@ -114,6 +117,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= RefreshLanguage;
             CancelAutoClose();
             openButton?.onClick.RemoveListener(Open);
             closeButton?.onClick.RemoveListener(Close);
@@ -138,7 +142,8 @@ namespace AnchorDefense
             if (input != null) input.IsTextEntryActive = true;
             inputField?.ActivateInputField();
             SetStatus(service.IsConfigured
-                ? "星核：想让我帮你做什么？" : "星核：还没有连上 AI 服务。", false);
+                ? GameLocalization.T("星核：想让我帮你做什么？", "Core: How can I help?")
+                : GameLocalization.T("星核：还没有连上 AI 服务。", "Core: The AI service is not connected."), false);
         }
 
         private void Close()
@@ -157,15 +162,17 @@ namespace AnchorDefense
             if (service == null || service.IsBusy) return;
             CancelAutoClose();
             string text = inputField != null ? inputField.text : string.Empty;
-            SetStatus("星核：让我想想怎么做……", false);
+            SetStatus(GameLocalization.T("星核：让我想想怎么做……", "Core: Let me think…"), false);
             AICommandExecutionResult result = await service.Submit(text);
-            SetStatus($"星核：{result.Message}", result.Succeeded);
+            lastResult = result;
+            SetStatus(GameLocalization.T("星核：", "Core: ") + GameLocalization.AIResultMessage(result), result.Succeeded);
             portraitMotion?.React(result.Succeeded);
             if (result.Succeeded)
             {
                 if (inputField != null) inputField.text = string.Empty;
                 if (resultText != null)
-                    resultText.text = result.Operations.Count > 0 ? result.OperationSummary : result.ZoneId >= 0
+                    resultText.text = GameLocalization.IsEnglish ? GameLocalization.AIOperationSummary(result) :
+                        result.Operations.Count > 0 ? result.OperationSummary : result.ZoneId >= 0
                         ? $"{result.OperationSummary ?? result.Skill?.DisplayName}  /  C{result.ZoneId + 1:00}"
                         : result.Skill?.DisplayName ?? result.Message;
                 if (resultIcon != null)
@@ -184,8 +191,9 @@ namespace AnchorDefense
 
         private void HandleExecutionUpdated(AICommandExecutionResult result)
         {
-            if (resultText != null) resultText.text = result.OperationSummary;
-            SetStatus($"星核：{result.Message}", result.Succeeded);
+            lastResult = result;
+            if (resultText != null) resultText.text = GameLocalization.AIOperationSummary(result);
+            SetStatus(GameLocalization.T("星核：", "Core: ") + GameLocalization.AIResultMessage(result), result.Succeeded);
             if (!result.Succeeded) CancelAutoClose();
         }
 
@@ -220,7 +228,24 @@ namespace AnchorDefense
             if (balanceText == null) return;
             int available = service?.Wallet != null ? service.Wallet.AvailableKills : 0;
             int cost = service != null ? service.CommandCost : 10;
-            balanceText.text = $"指令点 {available} · 技能 -{cost}";
+            balanceText.text = GameLocalization.IsEnglish
+                ? $"POINTS {available} · COST -{cost}"
+                : $"指令点 {available} · 技能 -{cost}";
+        }
+
+        private void RefreshLanguage()
+        {
+            RefreshBalance();
+            if (service != null && service.IsBusy)
+                SetStatus(GameLocalization.T("星核：让我想想怎么做……", "Core: Let me think…"), false);
+            else if (lastResult != null)
+            {
+                SetStatus(GameLocalization.T("星核：", "Core: ") + GameLocalization.AIResultMessage(lastResult), lastResult.Succeeded);
+                if (resultText != null) resultText.text = GameLocalization.AIOperationSummary(lastResult);
+            }
+            else SetStatus(service != null && service.IsConfigured
+                ? GameLocalization.T("星核：想让我帮你做什么？", "Core: How can I help?")
+                : GameLocalization.T("星核：还没有连上 AI 服务。", "Core: The AI service is not connected."), false);
         }
 
         private void SetStatus(string message, bool success)

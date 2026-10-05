@@ -73,6 +73,7 @@ namespace AnchorDefense
                 uiAudioSource.playOnAwake = false;
             }
             system.Changed += Refresh;
+            GameLocalization.LanguageChanged += Refresh;
             gameFlow.StateChanged += HandleGameStateChanged;
             openButton.onClick.AddListener(TogglePanel);
             closeButton.onClick.AddListener(ClosePanel);
@@ -92,7 +93,7 @@ namespace AnchorDefense
             {
                 if (panelTexts[i] != null && panelTexts[i].name == "Footer Hint")
                 {
-                    panelTexts[i].text = "左摇杆移动画布 · 右摇杆磁吸光标 · A 选择 · X 激活 · B 返回";
+                    panelTexts[i].text = GameLocalization.T("左摇杆移动画布 · 右摇杆磁吸光标 · A 选择 · X 激活 · B 返回", "Left stick: pan · Right stick: snap cursor · A: select · X: activate · B: back");
                     break;
                 }
             }
@@ -152,6 +153,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= Refresh;
             if (system != null)
             {
                 system.Changed -= Refresh;
@@ -352,9 +354,14 @@ namespace AnchorDefense
                 return;
             }
 
-            compactKillText.text = $"升级协议  {system.Wallet.AvailableKills}";
-            totalKillText.text = $"总击杀  {system.Wallet.TotalKills}";
-            availableKillText.text = $"可用击杀点  {system.Wallet.AvailableKills}";
+            if (panelRoot != null)
+                foreach (Text text in panelRoot.GetComponentsInChildren<Text>(true))
+                    if (text != null && text.name == "Footer Hint")
+                        text.text = GameLocalization.T("左摇杆移动画布 · 右摇杆磁吸光标 · A 选择 · X 激活 · B 返回", "Left stick: pan · Right stick: snap cursor · A: select · X: activate · B: back");
+
+            compactKillText.text = $"{GameLocalization.T("升级协议", "UPGRADES")}  {system.Wallet.AvailableKills}";
+            totalKillText.text = $"{GameLocalization.T("总击杀", "TOTAL KILLS")}  {system.Wallet.TotalKills}";
+            availableKillText.text = $"{GameLocalization.T("可用击杀点", "AVAILABLE POINTS")}  {system.Wallet.AvailableKills}";
 
             for (int i = 0; i < nodeViews.Length; i++)
             {
@@ -376,44 +383,44 @@ namespace AnchorDefense
             UpgradeNodeDefinition node = selectedView != null ? selectedView.Definition : null;
             if (node == null)
             {
-                selectedTitle.text = "待接入协议";
-                selectedDescription.text = "该 Anchor 分支暂未开放，可在后续直接绑定新的升级节点资产。";
-                selectedCost.text = "消耗  --";
-                selectedStatus.text = "尚未开放";
+                selectedTitle.text = GameLocalization.T("待接入协议", "Protocol Pending");
+                selectedDescription.text = GameLocalization.T("该 Anchor 分支暂未开放，可在后续直接绑定新的升级节点资产。", "This anchor branch is not available yet.");
+                selectedCost.text = GameLocalization.T("消耗  --", "Cost  --");
+                selectedStatus.text = GameLocalization.T("尚未开放", "Not Available");
                 purchaseButton.interactable = false;
-                purchaseButtonText.text = "锁定";
+                purchaseButtonText.text = GameLocalization.T("锁定", "Locked");
                 selectedAccent.color = new Color(0.22f, 0.28f, 0.38f);
                 return;
             }
 
             UpgradeNodeState state = system.GetState(node);
-            selectedTitle.text = node.DisplayName;
-            selectedDescription.text = node.Description;
-            selectedCost.text = $"消耗击杀点  {node.KillCost}";
+            selectedTitle.text = node.LocalizedDisplayName;
+            selectedDescription.text = node.LocalizedDescription;
+            selectedCost.text = $"{GameLocalization.T("消耗击杀点", "Cost")}  {node.KillCost}";
             selectedAccent.color = selectedView.GetBranchColor();
             purchaseButton.interactable = state == UpgradeNodeState.Available || state == UpgradeNodeState.InsufficientKills;
 
             switch (state)
             {
                 case UpgradeNodeState.Purchased:
-                    selectedStatus.text = "协议已激活";
-                    purchaseButtonText.text = "已完成";
+                    selectedStatus.text = GameLocalization.T("协议已激活", "Activated");
+                    purchaseButtonText.text = GameLocalization.T("已完成", "Complete");
                     break;
                 case UpgradeNodeState.Available:
-                    selectedStatus.text = "可以激活";
-                    purchaseButtonText.text = "激活升级";
+                    selectedStatus.text = GameLocalization.T("可以激活", "Ready to activate");
+                    purchaseButtonText.text = GameLocalization.T("激活升级", "Activate Upgrade");
                     break;
                 case UpgradeNodeState.InsufficientKills:
-                    selectedStatus.text = "击杀点不足";
-                    purchaseButtonText.text = "资源不足";
+                    selectedStatus.text = GameLocalization.T("击杀点不足", "Not enough points");
+                    purchaseButtonText.text = GameLocalization.T("资源不足", "Insufficient Points");
                     break;
                 case UpgradeNodeState.Locked:
-                    selectedStatus.text = "需要先激活前置协议";
-                    purchaseButtonText.text = "前置锁定";
+                    selectedStatus.text = GameLocalization.T("需要先激活前置协议", "Requires a prerequisite");
+                    purchaseButtonText.text = GameLocalization.T("前置锁定", "Prerequisite Locked");
                     break;
                 default:
-                    selectedStatus.text = "尚未开放";
-                    purchaseButtonText.text = "锁定";
+                    selectedStatus.text = GameLocalization.T("尚未开放", "Not Available");
+                    purchaseButtonText.text = GameLocalization.T("锁定", "Locked");
                     break;
             }
         }

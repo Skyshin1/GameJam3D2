@@ -7,8 +7,17 @@ namespace AnchorDefense
     {
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public string DisplayName { get; private set; }
+        [field: SerializeField] public string EnglishDisplayName { get; private set; }
         [field: SerializeField, TextArea(2, 5)] public string Description { get; private set; }
+        [field: SerializeField, TextArea(2, 5)] public string EnglishDescription { get; private set; }
         [field: SerializeField] public string ShortLabel { get; private set; } = "?";
+        [field: SerializeField] public string EnglishShortLabel { get; private set; }
+        public string LocalizedDisplayName => GameLocalization.IsEnglish
+            ? GameLocalization.AssetName(Id, EnglishDisplayName, DisplayName) : DisplayName;
+        public string LocalizedDescription => GameLocalization.IsEnglish
+            ? GameLocalization.AssetDescription(Id, EnglishDescription, Description) : Description;
+        public string LocalizedShortLabel => GameLocalization.IsEnglish && !string.IsNullOrWhiteSpace(EnglishShortLabel)
+            ? EnglishShortLabel : ShortLabel;
         [field: SerializeField] public Sprite Icon { get; private set; }
         [field: SerializeField, Min(0)] public int KillCost { get; private set; }
         [field: SerializeField] public bool Placeholder { get; private set; }

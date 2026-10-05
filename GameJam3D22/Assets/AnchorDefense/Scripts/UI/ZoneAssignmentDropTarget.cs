@@ -45,7 +45,8 @@ namespace AnchorDefense
             }
             if (label != null)
             {
-                label.text = $"当前立方体位置 {zoneIndex + 1}\n" + (effect != null ? effect.DisplayName : "未配置");
+                label.text = $"{GameLocalization.T("当前立方体位置", "Current cube slot")} {zoneIndex + 1}\n" +
+                    (effect != null ? effect.LocalizedDisplayName : GameLocalization.T("未配置", "Unassigned"));
             }
         }
 

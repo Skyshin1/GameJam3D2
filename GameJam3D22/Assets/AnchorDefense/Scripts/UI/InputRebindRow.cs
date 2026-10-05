@@ -48,6 +48,7 @@ namespace AnchorDefense
             ResolveBindingIndex();
             rebindButton.onClick.RemoveListener(BeginRebind);
             rebindButton.onClick.AddListener(BeginRebind);
+            GameLocalization.LanguageChanged += Refresh;
             Refresh();
         }
 
@@ -56,7 +57,7 @@ namespace AnchorDefense
             ResolveBindingIndex();
             if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count)
             {
-                bindingText.text = "未绑定";
+                bindingText.text = GameLocalization.T("未绑定", "Unbound");
                 rebindButton.interactable = false;
                 return;
             }
@@ -68,6 +69,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= Refresh;
             operation?.Dispose();
             if (rebindButton != null)
             {
@@ -84,7 +86,7 @@ namespace AnchorDefense
 
             wasEnabled = action.enabled;
             action.Disable();
-            bindingText.text = "请按下新的按键…  Esc 取消";
+            bindingText.text = GameLocalization.T("请按下新的按键…  Esc 取消", "Press a new key… Esc to cancel");
             rebindButton.interactable = false;
             operation = action.PerformInteractiveRebinding(bindingIndex)
                 .WithControlsExcluding("<Pointer>/position")

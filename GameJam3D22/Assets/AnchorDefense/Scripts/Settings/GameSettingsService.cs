@@ -79,12 +79,15 @@ namespace AnchorDefense
                 soundEffectsVolume = 1f,
                 ringDragSensitivity = 1f,
                 cameraOrbitSensitivity = 1f,
-                showZoneBordersOutsideEdit = false
+                showZoneBordersOutsideEdit = false,
+                language = GameLanguage.SimplifiedChinese
             };
         }
 
         private static void Sanitize(GameSettingsData settings, GameSettingsData defaults)
         {
+            if (!Enum.IsDefined(typeof(GameLanguage), settings.language))
+                settings.language = defaults.language;
             if (settings.resolutionWidth <= 0 || settings.resolutionHeight <= 0)
             {
                 settings.resolutionWidth = defaults.resolutionWidth;

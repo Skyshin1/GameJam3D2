@@ -44,7 +44,9 @@ namespace AnchorDefense
                 float normalizedProgress = Mathf.Clamp01(operation.progress / 0.9f);
                 progressFill.fillAmount = normalizedProgress;
                 progressText.text = Mathf.RoundToInt(normalizedProgress * 100f) + "%";
-                statusText.text = normalizedProgress < 0.9f ? "正在建立锚定连接…" : "锚定完成";
+                statusText.text = normalizedProgress < 0.9f
+                    ? GameLocalization.T("正在建立锚定连接…", "Establishing anchor link…")
+                    : GameLocalization.T("锚定完成", "Anchor link ready");
 
                 bool minimumTimePassed = Time.realtimeSinceStartup - startedAt >= minimumDisplayTime;
                 if (operation.progress >= 0.9f && minimumTimePassed)

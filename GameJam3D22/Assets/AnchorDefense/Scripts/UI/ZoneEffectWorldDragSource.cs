@@ -42,7 +42,7 @@ namespace AnchorDefense
             unlocked = value;
             if (canvasGroup != null) canvasGroup.alpha = unlocked ? 1f : 0.42f;
             if (label != null) label.text = definition != null
-                ? definition.DisplayName + (unlocked ? string.Empty : "  [LOCKED]") : "--";
+                ? definition.LocalizedDisplayName + (unlocked ? string.Empty : "  [LOCKED]") : "--";
         }
 
         private void Update()

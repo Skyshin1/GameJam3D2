@@ -19,7 +19,13 @@ namespace AnchorDefense
     {
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public string DisplayName { get; private set; }
+        [field: SerializeField] public string EnglishDisplayName { get; private set; }
         [field: SerializeField, TextArea(2, 4)] public string Description { get; private set; }
+        [field: SerializeField, TextArea(2, 4)] public string EnglishDescription { get; private set; }
+        public string LocalizedDisplayName => GameLocalization.IsEnglish
+            ? GameLocalization.AssetName(Id, EnglishDisplayName, DisplayName) : DisplayName;
+        public string LocalizedDescription => GameLocalization.IsEnglish
+            ? GameLocalization.AssetDescription(Id, EnglishDescription, Description) : Description;
         [field: SerializeField] public Sprite Icon { get; private set; }
         [field: SerializeField] public Color ZoneColor { get; private set; } = new Color(0.1f, 0.6f, 1f, 0.1f);
         [field: SerializeField] public CubeZoneEffectType EffectType { get; private set; }

@@ -17,6 +17,7 @@ namespace AnchorDefense
         [SerializeField] private Button resetBindingsButton;
         [SerializeField] private Button[] categoryButtons;
         [SerializeField] private GameObject[] categoryPanels;
+        [SerializeField] private Dropdown languageDropdown;
 
         [Header("Display")]
         [SerializeField] private Dropdown resolutionDropdown;
@@ -123,6 +124,7 @@ namespace AnchorDefense
             InputBindingPersistence.Load(inputActions);
 
             BuildOptions();
+            EnsureLanguageDropdown();
             WireEvents();
             ConfigureCategoryNavigation();
             EnsureGamepadBindingRows();
@@ -147,6 +149,74 @@ namespace AnchorDefense
             }
 
             SetPanelVisible(false);
+            GameLocalization.LanguageChanged += HandleLanguageChanged;
+        }
+
+        private void EnsureLanguageDropdown()
+        {
+            if (languageDropdown != null || screenModeDropdown == null || panelRoot == null) return;
+            Transform existing = panelRoot.transform.Find("Language Dropdown");
+            if (existing != null) languageDropdown = existing.GetComponent<Dropdown>();
+            if (languageDropdown == null)
+            {
+                GameObject copy = Instantiate(screenModeDropdown.gameObject, panelRoot.transform);
+                copy.name = "Language Dropdown";
+                languageDropdown = copy.GetComponent<Dropdown>();
+                RectTransform rect = (RectTransform)copy.transform;
+                rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
+                rect.pivot = new Vector2(1f, 1f);
+                rect.anchoredPosition = new Vector2(-92f, -76f);
+                rect.sizeDelta = new Vector2(270f, 42f);
+                rect.localScale = Vector3.one;
+
+                GameObject labelObject = new GameObject("Language Label", typeof(RectTransform), typeof(Text));
+                labelObject.transform.SetParent(panelRoot.transform, false);
+                RectTransform labelRect = (RectTransform)labelObject.transform;
+                labelRect.anchorMin = labelRect.anchorMax = new Vector2(1f, 1f);
+                labelRect.pivot = new Vector2(1f, 1f);
+                labelRect.anchoredPosition = new Vector2(-377f, -76f);
+                labelRect.sizeDelta = new Vector2(170f, 42f);
+                Text label = labelObject.GetComponent<Text>();
+                label.text = GameLocalization.T("语言", "Language");
+                label.font = languageDropdown.captionText != null && languageDropdown.captionText.font != null
+                    ? languageDropdown.captionText.font : Resources.GetBuiltinResource<Font>("Arial.ttf");
+                label.fontSize = 24;
+                label.alignment = TextAnchor.MiddleRight;
+                label.color = Color.white;
+                label.raycastTarget = false;
+            }
+            Text existingLabel = panelRoot.transform.Find("Language Label")?.GetComponent<Text>();
+            if (existingLabel != null) existingLabel.text = GameLocalization.T("语言", "Language");
+            languageDropdown.onValueChanged.RemoveAllListeners();
+            languageDropdown.ClearOptions();
+            languageDropdown.AddOptions(new List<string> { "简体中文", "English" });
+            languageDropdown.SetValueWithoutNotify((int)GameLocalization.Language);
+            languageDropdown.RefreshShownValue();
+        }
+
+        private void HandleLanguageChanged()
+        {
+            int resolution = resolutionDropdown != null ? resolutionDropdown.value : 0;
+            int screenMode = screenModeDropdown != null ? screenModeDropdown.value : 0;
+            int frameRate = frameRateDropdown != null ? frameRateDropdown.value : 0;
+            int quality = qualityDropdown != null ? qualityDropdown.value : 0;
+            int antiAliasing = antiAliasingDropdown != null ? antiAliasingDropdown.value : 0;
+            BuildOptions();
+            resolutionDropdown?.SetValueWithoutNotify(resolution);
+            resolutionDropdown?.RefreshShownValue();
+            screenModeDropdown?.SetValueWithoutNotify(screenMode);
+            frameRateDropdown?.SetValueWithoutNotify(frameRate);
+            qualityDropdown?.SetValueWithoutNotify(quality);
+            antiAliasingDropdown?.SetValueWithoutNotify(antiAliasing);
+            screenModeDropdown?.RefreshShownValue();
+            frameRateDropdown?.RefreshShownValue();
+            qualityDropdown?.RefreshShownValue();
+            antiAliasingDropdown?.RefreshShownValue();
+            if (languageDropdown != null)
+            {
+                languageDropdown.SetValueWithoutNotify((int)GameLocalization.Language);
+                languageDropdown.RefreshShownValue();
+            }
         }
 
         private void EnsureGamepadBindingRows()
@@ -372,13 +442,15 @@ namespace AnchorDefense
 
             Text clone = Instantiate(nearest, parent);
             clone.name = labelText + " Label";
-            clone.text = labelText;
+            clone.text = GameLocalization.Translate(labelText);
             clone.rectTransform.anchoredPosition =
                 new Vector2(nearest.rectTransform.anchoredPosition.x, targetY);
         }
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= HandleLanguageChanged;
+            languageDropdown?.onValueChanged.RemoveAllListeners();
             if (closeButton != null)
             {
                 closeButton.onClick.RemoveListener(Close);
@@ -589,30 +661,37 @@ namespace AnchorDefense
             if (screenModeDropdown != null)
             {
                 screenModeDropdown.ClearOptions();
-                screenModeDropdown.AddOptions(new List<string> { "无边框全屏", "独占全屏", "窗口模式" });
+                screenModeDropdown.AddOptions(new List<string> { GameLocalization.T("无边框全屏", "Borderless Fullscreen"), GameLocalization.T("独占全屏", "Exclusive Fullscreen"), GameLocalization.T("窗口模式", "Windowed") });
             }
 
             if (frameRateDropdown != null)
             {
                 frameRateDropdown.ClearOptions();
-                frameRateDropdown.AddOptions(new List<string> { "30 FPS", "60 FPS", "120 FPS", "不限制" });
+                frameRateDropdown.AddOptions(new List<string> { "30 FPS", "60 FPS", "120 FPS", GameLocalization.T("不限制", "Unlimited") });
             }
 
             if (qualityDropdown != null)
             {
                 qualityDropdown.ClearOptions();
-                qualityDropdown.AddOptions(new List<string>(QualitySettings.names));
+                var qualityNames = new List<string>();
+                foreach (string name in QualitySettings.names)
+                    qualityNames.Add(GameLocalization.IsEnglish ? name :
+                        name == "Performant" ? "性能优先" : name == "Balanced" ? "均衡" :
+                        name == "High Fidelity" ? "高画质" : name);
+                qualityDropdown.AddOptions(qualityNames);
             }
 
             if (antiAliasingDropdown != null)
             {
                 antiAliasingDropdown.ClearOptions();
-                antiAliasingDropdown.AddOptions(new List<string> { "关闭", "FXAA", "SMAA（高质量）" });
+                antiAliasingDropdown.AddOptions(new List<string> { GameLocalization.T("关闭", "Off"), "FXAA", GameLocalization.T("SMAA（高质量）", "SMAA (High Quality)") });
             }
         }
 
         private void WireEvents()
         {
+            languageDropdown?.onValueChanged.AddListener(value =>
+                GameLocalization.SetLanguage(value == 1 ? GameLanguage.English : GameLanguage.SimplifiedChinese));
             closeButton?.onClick.AddListener(Close);
             applyButton?.onClick.AddListener(Apply);
             resetDefaultsButton?.onClick.AddListener(ResetDefaults);
@@ -696,6 +775,12 @@ namespace AnchorDefense
             if (settings == null)
             {
                 return;
+            }
+
+            if (languageDropdown != null)
+            {
+                languageDropdown.SetValueWithoutNotify((int)settings.language);
+                languageDropdown.RefreshShownValue();
             }
 
             if (resolutionDropdown != null)
@@ -970,7 +1055,7 @@ namespace AnchorDefense
 
                 Navigation navigation = current.navigation;
                 navigation.mode = Navigation.Mode.Explicit;
-                navigation.selectOnUp = upButton;
+                navigation.selectOnUp = i == 0 && languageDropdown != null ? languageDropdown : upButton;
                 navigation.selectOnDown = downButton;
                 navigation.selectOnRight = firstPanelSelectable;
                 navigation.selectOnLeft = current;
@@ -982,9 +1067,19 @@ namespace AnchorDefense
                 Navigation closeNavigation = closeButton.navigation;
                 closeNavigation.mode = Navigation.Mode.Explicit;
                 closeNavigation.selectOnDown = categoryButtons[0];
-                closeNavigation.selectOnLeft = categoryButtons[0];
+                closeNavigation.selectOnLeft = languageDropdown != null ? languageDropdown : categoryButtons[0];
                 closeNavigation.selectOnRight = categoryButtons[0];
                 closeButton.navigation = closeNavigation;
+            }
+            if (languageDropdown != null)
+            {
+                Navigation languageNavigation = languageDropdown.navigation;
+                languageNavigation.mode = Navigation.Mode.Explicit;
+                languageNavigation.selectOnDown = categoryButtons[0];
+                languageNavigation.selectOnLeft = categoryButtons[0];
+                languageNavigation.selectOnRight = closeButton;
+                languageNavigation.selectOnUp = closeButton;
+                languageDropdown.navigation = languageNavigation;
             }
         }
 

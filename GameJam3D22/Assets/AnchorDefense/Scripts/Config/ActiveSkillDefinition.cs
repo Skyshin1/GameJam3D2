@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AnchorDefense
@@ -15,8 +16,26 @@ namespace AnchorDefense
     {
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public string DisplayName { get; private set; }
+        [field: SerializeField] public string EnglishDisplayName { get; private set; }
         [field: SerializeField, TextArea(2, 5)] public string ModelDescription { get; private set; }
+        [field: SerializeField, TextArea(2, 5)] public string EnglishModelDescription { get; private set; }
         [field: SerializeField] public string[] Keywords { get; private set; }
+        [field: SerializeField] public string[] EnglishKeywords { get; private set; }
+        public string LocalizedDisplayName => GameLocalization.IsEnglish
+            ? GameLocalization.AssetName(Id, EnglishDisplayName, DisplayName) : DisplayName;
+        public string LocalizedModelDescription => GameLocalization.IsEnglish
+            ? GameLocalization.AssetDescription(Id, EnglishModelDescription, ModelDescription) : ModelDescription;
+        public string[] RecognitionKeywords
+        {
+            get
+            {
+                var values = new List<string>();
+                if (Keywords != null) values.AddRange(Keywords);
+                if (EnglishKeywords != null && EnglishKeywords.Length > 0) values.AddRange(EnglishKeywords);
+                else values.AddRange(GameLocalization.SkillEnglishKeywords(Id));
+                return values.ToArray();
+            }
+        }
         [field: SerializeField] public Sprite Icon { get; private set; }
         [field: SerializeField] public ActiveSkillTargetPolicy TargetPolicy { get; private set; }
         [field: SerializeField] public ActiveSkillEffect Effect { get; private set; }

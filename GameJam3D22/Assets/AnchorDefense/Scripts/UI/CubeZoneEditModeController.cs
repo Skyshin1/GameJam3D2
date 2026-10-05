@@ -23,6 +23,8 @@ namespace AnchorDefense
         private UpgradeTreeController upgradeTree;
         private UpgradeSystem upgradeSystem;
         private GameInputController input;
+        private CubeZoneEffectDefinition visibleTooltipEffect;
+        private bool visibleTooltipUnlocked;
 
         public bool IsEditing => editBanner != null && editBanner.activeSelf;
         public bool IsControllerCursorActive => IsEditing;
@@ -54,6 +56,7 @@ namespace AnchorDefense
             openButton.gameObject.SetActive(grid != null);
             if (gameFlow != null) gameFlow.StateChanged += HandleGameStateChanged;
             if (upgradeSystem != null) upgradeSystem.Changed += RefreshFragmentSources;
+            GameLocalization.LanguageChanged += RefreshFragmentSources;
             for (int i = 0; i < fragmentSources.Length; i++) fragmentSources[i]?.Bind(this);
             RefreshFragmentSources();
             grid?.SetEditMode(false);
@@ -62,7 +65,7 @@ namespace AnchorDefense
             {
                 if (bannerTexts[i] != null && bannerTexts[i].name == "Edit Mode Hint")
                 {
-                    bannerTexts[i].text = "游戏已暂停 · 右摇杆移动磁吸光标 · 按住 A 拖动碎片或方块 · B 完成";
+                    bannerTexts[i].text = GameLocalization.T("游戏已暂停 · 右摇杆移动磁吸光标 · 按住 A 拖动碎片或方块 · B 完成", "Paused · Right stick: snap cursor · Hold A: drag fragment or cube · B: finish");
                     break;
                 }
             }
@@ -125,15 +128,20 @@ namespace AnchorDefense
         public void ShowFragmentTooltip(CubeZoneEffectDefinition effect, bool unlocked)
         {
             if (effect == null || tooltipRoot == null) return;
-            tooltipTitle.text = effect.DisplayName;
-            tooltipDescription.text = effect.Description;
-            tooltipStatus.text = unlocked ? "已解锁 · 可拖到区域方块" : "未解锁 · 请先激活对应技能树节点";
+            visibleTooltipEffect = effect;
+            visibleTooltipUnlocked = unlocked;
+            tooltipTitle.text = effect.LocalizedDisplayName;
+            tooltipDescription.text = effect.LocalizedDescription;
+            tooltipStatus.text = unlocked
+                ? GameLocalization.T("已解锁 · 可拖到区域方块", "Unlocked · Drag onto a zone cube")
+                : GameLocalization.T("未解锁 · 请先激活对应技能树节点", "Locked · Activate its upgrade-tree node first");
             tooltipStatus.color = unlocked ? new Color(0.35f, 1f, 0.68f) : new Color(1f, 0.48f, 0.25f);
             tooltipRoot.SetActive(true);
         }
 
         public void HideFragmentTooltip()
         {
+            visibleTooltipEffect = null;
             tooltipRoot?.SetActive(false);
         }
 
@@ -163,6 +171,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= RefreshFragmentSources;
             bool wasEditing = IsEditing;
             if (openButton != null) openButton.onClick.RemoveListener(EnterEditMode);
             if (closeButton != null) closeButton.onClick.RemoveListener(ExitEditMode);
@@ -208,11 +217,17 @@ namespace AnchorDefense
 
         private void RefreshFragmentSources()
         {
+            if (editBanner != null)
+                foreach (Text text in editBanner.GetComponentsInChildren<Text>(true))
+                    if (text != null && text.name == "Edit Mode Hint")
+                        text.text = GameLocalization.T("游戏已暂停 · 右摇杆移动磁吸光标 · 按住 A 拖动碎片或方块 · B 完成", "Paused · Right stick: snap cursor · Hold A: drag fragment or cube · B: finish");
             for (int i = 0; i < fragmentSources.Length; i++)
             {
                 ZoneEffectWorldDragSource source = fragmentSources[i];
                 if (source != null) source.SetUnlocked(IsEffectUnlocked(source.Definition));
             }
+            if (visibleTooltipEffect != null && tooltipRoot != null && tooltipRoot.activeSelf)
+                ShowFragmentTooltip(visibleTooltipEffect, visibleTooltipUnlocked);
         }
 
         private bool IsEffectUnlocked(CubeZoneEffectDefinition effect)

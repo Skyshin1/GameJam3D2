@@ -46,6 +46,7 @@ namespace AnchorDefense
             }
 
             grid.AssignmentChanged += HandleAssignmentChanged;
+            GameLocalization.LanguageChanged += RefreshAll;
             grid.SelectionChanged += HandleWorldSelectionChanged;
             grid.LayoutChanged += RefreshAll;
             if (upgradeSystem != null) upgradeSystem.Changed += RefreshUnlocks;
@@ -94,6 +95,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= RefreshAll;
             if (openButton != null) openButton.onClick.RemoveListener(Open);
             if (closeButton != null) closeButton.onClick.RemoveListener(Close);
             if (grid != null)
@@ -199,9 +201,9 @@ namespace AnchorDefense
             if (selectedDetails != null)
             {
                 selectedDetails.text = cube == null
-                    ? "未选中区域立方体"
-                    : $"立方体 C{cube.CubeId + 1:00}  /  坐标 {cube.GridPosition}\n" +
-                      (effect != null ? effect.Description : "尚未配置区域效果");
+                    ? GameLocalization.T("未选中区域立方体", "No zone cube selected")
+                    : $"{GameLocalization.T("立方体", "Cube")} C{cube.CubeId + 1:00}  /  {GameLocalization.T("坐标", "Position")} {cube.GridPosition}\n" +
+                      (effect != null ? effect.LocalizedDescription : GameLocalization.T("尚未配置区域效果", "No zone effect assigned"));
             }
             for (int i = 0; i < layoutMarkers.Length; i++)
             {

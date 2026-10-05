@@ -99,6 +99,26 @@ namespace AnchorDefense
                 ring.RingId == OrbitRingId.Middle ? "第二轨道" : "第三轨道";
             string direction = degrees > 0f ? "逆时针" : "顺时针";
             RingMode mode = ResolveMode(playerText, command);
+            if (GameLocalization.IsEnglish)
+            {
+                string englishRing = ring.RingId == OrbitRingId.Inner ? "inner ring" :
+                    ring.RingId == OrbitRingId.Middle ? "middle ring" : "outer ring";
+                string englishDirection = degrees > 0f ? "counterclockwise" : "clockwise";
+                if (mode == RingMode.Stop)
+                    return command?.RingId == null && !HasExplicitRing(playerText)
+                        ? "Stopped all rings" : $"Stopped the {englishRing}";
+                if (mode == RingMode.Once) return $"Turn the {englishRing} {englishDirection} {Mathf.Abs(degrees):0.#}° once";
+                if (mode == RingMode.Repeat)
+                {
+                    TryReadRepeatCount(playerText, out int englishCount);
+                    return $"Turn the {englishRing} {englishDirection} {Mathf.Abs(degrees):0.#}° {englishCount} times";
+                }
+                float englishDuration = ResolveSustainedDuration(playerText);
+                string englishAction = mode == RingMode.Spin
+                    ? $"Keep the {englishRing} spinning {englishDirection}"
+                    : $"Keep controlling the {englishRing}";
+                return englishDuration > 0f ? $"{englishAction} for {englishDuration:0.#} seconds" : englishAction + " until stopped";
+            }
             if (mode == RingMode.Stop)
                 return command?.RingId == null && !HasExplicitRing(playerText)
                     ? "已停止所有星环" : $"已停止{ringName}";
@@ -127,11 +147,13 @@ namespace AnchorDefense
 
         public static bool IsExplicitStop(string text)
         {
-            if (string.IsNullOrEmpty(text) || Regex.IsMatch(text, "不要停|不想停|不许停|不能停|别停")) return false;
+            if (string.IsNullOrEmpty(text) || Regex.IsMatch(text,
+                "不要停|不想停|不许停|不能停|别停|\\b(?:don't|do not|never)\\s+(?:stop|halt)\\b", RegexOptions.IgnoreCase)) return false;
             // A stop after a finite rotation describes its completion, not an immediate stop.
             if (TryReadRepeatCount(text, out _) || HasExplicitOnce(text)) return false;
             return Regex.IsMatch(text, @"(?:^|请|帮我|把|让|先)\s*(?:停止|停下|结束|别转|不再转)") ||
-                   Regex.IsMatch(text, @"(?:轨道|星环|[内中外][环轨])\s*(?:停止|停下|不再转|别转)");
+                   Regex.IsMatch(text, @"(?:轨道|星环|[内中外][环轨])\s*(?:停止|停下|不再转|别转)") ||
+                   Regex.IsMatch(text, @"\b(?:stop|halt|pause)\s+(?:all\s+)?(?:the\s+)?(?:(?:inner|middle|outer|first|second|third)\s+)?(?:rings?|tracks?)\b|\b(?:rings?|tracks?)\s+(?:should\s+)?(?:stop|halt|pause)\b", RegexOptions.IgnoreCase);
         }
 
         public static bool TryReadRepeatCount(string text, out int count)
@@ -139,6 +161,10 @@ namespace AnchorDefense
             count = 0;
             Match match = Regex.Match(text ?? string.Empty,
                 @"(?:旋转|转动|重复|转)\s*(\d+|[一二两三四五六七八九十]+)\s*次");
+            if (!match.Success)
+                match = Regex.Match(text ?? string.Empty,
+                    @"\b(\d{1,2})\s+(?:times?|turns?)\b",
+                    RegexOptions.IgnoreCase);
             if (!match.Success) return false;
             string value = match.Groups[1].Value;
             if (int.TryParse(value, out count)) return true;
@@ -161,7 +187,7 @@ namespace AnchorDefense
             if (text.Contains("只转一次") || text.Contains("转一次") ||
                 text.Contains("转一下") ||
                 text.Contains("就停") || text.Contains("后停")) return true;
-            return false;
+            return Regex.IsMatch(text, @"\b(?:once|one time|single turn|just one turn)\b", RegexOptions.IgnoreCase);
         }
 
         private static bool IsExplicitSpin(string text)
@@ -169,12 +195,13 @@ namespace AnchorDefense
             return !string.IsNullOrEmpty(text) &&
                    (text.Contains("持续旋转") || text.Contains("一直转") ||
                     text.Contains("不停转") || text.Contains("每秒") ||
-                    text.Contains("顺时针") || text.Contains("逆时针"));
+                    text.Contains("顺时针") || text.Contains("逆时针") ||
+                    Regex.IsMatch(text, @"\b(?:continuously|keep spinning|keep rotating|clockwise|counterclockwise|counter-clockwise)\b", RegexOptions.IgnoreCase));
         }
 
         private float ResolveSustainedDuration(string text)
         {
-            Match match = Regex.Match(text ?? string.Empty, @"(\d{1,2})\s*秒");
+            Match match = Regex.Match(text ?? string.Empty, @"(\d{1,2})\s*(?:秒|seconds?|secs?)", RegexOptions.IgnoreCase);
             return match.Success && float.TryParse(match.Groups[1].Value, out float seconds)
                 ? Mathf.Clamp(seconds, 1f, 20f) : sustainedDurationSeconds;
         }
@@ -182,7 +209,7 @@ namespace AnchorDefense
         private float ResolveSustainedSpeed(string text)
         {
             Match match = Regex.Match(text ?? string.Empty,
-                @"(\d{1,3})\s*(?:度|°)\s*(?:每秒|/s)");
+                @"(\d{1,3})\s*(?:度|°|degrees?)\s*(?:每秒|/s|per second)", RegexOptions.IgnoreCase);
             return match.Success && float.TryParse(match.Groups[1].Value, out float speed)
                 ? Mathf.Clamp(speed, 5f, 120f) : sustainedSpeedDegreesPerSecond;
         }
@@ -204,7 +231,7 @@ namespace AnchorDefense
             bool hasCount = TryReadRepeatCount(text, out int repeatCount);
             if ((hasCount && (repeatCount < 1 || repeatCount > 20)) ||
                 (command?.RingMode == "repeat" && (!hasCount || command.ring_count != repeatCount)) ||
-                (!hasCount && text.Contains("多次")))
+                (!hasCount && (text.Contains("多次") || Regex.IsMatch(text, @"\b(?:many|several|multiple)\s+times\b", RegexOptions.IgnoreCase))))
             {
                 error = "旋转次数必须来自原文且在 1～20 次之间，未扣指令点";
                 return false;
@@ -215,9 +242,11 @@ namespace AnchorDefense
                 return false;
             }
 
-            Match numericRing = Regex.Match(text, @"(?:第)?(\d+)(?:号|条|个)?(?:轨道|轨|星环|环)");
+            Match numericRing = Regex.Match(text, @"(?:第)?(\d+)(?:号|条|个)?(?:轨道|轨|星环|环)|\b(?:ring|track)\s*#?\s*(\d+)\b|\b(\d+)(?:st|nd|rd|th)?\s+(?:ring|track)\b", RegexOptions.IgnoreCase);
             int ringNumber = -1;
-            if (numericRing.Success && (!int.TryParse(numericRing.Groups[1].Value, out ringNumber) ||
+            string numericValue = numericRing.Groups[1].Success ? numericRing.Groups[1].Value :
+                numericRing.Groups[2].Success ? numericRing.Groups[2].Value : numericRing.Groups[3].Value;
+            if (numericRing.Success && (!int.TryParse(numericValue, out ringNumber) ||
                 ringNumber < 1 || ringNumber > 3))
             {
                 error = "指定的星环不存在，未扣指令点";
@@ -229,7 +258,7 @@ namespace AnchorDefense
             else if (MatchesRing(text, "第一", "1", "一号", "内环", "内轨")) requested = 0;
             else if (MatchesRing(text, "第二", "2", "二号", "中环", "中轨")) requested = 1;
             else if (MatchesRing(text, "第三", "3", "三号", "外环", "外轨")) requested = 2;
-            else if (Regex.IsMatch(text, @"第[四五六七八九十百4-9][条个]?(?:星环|轨道|轨|环)|[四五六七八九4-9]号(?:星环|轨道|轨|环)"))
+            else if (Regex.IsMatch(text, @"第[四五六七八九十百4-9][条个]?(?:星环|轨道|轨|环)|[四五六七八九4-9]号(?:星环|轨道|轨|环)|\b(?:fourth|fifth|sixth|4th|5th|6th)\s+(?:ring|track)\b", RegexOptions.IgnoreCase))
             {
                 error = "指定的星环不存在，未扣指令点";
                 return false;
@@ -242,9 +271,11 @@ namespace AnchorDefense
                 error = "每条星环操作必须对应唯一原文目标，未扣指令点";
                 return false;
             }
-            foreach (Match other in Regex.Matches(text, @"(?:第)?(\d+)(?:号|条|个)?(?:轨道|轨|星环|环)"))
+            foreach (Match other in Regex.Matches(text, @"(?:第)?(\d+)(?:号|条|个)?(?:轨道|轨|星环|环)|\b(?:ring|track)\s*#?\s*(\d+)\b|\b(\d+)(?:st|nd|rd|th)?\s+(?:ring|track)\b", RegexOptions.IgnoreCase))
             {
-                if (!int.TryParse(other.Groups[1].Value, out int otherNumber) ||
+                string otherValue = other.Groups[1].Success ? other.Groups[1].Value :
+                    other.Groups[2].Success ? other.Groups[2].Value : other.Groups[3].Value;
+                if (!int.TryParse(otherValue, out int otherNumber) ||
                     otherNumber < 1 || otherNumber > 3 || (requested >= 0 && requested != otherNumber - 1))
                 {
                     error = "每条星环操作必须对应唯一且有效的原文目标，未扣指令点";
@@ -253,8 +284,8 @@ namespace AnchorDefense
             }
             if (requested < 0)
             {
-                if (text.Contains("最外")) requested = 2;
-                else if (text.Contains("最内") || text.Contains("最里面")) requested = 0;
+                if (text.Contains("最外") || Regex.IsMatch(text, @"\boutermost\b", RegexOptions.IgnoreCase)) requested = 2;
+                else if (text.Contains("最内") || text.Contains("最里面") || Regex.IsMatch(text, @"\binnermost\b", RegexOptions.IgnoreCase)) requested = 0;
                 else if (text.Contains("中间")) requested = 1;
             }
 
@@ -280,7 +311,7 @@ namespace AnchorDefense
             }
 
             float angle = defaultDegrees;
-            Match angleMatch = Regex.Match(text, @"(?<![\d.])(-?\d+(?:\.\d+)?)\s*(?:度|°)");
+            Match angleMatch = Regex.Match(text, @"(?<![\d.])(-?\d+(?:\.\d+)?)\s*(?:度|°|degrees?)", RegexOptions.IgnoreCase);
             if (angleMatch.Success)
             {
                 if (!float.TryParse(angleMatch.Groups[1].Value, System.Globalization.NumberStyles.Float,
@@ -293,7 +324,8 @@ namespace AnchorDefense
                 angle = requestedAngle;
             }
             bool counterClockwise = text.Contains("逆时针") || text.Contains("反时针") ||
-                text.Contains("向左转") || text.Contains("左转");
+                text.Contains("向左转") || text.Contains("左转") ||
+                Regex.IsMatch(text, @"\b(?:counterclockwise|counter-clockwise|anti-clockwise|turn left|rotate left)\b", RegexOptions.IgnoreCase);
             degrees = counterClockwise ? angle : -angle;
             error = null;
             return true;
@@ -303,6 +335,7 @@ namespace AnchorDefense
         {
             if (string.IsNullOrEmpty(text)) return false;
             return Regex.IsMatch(text, @"(?:第)?\d+(?:号|条|个)?(?:轨道|轨|星环|环)") ||
+                   Regex.IsMatch(text, @"\b(?:ring|track)\s*#?\s*\d+\b|\b\d+(?:st|nd|rd|th)?\s+(?:ring|track)\b", RegexOptions.IgnoreCase) ||
                    text.Contains("最外") || text.Contains("最内") || text.Contains("最里面") || text.Contains("中间") ||
                    MatchesRing(text, "第一", "1", "一号", "内环", "内轨") ||
                    MatchesRing(text, "第二", "2", "二号", "中环", "中轨") ||
@@ -319,7 +352,10 @@ namespace AnchorDefense
                    text.Contains("第" + digit + "条轨") ||
                    text.Contains(digit + "号轨") || text.Contains(digit + "号环") ||
                    text.Contains(numbered + "轨") || text.Contains(numbered + "环") ||
-                   text.Contains(shortName) || text.Contains(alternateName);
+                   text.Contains(shortName) || text.Contains(alternateName) ||
+                   Regex.IsMatch(text, digit == "1" ? @"\b(?:inner|first|1st)\s+(?:orbit(?:al)?\s+)?(?:ring|track)\b" :
+                       digit == "2" ? @"\b(?:middle|second|2nd)\s+(?:orbit(?:al)?\s+)?(?:ring|track)\b" :
+                       @"\b(?:outer|third|3rd)\s+(?:orbit(?:al)?\s+)?(?:ring|track)\b", RegexOptions.IgnoreCase);
         }
     }
 }

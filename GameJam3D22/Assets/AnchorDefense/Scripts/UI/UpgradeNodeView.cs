@@ -33,7 +33,7 @@ namespace AnchorDefense
         {
             state = system != null ? system.GetState(definition) : UpgradeNodeState.Placeholder;
             bool hasDefinition = definition != null;
-            shortLabel.text = hasDefinition ? definition.ShortLabel : "?";
+            shortLabel.text = hasDefinition ? definition.LocalizedShortLabel : "?";
             costLabel.text = hasDefinition && !definition.Placeholder ? definition.KillCost.ToString() : string.Empty;
             icon.gameObject.SetActive(hasDefinition && definition.Icon != null);
             if (hasDefinition && definition.Icon != null)

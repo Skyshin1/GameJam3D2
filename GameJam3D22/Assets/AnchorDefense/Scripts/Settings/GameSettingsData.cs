@@ -10,6 +10,12 @@ namespace AnchorDefense
         Smaa
     }
 
+    public enum GameLanguage
+    {
+        SimplifiedChinese = 0,
+        English = 1
+    }
+
     [Serializable]
     public sealed class GameSettingsData
     {
@@ -27,6 +33,7 @@ namespace AnchorDefense
         public float ringDragSensitivity = 1f;
         public float cameraOrbitSensitivity = 1f;
         public bool showZoneBordersOutsideEdit;
+        public GameLanguage language = GameLanguage.SimplifiedChinese;
 
         public GameSettingsData Clone()
         {

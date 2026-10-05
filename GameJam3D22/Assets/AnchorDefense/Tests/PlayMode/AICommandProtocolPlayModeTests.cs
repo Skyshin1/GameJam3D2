@@ -27,10 +27,13 @@ namespace AnchorDefense.Tests
         private EnemyRegistry enemies;
         private TurretRegistry turrets;
         private UpgradeSystem upgrades;
+        private GameSettingsData savedSettings;
 
         [SetUp]
         public void SetUp()
         {
+            savedSettings = GameSettingsService.Current.Clone();
+            GameLocalization.SetLanguage(GameLanguage.SimplifiedChinese);
             Time.timeScale = 1f;
             core = Create("Core").transform;
             flow = Create("Flow").AddComponent<GameFlowController>();
@@ -72,6 +75,7 @@ namespace AnchorDefense.Tests
         [TearDown]
         public void TearDown()
         {
+            if (savedSettings != null) GameSettingsService.ApplyAndSave(savedSettings);
             service?.Dispose();
             service = null;
             upgrades?.Dispose();

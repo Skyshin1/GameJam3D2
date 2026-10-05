@@ -92,7 +92,8 @@ namespace AnchorDefense
             }
             if (label != null)
             {
-                label.text = isUnlocked ? definition.DisplayName : definition.DisplayName + "\n（技能树未解锁）";
+                label.text = isUnlocked ? definition.LocalizedDisplayName : definition.LocalizedDisplayName +
+                    GameLocalization.T("\n（技能树未解锁）", "\n(Unlock in Upgrade Tree)");
                 label.color = isUnlocked ? Color.white : new Color(0.48f, 0.56f, 0.62f, 1f);
             }
             CanvasGroup group = GetComponent<CanvasGroup>();

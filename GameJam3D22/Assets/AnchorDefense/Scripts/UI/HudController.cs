@@ -63,6 +63,7 @@ namespace AnchorDefense
             finalTimeLabel = ExtractLeadingLabel(finalTimeText != null ? finalTimeText.text : null, "TIME");
 
             core.HealthChanged += HandleHealthChanged;
+            GameLocalization.LanguageChanged += RefreshLanguage;
             gameFlow.StateChanged += HandleStateChanged;
             restartButton.onClick.AddListener(RestartGame);
             gameOverPanel.SetActive(false);
@@ -76,12 +77,13 @@ namespace AnchorDefense
                 return;
             }
 
-            timerText.text = $"{timerLabel}  {FormatTime(spawner.ElapsedTime)}";
-            enemyText.text = $"{enemyLabel}  {registry.Count}";
+            timerText.text = $"{GameLocalization.T(timerLabel, "SURVIVAL")}  {FormatTime(spawner.ElapsedTime)}";
+            enemyText.text = $"{GameLocalization.T(enemyLabel, "ENEMIES")}  {registry.Count}";
         }
 
         private void OnDestroy()
         {
+            GameLocalization.LanguageChanged -= RefreshLanguage;
             if (core != null)
             {
                 core.HealthChanged -= HandleHealthChanged;
@@ -95,7 +97,7 @@ namespace AnchorDefense
 
         private void HandleHealthChanged(float current, float maximum)
         {
-            healthText.text = $"{coreLabel}  {Mathf.CeilToInt(current)} / {Mathf.CeilToInt(maximum)}";
+            healthText.text = $"{GameLocalization.T(coreLabel, "CORE")}  {Mathf.CeilToInt(current)} / {Mathf.CeilToInt(maximum)}";
             healthFill.fillAmount = maximum > 0f ? current / maximum : 0f;
         }
 
@@ -107,8 +109,19 @@ namespace AnchorDefense
                 return;
             }
 
-            finalTimeText.text = $"{finalTimeLabel}  {FormatTime(spawner.ElapsedTime)}";
+            finalTimeText.text = $"{GameLocalization.T(finalTimeLabel, "SURVIVED")}  {FormatTime(spawner.ElapsedTime)}";
             gameOverPanel.SetActive(true);
+        }
+
+        private void RefreshLanguage()
+        {
+            if (core != null) HandleHealthChanged(core.CurrentHealth, core.MaxHealth);
+            if (spawner != null && timerText != null)
+                timerText.text = $"{GameLocalization.T(timerLabel, "SURVIVAL")}  {FormatTime(spawner.ElapsedTime)}";
+            if (registry != null && enemyText != null)
+                enemyText.text = $"{GameLocalization.T(enemyLabel, "ENEMIES")}  {registry.Count}";
+            if (gameOverPanel != null && gameOverPanel.activeSelf && finalTimeText != null && spawner != null)
+                finalTimeText.text = $"{GameLocalization.T(finalTimeLabel, "SURVIVED")}  {FormatTime(spawner.ElapsedTime)}";
         }
 
         private static string ExtractLeadingLabel(string initialText, string fallback)

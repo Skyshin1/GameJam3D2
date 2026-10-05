@@ -8,6 +8,14 @@ namespace AnchorDefense
         [SerializeField] private ParticleSystem particles;
         private Action<PooledParticleEffect> releaseAction;
         private float remaining;
+        private bool unscaledPlayback;
+
+        public void UseUnscaledPlayback(bool value)
+        {
+            unscaledPlayback = value;
+            foreach (ParticleSystem system in GetComponentsInChildren<ParticleSystem>(true))
+            { var main = system.main; main.useUnscaledTime = value; }
+        }
 
         public void Configure(ParticleSystem particleSystem)
         {
@@ -66,6 +74,7 @@ namespace AnchorDefense
 
         public void OnReturnedToPool()
         {
+            UseUnscaledPlayback(false);
             particles?.Clear(true);
             releaseAction = null;
             remaining = 0f;
@@ -78,7 +87,7 @@ namespace AnchorDefense
                 return;
             }
 
-            remaining -= Time.deltaTime;
+            remaining -= unscaledPlayback ? Time.unscaledDeltaTime : Time.deltaTime;
             if (remaining <= 0f)
             {
                 releaseAction?.Invoke(this);

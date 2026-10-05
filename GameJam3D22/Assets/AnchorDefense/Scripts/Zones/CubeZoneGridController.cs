@@ -841,7 +841,8 @@ namespace AnchorDefense
 
         private void Update()
         {
-            if (!initialized)
+            if (Time.timeScale <= 0f) return;
+            if (!initialized || turretRegistry == null || enemyRegistry == null)
             {
                 return;
             }

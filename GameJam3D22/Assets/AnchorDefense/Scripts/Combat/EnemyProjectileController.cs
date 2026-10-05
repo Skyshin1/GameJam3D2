@@ -30,6 +30,8 @@ namespace AnchorDefense
             }
         }
 
+        public void ClearForRescue() { if (isFlying) Release(); }
+
         public void Configure(TrailRenderer projectileTrail)
         {
             trail = projectileTrail;
@@ -89,6 +91,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (!isFlying)
             {
                 return;

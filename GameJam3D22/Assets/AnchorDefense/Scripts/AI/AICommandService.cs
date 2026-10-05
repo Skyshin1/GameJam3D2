@@ -51,7 +51,25 @@ namespace AnchorDefense
         public event Action<bool> BusyChanged;
         public event Action<AICommandExecutionResult> ExecutionUpdated;
 
-        public async Task<AICommandExecutionResult> Submit(string playerText)
+        public string GetPlanningPrompt()
+        {
+            RefreshAvailableSkills();
+            return BuildSystemPrompt();
+        }
+
+        public void CancelPending()
+        {
+            lifetimeCancellation.Cancel();
+            lifetimeCancellation.Dispose();
+            lifetimeCancellation = new CancellationTokenSource();
+        }
+
+        public Task<AICommandExecutionResult> ExecuteParsed(string playerText, AIParsedCommand parsed) =>
+            SubmitCore(playerText, parsed);
+
+        public Task<AICommandExecutionResult> Submit(string playerText) => SubmitCore(playerText, null);
+
+        private async Task<AICommandExecutionResult> SubmitCore(string playerText, AIParsedCommand supplied)
         {
             if (disposed) return Result(AICommandOutcome.Cancelled, "指令系统已关闭");
             if (IsBusy) return Result(AICommandOutcome.Busy, "星核正在解析上一条指令");
@@ -60,13 +78,13 @@ namespace AnchorDefense
             {
                 return Result(AICommandOutcome.GameUnavailable, "指令系统未正确初始化");
             }
-            if (!gameFlow.IsPlaying) return Result(AICommandOutcome.GameUnavailable, "当前无法执行指令");
+            if (!gameFlow.IsPlaying || GamePause.IsPaused) return Result(AICommandOutcome.GameUnavailable, "当前无法执行指令");
             if (!wallet.CanSpend(CommandCost) && !AICommandValidator.HasRingControlIntent(playerText) &&
                 !AIGameCapabilityCatalog.HasUpgradeIntent(playerText))
             {
                 return Result(AICommandOutcome.InsufficientPoints, $"指令点不足，需要 {CommandCost} 点");
             }
-            if (!IsConfigured) return Result(AICommandOutcome.NotConfigured, "AI 服务未配置");
+            if (supplied == null && !IsConfigured) return Result(AICommandOutcome.NotConfigured, "AI 服务未配置");
 
             string normalized = playerText.Trim();
             if (normalized.Length > MaximumInputLength)
@@ -87,10 +105,10 @@ namespace AnchorDefense
                 AICommandRequest request = new AICommandRequest(
                     BuildSystemPrompt(), normalized, GetAvailableSkillIds());
                 CancellationToken cancellationToken = lifetimeCancellation.Token;
-                AIProviderResult providerResult = await provider.RequestAsync(
-                    request, cancellationToken);
+                AIProviderResult providerResult = supplied != null ? AIProviderResult.Ok(supplied) :
+                    await provider.RequestAsync(request, cancellationToken);
 
-                if (!gameFlow.IsPlaying || cancellationToken.IsCancellationRequested)
+                if (!gameFlow.IsPlaying || GamePause.IsPaused || cancellationToken.IsCancellationRequested)
                 {
                     return Result(AICommandOutcome.Cancelled, "指令已取消");
                 }

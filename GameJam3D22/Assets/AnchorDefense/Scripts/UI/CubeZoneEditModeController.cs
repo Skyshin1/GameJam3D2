@@ -73,6 +73,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (GamePause.RescueActive) return;
             if (IsEditing && Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame)
             {
                 ExitEditMode();
@@ -178,12 +179,13 @@ namespace AnchorDefense
             if (gameFlow != null) gameFlow.StateChanged -= HandleGameStateChanged;
             if (upgradeSystem != null) upgradeSystem.Changed -= RefreshFragmentSources;
             grid?.SetEditMode(false);
-            if (wasEditing) Time.timeScale = 1f;
+            if (wasEditing) GamePause.Set(this, false);
             GamepadVirtualCursorController.ClearContext(this);
         }
 
         private void EnterEditMode()
         {
+            if (GamePause.RescueActive) return;
             if (gameFlow == null || !gameFlow.IsPlaying || grid == null) return;
             upgradeTree?.CloseFromExternal();
             SetEditing(true, true);
@@ -211,7 +213,7 @@ namespace AnchorDefense
             }
             if (updateTimeScale && gameFlow != null && gameFlow.IsPlaying)
             {
-                Time.timeScale = editing ? 0f : 1f;
+                GamePause.Set(this, editing);
             }
         }
 

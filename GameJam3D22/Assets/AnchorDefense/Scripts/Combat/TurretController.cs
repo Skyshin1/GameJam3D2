@@ -118,6 +118,7 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (Time.time >= commandBoostUntil)
             {
                 commandFireIntervalMultiplier = 1f;

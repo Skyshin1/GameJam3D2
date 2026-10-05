@@ -171,6 +171,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (gameFlow == null || !gameFlow.IsPlaying || enemyTypes.Count == 0)
             {
                 return;

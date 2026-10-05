@@ -140,8 +140,17 @@ namespace AnchorDefense
                 gameplayCamera,
                 gameFlow,
                 rings);
-            FindObjectOfType<AICommandConsoleController>(true)?.Initialize(
-                AICommandService, inputController, gameFlow);
+            AICommandConsoleController console = FindObjectOfType<AICommandConsoleController>(true);
+            console?.Initialize(AICommandService, inputController, gameFlow);
+            AICompanionView companionView = console != null ? console.GetComponent<AICompanionView>() : null;
+            if (zoneGrid != null && companionView != null && companionView.Config != null)
+            {
+                AICompanionService companion = gameObject.AddComponent<AICompanionService>();
+                companion.Initialize(companionView.Config, new DeepSeekCompanionProvider(aiCommandConfig),
+                    AICommandService, UpgradeSystem, core, registry, TurretRegistry, gameFlow, spawner);
+                console.AttachCompanion(companion);
+                companionView.Initialize(companion, console, upgradeTree);
+            }
 
             core.Died += gameFlow.EndGame;
             gameFlow.BeginGame();

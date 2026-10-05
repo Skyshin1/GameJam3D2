@@ -101,6 +101,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (grid == null || gameFlow == null || !gameFlow.IsPlaying ||
                 grid.GetCubeById(zoneId) == null)
             {

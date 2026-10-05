@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6fb0a124b556374b9b4497976f77a26, type: 3}
+  m_Name: AICompanionConfig
+  m_EditorClassIdentifier: 
+  recommendationInterval: 25
+  recommendationLifetime: 30
+  chatterMinimum: 8
+  chatterMaximum: 12
+  bubbleSeconds: 7
+  temperature: 0.8
+  typewriterEnabled: 1
+  typewriterCharactersPerSecond: 28
+  rescueHealthRatio: 0.3
+  rescueVisualSeconds: 0.8
+  rescueVfxPrefab: {fileID: 0}
+  chineseCharacters: 45
+  recommendationCharacters: 60
+  englishWords: 30
+  recommendationWords: 40
+  personality: Warm, playful, confident planetary companion. Tease a tactical choice
+    gently, never insult the player. Speak like a close teammate, not a lecturer.
+  worldLore: The invaders come from a distant fairy-tale planet. They have destroyed
+    many peaceful planets. Now they surround our planet; together we must stop them.
+    Reveal one small detail at a time. Do not invent new historical facts, characters,
+    levels or abilities.

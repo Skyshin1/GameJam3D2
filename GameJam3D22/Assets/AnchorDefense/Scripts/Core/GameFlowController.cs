@@ -17,7 +17,7 @@ namespace AnchorDefense
 
         public void BeginGame()
         {
-            Time.timeScale = 1f;
+            GamePause.Reset();
             State = GameState.Playing;
             StateChanged?.Invoke(State);
         }
@@ -31,7 +31,7 @@ namespace AnchorDefense
 
             State = GameState.GameOver;
             StateChanged?.Invoke(State);
-            Time.timeScale = 0f;
+            GamePause.EndGame();
         }
     }
 }

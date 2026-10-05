@@ -83,7 +83,9 @@ namespace AnchorDefense
         private static bool ContainsName(string source, string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return false;
-            if (name.Length == 1 && name[0] < 128) return false;
+            if (name.Length == 1 && name[0] < 128)
+                return name == "I" && Regex.IsMatch(source,
+                    @"(?:购买|买|升级|\b(?:buy|purchase|upgrade)\s+)\s*I(?![A-Za-z0-9_.])", RegexOptions.IgnoreCase);
             return Regex.IsMatch(name, @"^[A-Za-z0-9_.]+$") ?
                 Regex.IsMatch(source, @"(?<![A-Za-z0-9_.])" + Regex.Escape(name) + @"(?![A-Za-z0-9_.])", RegexOptions.IgnoreCase) :
                 name.Length >= 2 && source.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0;

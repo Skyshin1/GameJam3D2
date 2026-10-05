@@ -85,6 +85,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (GamePause.RescueActive) return;
             if (input == null || gameFlow == null || !gameFlow.IsPlaying)
             {
                 return;
@@ -123,6 +124,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GamePause.Set(this, false);
             if (resumeButton != null)
             {
                 resumeButton.onClick.RemoveListener(Resume);
@@ -205,7 +207,7 @@ namespace AnchorDefense
 
             if (gameFlow != null && gameFlow.IsPlaying)
             {
-                Time.timeScale = paused ? 0f : 1f;
+                GamePause.Set(this, paused);
             }
         }
 

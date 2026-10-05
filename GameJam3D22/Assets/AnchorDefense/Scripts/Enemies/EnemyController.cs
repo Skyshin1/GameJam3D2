@@ -48,6 +48,17 @@ namespace AnchorDefense
         private static int attackSoundsInWindow;
 
         public bool IsAlive => isAlive;
+        public EnemyConfig Definition => config;
+        public float CurrentHealth => currentHealth;
+        public float EffectiveMoveSpeed => moveSpeed * zoneSpeedMultiplier * commandSlowMultiplier;
+
+        public void ClearForRescue()
+        {
+            if (!isAlive) return;
+            isAlive = false;
+            deathEffectAction?.Invoke(transform.position, config.BaseColor);
+            releaseAction?.Invoke(this);
+        }
         public int SpawnVersion { get; private set; }
         public float ZoneSpeedMultiplier => zoneSpeedMultiplier;
         public float ZoneDamagePerSecond => zoneDamagePerSecond;
@@ -182,6 +193,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (!isAlive || core == null || config == null)
             {
                 return;

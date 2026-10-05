@@ -41,7 +41,6 @@ namespace AnchorDefense
 
             using var request = new UnityWebRequest(BuildEndpoint(settings.BaseUrl), UnityWebRequest.kHttpVerbPOST);
             request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(payload));
-            Debug.Log(payload);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.timeout = Mathf.Max(1, Mathf.CeilToInt(config.TimeoutSeconds));
             request.SetRequestHeader("Content-Type", "application/json");

@@ -159,6 +159,16 @@ namespace AnchorDefense
 
     public static class AICommandJsonValidator
     {
+        public static bool TryReadObject(string json, out Dictionary<string, object> result)
+        {
+            result = null;
+            if (string.IsNullOrWhiteSpace(json)) return false;
+            int cursor = 0;
+            if (!TryReadValue(json, ref cursor, 0, out object value)) return false;
+            SkipWhitespace(json, ref cursor);
+            result = value as Dictionary<string, object>;
+            return cursor == json.Length && result != null;
+        }
         private static readonly HashSet<string> LegacyKeys = new HashSet<string>
         {
             "action", "skill_id", "target_zone_id"

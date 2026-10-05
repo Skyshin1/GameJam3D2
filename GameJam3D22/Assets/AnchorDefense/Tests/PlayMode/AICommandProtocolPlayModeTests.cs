@@ -32,6 +32,7 @@ namespace AnchorDefense.Tests
         [SetUp]
         public void SetUp()
         {
+            GamePause.Reset();
             savedSettings = GameSettingsService.Current.Clone();
             GameLocalization.SetLanguage(GameLanguage.SimplifiedChinese);
             Time.timeScale = 1f;
@@ -85,7 +86,7 @@ namespace AnchorDefense.Tests
             for (int i = owned.Count - 1; i >= 0; i--)
                 if (owned[i] != null) Object.DestroyImmediate(owned[i]);
             owned.Clear();
-            Time.timeScale = 1f;
+            GamePause.Reset();
         }
 
         private GameObject Create(string name)

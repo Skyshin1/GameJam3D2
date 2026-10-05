@@ -28,6 +28,7 @@ namespace AnchorDefense
         public void SpawnDeath(Vector3 position, Color color)
         {
             PooledParticleEffect effect = deathPool.Get();
+            effect.UseUnscaledPlayback(GamePause.RescueActive);
             effect.PlayBurst(position, color, 18, 0.8f, deathPool.Release);
         }
     }

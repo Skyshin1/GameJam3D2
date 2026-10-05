@@ -186,6 +186,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (!isFlying)
             {
                 return;

@@ -27,6 +27,47 @@ namespace AnchorDefense
         private bool initialized;
         private Coroutine autoCloseRoutine;
         private AICommandExecutionResult lastResult;
+        private AICompanionService companion;
+        private UnityEngine.InputSystem.Keyboard imeKeyboard;
+        private bool imeComposing;
+        private int imeCommitFrame = -10;
+        private void OnImeComposition(UnityEngine.InputSystem.LowLevel.IMECompositionString composition)
+        {
+            imeComposing = composition.Count > 0;
+            if (!imeComposing) imeCommitFrame = Time.frameCount;
+        }
+        public event System.Action<bool> OpenChanged;
+        public RectTransform PanelRect => panelRoot != null ? panelRoot.transform as RectTransform : null;
+        public Button Opener => openButton;
+        public TMP_InputField InputField => inputField;
+
+        public void AttachCompanion(AICompanionService value)
+        {
+            companion = value;
+            companion.BusyChanged += HandleBusyChanged;
+            RefreshLanguage();
+        }
+        public void ShowCompanionMessage(string message, bool systemMessage, bool concerned = false)
+        {
+            SetStatus(message, false);
+            if (resultText != null) resultText.text = string.Empty;
+            if (resultIcon != null) resultIcon.gameObject.SetActive(false);
+            if (!systemMessage) portraitMotion?.React(!concerned);
+        }
+        public void OpenForRescue()
+        {
+            CancelAutoClose();
+            panelRoot.SetActive(true);
+            openButton.gameObject.SetActive(false);
+            companion.ConversationOpen = true;
+            if (input != null) input.IsTextEntryActive = true;
+            inputField?.ActivateInputField();
+            ShowCompanionMessage(GameLocalization.T("核心告急 · 是否需要救援？", "Core critical · Need rescue?"), true);
+            portraitMotion?.SetMood(AICommandAssistantMood.Failure);
+            SetCompanionLabels(true);
+            OpenChanged?.Invoke(true);
+        }
+        public void CloseAfterRescue() { Close(); }
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
@@ -95,6 +136,12 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (imeKeyboard != UnityEngine.InputSystem.Keyboard.current)
+            {
+                if (imeKeyboard != null) imeKeyboard.onIMECompositionChange -= OnImeComposition;
+                imeKeyboard = UnityEngine.InputSystem.Keyboard.current;
+                if (imeKeyboard != null) imeKeyboard.onIMECompositionChange += OnImeComposition;
+            }
             if (!initialized || input == null) return;
 
             if (!IsOpen)
@@ -111,12 +158,17 @@ namespace AnchorDefense
 
             if (input.SubmitAICommand != null && input.SubmitAICommand.WasPressedThisFrame())
             {
+                var selected = UnityEngine.EventSystems.EventSystem.current?.currentSelectedGameObject;
+                if (companion != null && companion.RescuePending && selected != null &&
+                    selected.GetComponent<Button>() != null && selected != submitButton.gameObject) return;
                 SubmitFromUi();
             }
         }
 
         private void OnDestroy()
         {
+            if (imeKeyboard != null) imeKeyboard.onIMECompositionChange -= OnImeComposition;
+            if (companion != null) companion.BusyChanged -= HandleBusyChanged;
             GameLocalization.LanguageChanged -= RefreshLanguage;
             CancelAutoClose();
             openButton?.onClick.RemoveListener(Open);
@@ -132,7 +184,7 @@ namespace AnchorDefense
             if (input != null) input.IsTextEntryActive = false;
         }
 
-        private void Open()
+        public void Open()
         {
             if (!initialized || gameFlow == null || !gameFlow.IsPlaying || Time.timeScale <= 0f) return;
             CancelAutoClose();
@@ -141,6 +193,14 @@ namespace AnchorDefense
             portraitMotion?.SetMood(AICommandAssistantMood.Listening);
             if (input != null) input.IsTextEntryActive = true;
             inputField?.ActivateInputField();
+            if (companion != null)
+            {
+                companion.ConversationOpen = true;
+                SetCompanionLabels(false);
+                ShowCompanionMessage(GameLocalization.T("聊天免费 · 游戏操作按原规则消耗指令点", "Chat is free · Game actions use command points"), true);
+                OpenChanged?.Invoke(true);
+                return;
+            }
             SetStatus(service.IsConfigured
                 ? GameLocalization.T("星核：想让我帮你做什么？", "Core: How can I help?")
                 : GameLocalization.T("星核：还没有连上 AI 服务。", "Core: The AI service is not connected."), false);
@@ -149,16 +209,31 @@ namespace AnchorDefense
         private void Close()
         {
             if (!IsOpen) return;
+            if (companion != null && companion.RescuePending) { companion.ResolveRescue(false); return; }
             CancelAutoClose();
             inputField?.DeactivateInputField();
             portraitMotion?.SetMood(AICommandAssistantMood.Idle);
             panelRoot.SetActive(false);
             openButton.gameObject.SetActive(gameFlow != null && gameFlow.IsPlaying);
             if (input != null) input.IsTextEntryActive = false;
+            if (companion != null) companion.ConversationOpen = false;
+            OpenChanged?.Invoke(false);
         }
 
         private async void SubmitFromUi()
         {
+            if (companion != null)
+            {
+                if (companion.IsBusy || service.IsBusy) return;
+                if (imeComposing || Time.frameCount <= imeCommitFrame + 1) return;
+                string playerText = inputField != null ? inputField.text : string.Empty;
+                if (string.IsNullOrWhiteSpace(playerText)) return;
+                if (inputField != null) inputField.text = string.Empty;
+                ShowCompanionMessage(GameLocalization.T("正在回应…", "Thinking…"), true);
+                await companion.Submit(playerText);
+                if (this != null && IsOpen) inputField?.ActivateInputField();
+                return;
+            }
             if (service == null || service.IsBusy) return;
             CancelAutoClose();
             string text = inputField != null ? inputField.text : string.Empty;
@@ -191,6 +266,7 @@ namespace AnchorDefense
 
         private void HandleExecutionUpdated(AICommandExecutionResult result)
         {
+            if (companion != null) { RefreshBalance(); return; }
             lastResult = result;
             if (resultText != null) resultText.text = GameLocalization.AIOperationSummary(result);
             SetStatus(GameLocalization.T("星核：", "Core: ") + GameLocalization.AIResultMessage(result), result.Succeeded);
@@ -215,6 +291,7 @@ namespace AnchorDefense
 
         private void HandleBusyChanged(bool busy)
         {
+            busy = busy || (companion != null && companion.IsBusy) || (service != null && service.IsBusy);
             if (submitButton != null) submitButton.interactable = !busy;
             if (inputField != null) inputField.interactable = !busy;
             if (loadingVisual != null) loadingVisual.SetActive(busy);
@@ -236,6 +313,12 @@ namespace AnchorDefense
         private void RefreshLanguage()
         {
             RefreshBalance();
+            if (companion != null)
+            {
+                SetCompanionLabels(companion.RescuePending);
+                ShowCompanionMessage(GameLocalization.T("聊天免费 · 游戏操作按原规则消耗指令点", "Chat is free · Game actions use command points"), true);
+                return;
+            }
             if (service != null && service.IsBusy)
                 SetStatus(GameLocalization.T("星核：让我想想怎么做……", "Core: Let me think…"), false);
             else if (lastResult != null)
@@ -255,6 +338,18 @@ namespace AnchorDefense
             statusText.color = success
                 ? new Color(0.12f, 0.44f, 0.31f)
                 : new Color(0.17f, 0.13f, 0.23f);
+        }
+
+        private void SetCompanionLabels(bool rescue)
+        {
+            TMP_Text buttonLabel = submitButton != null ? submitButton.GetComponentInChildren<TMP_Text>(true) : null;
+            if (buttonLabel != null) buttonLabel.text = GameLocalization.T("发送", "Send");
+            TMP_Text placeholder = inputField != null ? inputField.placeholder as TMP_Text : null;
+            if (placeholder != null) placeholder.text = rescue
+                ? GameLocalization.T("回复星核，或使用上方选项…", "Reply, or choose an option above…")
+                : GameLocalization.T("和星核聊聊，或告诉它你的计划…", "Chat, or tell me your plan…");
+            TMP_Text title = panelRoot != null ? panelRoot.transform.Find("Title")?.GetComponent<TMP_Text>() : null;
+            if (title != null) title.text = GameLocalization.T("ANCHOR / 星核助手", "ANCHOR / CORE");
         }
 
         private void HandleGameStateChanged(GameState state)

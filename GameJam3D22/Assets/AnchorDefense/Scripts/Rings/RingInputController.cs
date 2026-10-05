@@ -117,6 +117,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (GamePause.RescueActive) return;
             if (!isInitialized || gameplayCamera == null || orbitTarget == null || input == null)
             {
                 return;

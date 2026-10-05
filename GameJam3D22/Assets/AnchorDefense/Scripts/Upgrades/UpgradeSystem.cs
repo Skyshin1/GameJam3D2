@@ -31,6 +31,7 @@ namespace AnchorDefense
         public KillResourceWallet Wallet => wallet;
 
         public event Action Changed;
+        public event Action<UpgradeNodeDefinition> Purchased;
 
         public UpgradeNodeState GetState(UpgradeNodeDefinition node)
         {
@@ -80,6 +81,7 @@ namespace AnchorDefense
             }
 
             Changed?.Invoke();
+            Purchased?.Invoke(node);
             return true;
         }
 

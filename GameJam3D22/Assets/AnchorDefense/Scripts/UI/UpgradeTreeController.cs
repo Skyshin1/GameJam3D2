@@ -139,6 +139,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (GamePause.RescueActive) return;
             if (input != null && input.ToggleUpgrade.WasPressedThisFrame() &&
                 !input.ShouldSuppressShortcut(input.ToggleUpgrade))
             {
@@ -153,6 +154,7 @@ namespace AnchorDefense
 
         private void OnDestroy()
         {
+            GamePause.Set(this, false);
             GameLocalization.LanguageChanged -= Refresh;
             if (system != null)
             {
@@ -179,7 +181,7 @@ namespace AnchorDefense
 
         private void TogglePanel()
         {
-            if (gameFlow == null || !gameFlow.IsPlaying)
+            if (gameFlow == null || !gameFlow.IsPlaying || GamePause.RescueActive)
             {
                 return;
             }
@@ -192,6 +194,27 @@ namespace AnchorDefense
             SetPanelOpen(opening, true);
         }
 
+        public void FocusNode(UpgradeNodeDefinition node)
+        {
+            if (node == null || GamePause.RescueActive) return;
+            UpgradeNodeView view = System.Array.Find(nodeViews, v => v != null && v.Definition == node);
+            if (view == null) return;
+            zoneEditor?.ExitFromExternal();
+            SetPanelOpen(true, true);
+            SelectNode(view);
+            Canvas.ForceUpdateCanvases();
+            if (protocolScroll != null && protocolScroll.content != null)
+            {
+                RectTransform viewport = protocolScroll.viewport;
+                if (viewport == null) viewport = protocolScroll.transform as RectTransform;
+                Vector3 offset = viewport.InverseTransformPoint(viewport.TransformPoint(viewport.rect.center)) -
+                    viewport.InverseTransformPoint(view.transform.position);
+                protocolScroll.content.anchoredPosition += new Vector2(offset.x, offset.y);
+                protocolScroll.StopMovement();
+            }
+            EventSystem.current?.SetSelectedGameObject(view.gameObject);
+        }
+
         private void ClosePanel()
         {
             SetPanelOpen(false, true);
@@ -202,7 +225,7 @@ namespace AnchorDefense
             panelRoot.SetActive(open);
             if (updateTimeScale && gameFlow != null && gameFlow.IsPlaying)
             {
-                Time.timeScale = open ? 0f : 1f;
+                GamePause.Set(this, open);
             }
             if (open)
             {

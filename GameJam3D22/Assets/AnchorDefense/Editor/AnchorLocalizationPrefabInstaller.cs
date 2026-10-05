@@ -61,7 +61,7 @@ namespace AnchorDefense.Editor
                 Text label = labelObject.GetComponent<Text>();
                 label.text = "语言";
                 label.font = dropdown != null && dropdown.captionText != null ? dropdown.captionText.font :
-                    Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                 label.fontSize = 24;
                 label.alignment = TextAnchor.MiddleRight;
                 label.color = Color.white;
@@ -95,7 +95,7 @@ namespace AnchorDefense.Editor
                 rect.localScale = source.localScale;
                 Text text = title.GetComponent<Text>();
                 text.text = "PLUSH DEFENSE";
-                text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                 text.fontStyle = FontStyle.Bold;
                 text.fontSize = 48;
                 text.alignment = TextAnchor.MiddleCenter;

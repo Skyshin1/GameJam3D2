@@ -42,7 +42,7 @@ namespace AnchorDefense
 
         public void TakeDamage(DamageInfo damage)
         {
-            if (!IsAlive || damage.Amount <= 0f)
+            if (GamePause.IsPaused || !IsAlive || damage.Amount <= 0f)
             {
                 return;
             }

@@ -90,6 +90,7 @@ namespace AnchorDefense
 
         private void Update()
         {
+            if (Time.timeScale <= 0f) return;
             if (!started || finished) return;
             if (flow == null || !flow.IsPlaying) { Cancel(); return; }
             elapsed += Time.deltaTime;

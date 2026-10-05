@@ -80,15 +80,13 @@ namespace AnchorDefense
 
         public void SetMood(AICommandAssistantMood nextMood)
         {
-            if (dockMode) return;
             mood = nextMood;
             moodStartedAt = Time.unscaledTime;
         }
 
         public void React(bool success, AICommandAssistantMood afterward = AICommandAssistantMood.Listening)
         {
-            if (dockMode) return;
-            returnMood = afterward;
+            returnMood = dockMode ? AICommandAssistantMood.Idle : afterward;
             SetMood(success ? AICommandAssistantMood.Success : AICommandAssistantMood.Failure);
         }
 
@@ -111,7 +109,7 @@ namespace AnchorDefense
             float horizontal = 0f;
             Color tint = baseColor;
 
-            if (!dockMode)
+            if (!dockMode || mood != AICommandAssistantMood.Idle)
             {
                 switch (mood)
                 {

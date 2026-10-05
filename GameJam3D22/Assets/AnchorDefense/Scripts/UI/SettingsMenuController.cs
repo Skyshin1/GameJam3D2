@@ -179,7 +179,7 @@ namespace AnchorDefense
                 Text label = labelObject.GetComponent<Text>();
                 label.text = GameLocalization.T("语言", "Language");
                 label.font = languageDropdown.captionText != null && languageDropdown.captionText.font != null
-                    ? languageDropdown.captionText.font : Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    ? languageDropdown.captionText.font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                 label.fontSize = 24;
                 label.alignment = TextAnchor.MiddleRight;
                 label.color = Color.white;

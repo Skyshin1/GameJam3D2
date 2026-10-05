@@ -192,7 +192,7 @@ namespace AnchorDefense
                     rect.localRotation = source.localRotation;
                     rect.localScale = source.localScale;
                     label = objectWithText.GetComponent<Text>();
-                    label.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                     label.fontStyle = FontStyle.Bold;
                     label.fontSize = 48;
                     label.alignment = TextAnchor.MiddleCenter;

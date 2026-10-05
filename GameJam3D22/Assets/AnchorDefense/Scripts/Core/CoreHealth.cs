@@ -23,7 +23,7 @@ namespace AnchorDefense
 
         public void ApplyDamage(float amount)
         {
-            if (IsDead || amount <= 0f)
+            if (IsDead || amount <= 0f || GamePause.IsPaused)
             {
                 return;
             }

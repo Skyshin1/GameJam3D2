@@ -174,7 +174,7 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
         private bool IsTargetValid(EnemyController target)
         {
             float range = runtimeStats.Range * zoneRangeMultiplier;
-            return target != null && target.IsAlive &&
+            return target != null && target.IsAlive && target.CanTakeDamage &&
                    (target.transform.position - transform.position).sqrMagnitude <= range * range;
         }
 
@@ -188,7 +188,7 @@ public void ConfigureFireAudio(AudioSource source, AudioClip clip, float volume 
             for (int i = 0; i < enemies.Count; i++)
             {
                 EnemyController enemy = enemies[i];
-                if (enemy == null || !enemy.IsAlive)
+                if (enemy == null || !enemy.IsAlive || !enemy.CanTakeDamage)
                 {
                     continue;
                 }

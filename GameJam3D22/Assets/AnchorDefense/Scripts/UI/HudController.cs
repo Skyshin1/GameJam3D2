@@ -14,6 +14,8 @@ namespace AnchorDefense
         [SerializeField] private Image healthFill;
         [SerializeField] private GameObject gameOverPanel;
         [SerializeField] private Button restartButton;
+        [SerializeField] private Sprite waveCatIdleSprite;
+        [SerializeField] private Sprite waveCatAlertSprite;
 
         private CoreHealth core;
         private EndlessEnemySpawner spawner;
@@ -26,6 +28,17 @@ namespace AnchorDefense
         private string timerLabel;
         private string enemyLabel;
         private string finalTimeLabel;
+        private Image waveProgress;
+        private Image waveBorder;
+        private Image waveMarker;
+        private Image waveCatPortrait;
+        private RectTransform waveBeacon;
+        private RectTransform waveFlag;
+        private Image waveFlagIcon;
+        private Text waveTitle;
+        private Text waveTime;
+        private CubeZoneEditModeController zoneEditor;
+        private static Sprite roundedWaveSprite;
 
         public void ConfigureView(
             Text coreHealthText,
@@ -43,6 +56,12 @@ namespace AnchorDefense
             healthFill = coreHealthFill;
             gameOverPanel = gameOver;
             restartButton = restart;
+        }
+
+        public void ConfigureWaveArt(Sprite idle, Sprite alert)
+        {
+            waveCatIdleSprite = idle;
+            waveCatAlertSprite = alert;
         }
 
         public void Initialize(
@@ -67,6 +86,8 @@ namespace AnchorDefense
             gameFlow.StateChanged += HandleStateChanged;
             restartButton.onClick.AddListener(RestartGame);
             gameOverPanel.SetActive(false);
+            zoneEditor = FindObjectOfType<CubeZoneEditModeController>(true);
+            BuildWaveBar();
             HandleHealthChanged(core.CurrentHealth, core.MaxHealth);
         }
 
@@ -79,6 +100,7 @@ namespace AnchorDefense
 
             timerText.text = $"{GameLocalization.T(timerLabel, "SURVIVAL")}  {FormatTime(spawner.ElapsedTime)}";
             enemyText.text = $"{GameLocalization.T(enemyLabel, "ENEMIES")}  {registry.Count}";
+            UpdateWaveBar();
         }
 
         private void OnDestroy()
@@ -122,6 +144,142 @@ namespace AnchorDefense
                 enemyText.text = $"{GameLocalization.T(enemyLabel, "ENEMIES")}  {registry.Count}";
             if (gameOverPanel != null && gameOverPanel.activeSelf && finalTimeText != null && spawner != null)
                 finalTimeText.text = $"{GameLocalization.T(finalTimeLabel, "SURVIVED")}  {FormatTime(spawner.ElapsedTime)}";
+            UpdateWaveBar();
+        }
+
+        private void BuildWaveBar()
+        {
+            Transform controls = transform.Find("Controls");
+            if (controls != null) controls.gameObject.SetActive(false);
+            Font font = chineseUiFont != null ? chineseUiFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            waveBorder = WaveImage("Cat Transit Beacon", transform, new Color(0.46f, 0.72f, 0.86f, 0.4f));
+            waveBeacon = waveBorder.rectTransform;
+            waveBeacon.anchorMin = waveBeacon.anchorMax = Vector2.zero;
+            waveBeacon.pivot = Vector2.zero;
+            waveBeacon.anchoredPosition = new Vector2(18f, 18f);
+            waveBeacon.sizeDelta = new Vector2(320f, 82f);
+
+            Image panel = WaveImage("Night Signal", waveBorder.transform, new Color(0.045f, 0.055f, 0.125f, 0.8f));
+            Stretch(panel.rectTransform, new Vector2(2f, 2f), new Vector2(-2f, -2f));
+            Image catWindow = WaveImage("Cat Porthole", panel.transform, new Color(0.35f, 0.27f, 0.42f, 0.95f));
+            Place(catWindow.rectTransform, 9f, 11f, 58f, 58f);
+            catWindow.gameObject.AddComponent<Mask>().showMaskGraphic = true;
+            waveCatPortrait = WaveImage("Cat Observer", catWindow.transform, Color.white);
+            waveCatPortrait.sprite = waveCatIdleSprite;
+            waveCatPortrait.type = Image.Type.Simple;
+            waveCatPortrait.preserveAspect = true;
+            Stretch(waveCatPortrait.rectTransform, new Vector2(2f, 2f), new Vector2(-2f, -2f));
+
+            waveTitle = WaveText("Transit Whisper", panel.transform, font, 16, TextAnchor.MiddleLeft);
+            Place(waveTitle.rectTransform, 76f, 39f, 202f, 29f);
+            waveTitle.color = new Color(0.94f, 0.93f, 0.97f);
+            waveTime = WaveText("Transit Signal", panel.transform, font, 13, TextAnchor.MiddleLeft);
+            Place(waveTime.rectTransform, 77f, 18f, 211f, 23f);
+            waveTime.color = new Color(0.63f, 0.79f, 0.88f);
+
+            Image track = WaveImage("Quiet Orbit", panel.transform, new Color(0.18f, 0.25f, 0.36f, 0.75f));
+            Place(track.rectTransform, 77f, 10f, 214f, 4f);
+            waveProgress = WaveImage("Incoming Starlight", track.transform, new Color(0.45f, 0.78f, 0.9f, 0.85f));
+            Stretch(waveProgress.rectTransform, Vector2.zero, Vector2.zero);
+            waveMarker = WaveImage("Little Comet", track.transform, new Color(0.95f, 0.83f, 0.59f, 0.9f));
+            waveFlag = waveMarker.rectTransform;
+            waveFlag.anchorMin = waveFlag.anchorMax = new Vector2(0f, 0.5f);
+            waveFlag.pivot = new Vector2(0.5f, 0.5f);
+            waveFlag.sizeDelta = new Vector2(9f, 9f);
+
+            waveFlagIcon = WaveImage("Visitor Silhouette", panel.transform, Color.white);
+            Place(waveFlagIcon.rectTransform, 282f, 46f, 27f, 27f);
+            waveFlagIcon.type = Image.Type.Simple;
+            waveFlagIcon.preserveAspect = true;
+            waveBorder.raycastTarget = panel.raycastTarget = catWindow.raycastTarget = waveCatPortrait.raycastTarget =
+                track.raycastTarget = waveProgress.raycastTarget = waveMarker.raycastTarget = waveFlagIcon.raycastTarget = false;
+            UpdateWaveBar();
+        }
+
+        private void UpdateWaveBar()
+        {
+            if (spawner == null || waveProgress == null) return;
+            bool surge = spawner.IsSurgeActive;
+            int wave = surge ? spawner.CurrentWave : spawner.CurrentWave + 1;
+            float remaining = surge ? spawner.SurgeSecondsRemaining : spawner.SecondsUntilNextWave;
+            float duration = surge ? 10f : 30f;
+            float progress = Mathf.Clamp01(1f - remaining / duration);
+            waveProgress.rectTransform.anchorMax = new Vector2(progress, 1f);
+            bool alert = surge || remaining <= 5f;
+            waveProgress.color = surge ? new Color(1f, 0.59f, 0.48f, 0.95f) :
+                alert ? new Color(0.98f, 0.79f, 0.5f, 0.95f) : new Color(0.45f, 0.78f, 0.9f, 0.85f);
+            waveBorder.color = surge ? new Color(0.94f, 0.61f, 0.55f, 0.6f) :
+                new Color(0.46f, 0.72f, 0.86f, 0.4f);
+            Color glimmer = waveProgress.color;
+            glimmer.a *= Mathf.Lerp(0.55f, 1f, 0.5f + 0.5f * Mathf.Sin(spawner.ElapsedTime * 4f));
+            waveMarker.color = glimmer;
+            waveCatPortrait.sprite = alert && waveCatAlertSprite != null ? waveCatAlertSprite : waveCatIdleSprite;
+            waveTitle.text = surge ? GameLocalization.T("异星群落正集体跃迁", "Alien swarm in transit") :
+                alert ? GameLocalization.T("猫咪竖起了耳朵", "The cat is all ears") :
+                GameLocalization.T("猫咪听见星海回声", "The cat hears the stars");
+            waveTime.text = surge ? GameLocalization.T($"裂隙 {wave:00} · 余辉 {Mathf.CeilToInt(remaining)} 秒", $"RIFT {wave:00} · {Mathf.CeilToInt(remaining)}s remain") :
+                GameLocalization.T($"跃迁讯号 {wave:00} · {Mathf.CeilToInt(remaining)} 秒", $"TRANSIT {wave:00} · {Mathf.CeilToInt(remaining)}s");
+            waveFlag.anchorMin = waveFlag.anchorMax = new Vector2(progress, 0.5f);
+            Sprite icon = wave == 2 || wave == 3 ? spawner.GetWaveIcon(wave) : null;
+            waveFlagIcon.sprite = icon;
+            waveFlagIcon.enabled = icon != null;
+            if (waveBeacon != null && zoneEditor != null)
+                waveBeacon.gameObject.SetActive(!zoneEditor.IsEditing);
+        }
+
+        private static void Place(RectTransform rect, float x, float y, float width, float height)
+        {
+            rect.anchorMin = rect.anchorMax = Vector2.zero;
+            rect.pivot = Vector2.zero;
+            rect.anchoredPosition = new Vector2(x, y);
+            rect.sizeDelta = new Vector2(width, height);
+        }
+
+        private static Image WaveImage(string name, Transform parent, Color color)
+        {
+            GameObject item = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            item.transform.SetParent(parent, false);
+            Image image = item.GetComponent<Image>(); image.color = color;
+            image.sprite = RoundedWaveSprite(); image.type = Image.Type.Sliced;
+            return image;
+        }
+
+        private static Sprite RoundedWaveSprite()
+        {
+            if (roundedWaveSprite != null) return roundedWaveSprite;
+            const int size = 32;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            texture.hideFlags = HideFlags.DontSave;
+            texture.filterMode = FilterMode.Bilinear;
+            var pixels = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float dx = Mathf.Max(Mathf.Abs(x - 15.5f) - 7.5f, 0f);
+                float dy = Mathf.Max(Mathf.Abs(y - 15.5f) - 7.5f, 0f);
+                byte alpha = (byte)Mathf.RoundToInt(Mathf.Clamp01(8.5f - Mathf.Sqrt(dx * dx + dy * dy)) * 255f);
+                pixels[y * size + x] = new Color32(255, 255, 255, alpha);
+            }
+            texture.SetPixels32(pixels); texture.Apply();
+            roundedWaveSprite = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f),
+                100f, 0, SpriteMeshType.FullRect, new Vector4(15f, 15f, 15f, 15f));
+            roundedWaveSprite.hideFlags = HideFlags.DontSave;
+            return roundedWaveSprite;
+        }
+
+        private static Text WaveText(string name, Transform parent, Font font, int size, TextAnchor alignment)
+        {
+            GameObject item = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            item.transform.SetParent(parent, false);
+            Text value = item.GetComponent<Text>(); value.font = font; value.fontSize = size;
+            value.alignment = alignment; value.color = Color.white; value.raycastTarget = false;
+            return value;
+        }
+
+        private static void Stretch(RectTransform rect, Vector2 minimum, Vector2 maximum)
+        {
+            rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+            rect.offsetMin = minimum; rect.offsetMax = maximum;
         }
 
         private static string ExtractLeadingLabel(string initialText, string fallback)

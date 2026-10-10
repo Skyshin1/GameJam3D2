@@ -19,7 +19,7 @@ namespace AnchorDefense
         }
         public async Task<AICompanionReply> RequestAsync(AICompanionRequest request, CancellationToken cancellationToken)
         {
-            if (!IsConfigured || cancellationToken.IsCancellationRequested) return AICompanionReply.Failure();
+            if (!IsConfigured || cancellationToken.IsCancellationRequested) return AICompanionReply.Failure("not_configured_or_cancelled");
             string url = settings.BaseUrl.TrimEnd('/');
             if (!url.EndsWith("/chat/completions", StringComparison.OrdinalIgnoreCase)) url += "/chat/completions";
             var body = new Body { model = settings.Model, messages = request.Messages,
@@ -35,18 +35,18 @@ namespace AnchorDefense
                 var pending = web.SendWebRequest();
                 while (!pending.isDone)
                 {
-                    if (cancellationToken.IsCancellationRequested) { web.Abort(); return AICompanionReply.Failure(); }
+                    if (cancellationToken.IsCancellationRequested) { web.Abort(); return AICompanionReply.Failure("cancelled"); }
                     await Task.Yield();
                 }
                 if (cancellationToken.IsCancellationRequested || web.result != UnityWebRequest.Result.Success)
-                    return AICompanionReply.Failure();
+                    return AICompanionReply.Failure("network=" + web.result + ", HTTP=" + web.responseCode);
                 Envelope envelope = JsonUtility.FromJson<Envelope>(web.downloadHandler.text);
                 if (envelope?.choices == null || envelope.choices.Length == 0 ||
-                    envelope.choices[0].finish_reason == "length") return AICompanionReply.Failure();
+                    envelope.choices[0].finish_reason == "length") return AICompanionReply.Failure("empty_or_truncated_response");
                 return AICompanionReply.TryParse(envelope.choices[0].message?.content, out var reply)
-                    ? reply : AICompanionReply.Failure();
+                    ? reply : AICompanionReply.Failure("invalid_json_envelope");
             }
-            catch (Exception) { return AICompanionReply.Failure(); }
+            catch (Exception exception) { return AICompanionReply.Failure("exception=" + exception.GetType().Name); }
         }
         [Serializable] private sealed class Body
         {

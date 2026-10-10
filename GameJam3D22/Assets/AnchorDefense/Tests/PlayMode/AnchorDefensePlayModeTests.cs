@@ -235,7 +235,7 @@ namespace AnchorDefense.Tests
             AudioSource upgradeTreeAudio = upgradeTree.GetComponent<AudioSource>();
             Assert.That(upgradeTreeAudio, Is.Not.Null);
             Assert.That(upgradeTreeAudio.clip, Is.Not.Null);
-            Assert.That(upgradeTreeAudio.clip.name, Is.EqualTo("鍗囩骇"));
+            Assert.That(upgradeTreeAudio.clip.name, Is.EqualTo("升级"));
             Assert.That(Object.FindObjectOfType<GameInputController>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<SceneSettingsApplier>(), Is.Not.Null);
             Assert.That(Object.FindObjectOfType<PauseMenuController>(true), Is.Not.Null);
@@ -327,7 +327,7 @@ namespace AnchorDefense.Tests
 
             EndlessEnemySpawner spawner = Object.FindObjectOfType<EndlessEnemySpawner>();
             Assert.That(spawner, Is.Not.Null);
-            Assert.That(spawner.EnemyTypeCount, Is.EqualTo(2));
+            Assert.That(spawner.EnemyTypeCount, Is.EqualTo(4));
             Assert.That(spawner.HasRangedEnemyType, Is.True);
             EnemyConfig rangedEnemy = null;
             for (int i = 0; i < spawner.EnemyTypeCount; i++)

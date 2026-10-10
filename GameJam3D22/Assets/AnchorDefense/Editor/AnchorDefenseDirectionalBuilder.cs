@@ -75,6 +75,7 @@ namespace AnchorDefense.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             AnchorDefenseUpgradeBuilder.RepairAfterGameplayRebuild();
+            AnchorDefenseStellarVisualBuilder.ApplyAll();
             Debug.Log("Anchor Defense directional Sprite scene rebuilt successfully.");
         }
 

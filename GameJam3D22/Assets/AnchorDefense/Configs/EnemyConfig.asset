@@ -17,6 +17,9 @@ MonoBehaviour:
   <MaxHealth>k__BackingField: 24
   <MoveSpeed>k__BackingField: 1.8
   <CoreDamage>k__BackingField: 10
+  <IntroFacts>k__BackingField: Basic enemy; moves toward core and deals 10 contact damage when it reaches it. Turret shots and area attacks can destroy it.
+  <IntroChinese>k__BackingField: 普通怪会直冲核心并造成接触伤害。用炮塔射击或区域攻击阻止它！
+  <IntroEnglish>k__BackingField: Basic enemies rush the core and damage it on contact. Stop them with turret fire or area attacks!
   <AttackMode>k__BackingField: 0
   <RangedStopRadius>k__BackingField: 10.5
   <FireInterval>k__BackingField: 2.2

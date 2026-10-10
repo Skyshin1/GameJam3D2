@@ -88,6 +88,7 @@ namespace AnchorDefense.Editor
             AnchorDefenseCombatVarietyBuilder.BuildAll();
             AnchorDefenseSingleSpriteEnemyBuilder.BuildAll();
             AnchorDefenseProjectileFusionBuilder.BuildAll();
+            AnchorDefenseStellarVisualBuilder.ApplyAll();
             Debug.Log("Anchor Defense editable assets and Gameplay scene rebuilt successfully.");
         }
 
@@ -361,14 +362,6 @@ namespace AnchorDefense.Editor
             ringRenderer.sharedMaterial = material;
 
             var selectionRenderers = new List<Renderer> { ringRenderer };
-            for (int i = 0; i < 16; i++)
-            {
-                float angle = i * Mathf.PI * 2f / 16f;
-                Vector3 position = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
-                GameObject node = CreatePrimitive("Energy Node", PrimitiveType.Cube, visualRoot.transform, position, new Vector3(0.26f, 0.2f, 0.5f), material);
-                node.transform.localRotation = Quaternion.LookRotation(position.normalized, Vector3.up);
-                selectionRenderers.Add(node.GetComponent<Renderer>());
-            }
 
             GameObject collidersRoot = new GameObject("SelectionColliders");
             collidersRoot.transform.SetParent(root.transform, false);
@@ -404,6 +397,7 @@ namespace AnchorDefense.Editor
 
             controller.Configure(selectionRenderers.ToArray(), color, Color.Lerp(color, Color.white, 0.65f));
             controller.ConfigureTurretSlotAssets(ringId, turretSlots.ToArray(), new TurretSlot[0]);
+            AnchorDefenseStellarVisualBuilder.ApplyRing(root);
             AssignUiFonts(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             UnityEngine.Object.DestroyImmediate(root);
@@ -468,10 +462,6 @@ namespace AnchorDefense.Editor
             SetRect(enemyText.rectTransform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-380f, -122f), new Vector2(-34f, -88f));
             enemyText.text = "ENEMIES  0";
 
-            Text hint = CreateText("Controls", canvasObject.transform, font, 20, TextAnchor.LowerCenter, new Color(0.72f, 0.82f, 0.95f, 0.9f));
-            SetRect(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(-520f, 22f), new Vector2(520f, 64f));
-            hint.text = "CLICK A RING  /  HOLD LEFT MOUSE AND DRAG TO ROTATE";
-
             Image gameOverPanel = CreateImage("Game Over Panel", canvasObject.transform, new Color(0.015f, 0.02f, 0.06f, 0.94f));
             SetRect(gameOverPanel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(-260f, -175f), new Vector2(260f, 175f));
             Text gameOverTitle = CreateText("Game Over", gameOverPanel.transform, font, 46, TextAnchor.MiddleCenter, new Color(1f, 0.3f, 0.38f));
@@ -490,6 +480,13 @@ namespace AnchorDefense.Editor
 
             HudController hud = canvasObject.AddComponent<HudController>();
             hud.ConfigureView(healthText, timeText, enemyText, finalTime, healthFill, gameOverPanel.gameObject, restartButton);
+            Sprite idleCat = null, alertCat = null;
+            foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(Art + "/UI/CatCourierExpressions.png"))
+            {
+                if (asset is Sprite sprite && sprite.name == "Courier_0") idleCat = sprite;
+                if (asset is Sprite warning && warning.name == "Courier_5") alertCat = warning;
+            }
+            hud.ConfigureWaveArt(idleCat, alertCat);
             AssignUiFonts(canvasObject);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(canvasObject, UiPrefabs + "/HUD.prefab");
             UnityEngine.Object.DestroyImmediate(canvasObject);

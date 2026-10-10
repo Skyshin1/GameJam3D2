@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AnchorDefense
 {
-    public enum CompanionPurpose { Chatter, Recommendation, PurchaseFeedback, PlayerTurn, RescueQuestion, RescueAnswer, RescueResult, CommandResult }
+    public enum CompanionPurpose { Chatter, Recommendation, PurchaseFeedback, PlayerTurn, RescueQuestion, RescueAnswer, RescueResult, CommandResult, EnemyIntroduction }
     [Serializable] public sealed class CompanionChatMessage
     {
         public string role;
@@ -24,13 +24,17 @@ namespace AnchorDefense
     {
         public string Kind, Text, NodeId, Decision, Summary;
         public AIParsedCommand Command;
+        public CompanionEmotion? Emotion;
         public bool Success;
-        public static AICompanionReply Failure() => new AICompanionReply();
+        public string FailureReason;
+        public static AICompanionReply Failure(string reason = null) => new AICompanionReply { FailureReason = reason };
 
         public static bool TryParse(string json, out AICompanionReply reply)
         {
             reply = null;
-            if (!AICommandJsonValidator.TryReadObject(json, out var root) || root.Count != 6) return false;
+            if (!AICommandJsonValidator.TryReadObject(json, out var root) ||
+                (root.Count != 6 && !(root.Count == 7 && root.ContainsKey("emotion")))) return false;
+            if (root.TryGetValue("emotion", out var emotion) && emotion != null && !(emotion is string)) return false;
             foreach (string key in new[] { "kind", "text", "node_id", "decision", "command", "summary" })
                 if (!root.ContainsKey(key)) return false;
             foreach (string key in new[] { "kind", "text", "node_id", "decision", "summary" })
@@ -48,7 +52,7 @@ namespace AnchorDefense
             if (decision != null && decision != "accept" && decision != "decline" && decision != "unclear") return false;
             reply = new AICompanionReply { Success = true, Kind = kind, Text = root["text"] as string,
                 NodeId = root["node_id"] as string, Decision = decision, Command = command,
-                Summary = root["summary"] as string };
+                Summary = root["summary"] as string, Emotion = CompanionEmotions.Parse(emotion as string) };
             return true;
         }
 

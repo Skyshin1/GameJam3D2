@@ -24,7 +24,7 @@ namespace AnchorDefense
 
         public static Color ColorFor(ActiveSkillEffect effect)
         {
-            if (effect is AreaDamageSkillEffect) return new Color(1f, 0.7f, 0.32f);
+            if (effect is AreaDamageSkillEffect) return new Color(1f, 0.55f, 0.18f);
             if (effect is TurretRepairSkillEffect) return new Color(0.3f, 1f, 0.72f);
             if (effect is EnemySlowSkillEffect) return new Color(0.4f, 0.8f, 1f);
             if (effect is TurretBoostSkillEffect) return new Color(0.95f, 0.65f, 1f);

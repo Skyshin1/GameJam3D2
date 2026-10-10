@@ -19,6 +19,12 @@ namespace AnchorDefense
         [field: SerializeField, Min(0.1f)] public float MaxHealth { get; private set; } = 24f;
         [field: SerializeField, Min(0.1f)] public float MoveSpeed { get; private set; } = 1.8f;
         [field: SerializeField, Min(0f)] public float CoreDamage { get; private set; } = 10f;
+        [field: SerializeField] public bool TurretCollisionOnly { get; private set; }
+        [field: SerializeField, Min(0.1f)] public float TurretCollisionRadius { get; private set; } = 0.8f;
+        [field: SerializeField] public Sprite WaveIcon { get; private set; }
+        [field: SerializeField, TextArea] public string IntroFacts { get; private set; }
+        [field: SerializeField, TextArea] public string IntroChinese { get; private set; }
+        [field: SerializeField, TextArea] public string IntroEnglish { get; private set; }
 
         [field: Header("Combat Behaviour")]
         [field: SerializeField] public EnemyAttackMode AttackMode { get; private set; } = EnemyAttackMode.ContactCore;

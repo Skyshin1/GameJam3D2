@@ -4,8 +4,10 @@ Shader "AnchorDefense/AICommandSignal"
     {
         _TintColor ("Tint", Color) = (0.25, 0.85, 1, 1)
         _Opacity ("Opacity", Range(0, 1)) = 0.3
-        _Style ("Style: Burst / Hit / Heal / Slow / Boost / Star / Scan / Arc", Float) = 0
+        _Style ("Style: Burst / Hit / Heal / Slow / Boost / Star / Scan / Arc / Frame / Volume / Core / Sweep", Float) = 0
         _Progress ("Animation Progress", Float) = 0
+        _Dissolve ("Volume Disintegration", Range(0, 1)) = 0
+        _SealPulse ("Volume Seal Pulse", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -29,6 +31,8 @@ Shader "AnchorDefense/AICommandSignal"
                 half _Opacity;
                 half _Style;
                 float _Progress;
+                half _Dissolve;
+                half _SealPulse;
             CBUFFER_END
             Varyings Vert(Attributes input)
             {
@@ -81,7 +85,7 @@ Shader "AnchorDefense/AICommandSignal"
                     float arrival = seed * 0.4;
                     float blink = sin(saturate((_Progress - arrival) / 0.6) * 3.141593);
                     signal = Star(q) * blink * step(0.38, seed);
-                    tint.rgb = Prism(seed + _Progress * 0.08);
+                    tint.rgb = lerp(Prism(seed + _Progress * 0.08), _TintColor.rgb, 0.55);
                 }
                 else if (_Style < 1.5)
                 {
@@ -134,14 +138,56 @@ Shader "AnchorDefense/AICommandSignal"
                     float border = Stroke(max(abs(p.x), abs(p.y)) - 0.975, 0.01);
                     float orbit = Stroke(r - 0.67, 0.008) * (0.4 + 0.6 * pow(0.5 + 0.5 * sin(atan2(p.y, p.x) * 3 + _Progress * 5), 3));
                     signal = lattice * edgeFade * 0.17 + border * 0.9 + orbit * 0.28;
-                    tint.rgb = Prism(input.uv.x * 0.32 + input.uv.y * 0.5 + _Progress * 0.12);
+                    tint.rgb = lerp(Prism(input.uv.x * 0.32 + input.uv.y * 0.5 + _Progress * 0.12), _TintColor.rgb, 0.65);
                 }
-                else
+                else if (_Style < 7.5)
                 {
                     signal = exp(-abs(p.y) * 3) * (0.28 + 0.72 * pow(0.5 + 0.5 * sin(input.uv.x * 25 - _Progress * 3), 6));
                     tint *= input.color;
                 }
-                half3 color = lerp(tint.rgb, half3(0.9, 0.96, 1), saturate(signal) * 0.22);
+                else if (_Style < 8.5)
+                {
+                    // Narrow luminous core, saturated feathered shoulders, a slow traveling glint.
+                    // A stable floor keeps the whole boundary readable between activations.
+                    float crossSection = abs(p.y);
+                    float core = 1 - smoothstep(0.12, 0.42, crossSection);
+                    float shoulder = 1 - smoothstep(0.3, 1, crossSection);
+                    float glint = pow(saturate(0.5 + 0.5 * sin(input.uv.x * 5 - _Progress * 2.4)), 8);
+                    signal = (core * 0.65 + shoulder * 0.35) * (0.85 + glint * 0.15);
+                    tint *= input.color;
+                    tint.rgb = lerp(tint.rgb, float3(1.05, 1.12, 1.3), core * 0.23);
+                }
+                else if (_Style < 9.5)
+                {
+                    // Six nearly transparent faces read as an enclosed spatial field, not fog.
+                    float square = max(abs(p.x), abs(p.y));
+                    float outline = Stroke(square - 0.99, 0.005);
+                    float rim = exp(-abs(square - 0.985) * 80) * 0.07;
+                    float2 cells = input.uv * 14;
+                    float2 cell = floor(cells);
+                    float seed = Hash(cell);
+                    // Quiet faces: no second frame, moving stripes or floating cell particles.
+                    // Dissolve only subtracts from the shell while it contracts.
+                    float surviving = 1 - smoothstep(seed * 0.75, seed * 0.75 + 0.2, _Dissolve);
+                    float sealPulse = _SealPulse * (1 - square * 0.5);
+                    signal = (outline * 0.65 + rim + sealPulse * 0.025 + 0.006) * surviving;
+                    tint *= input.color;
+                    tint.rgb = lerp(tint.rgb, float3(0.7, 0.8, 1.0), outline * 0.25);
+                }
+                else if (_Style < 10.5)
+                {
+                    // A small gathering light, without nested reticles or orbiting halos.
+                    signal = exp(-r * 14) + Star(p / 0.45) * 0.22;
+                    tint.rgb = lerp(tint.rgb, float3(0.85, 0.9, 1.05), exp(-r * 12));
+                }
+                else
+                {
+                    // One clear downward light sheet instead of a grid and circular overlay.
+                    float square = max(abs(p.x), abs(p.y));
+                    signal = Stroke(square - 0.975, 0.005) * 0.5 +
+                        saturate(1 - square * square) * 0.04;
+                }
+                half3 color = lerp(tint.rgb, half3(0.9, 0.96, 1), saturate(signal) * (_Style >= 8.5 ? 0.04 : 0.22));
                 return half4(color, saturate(signal) * _Opacity * tint.a);
             }
             ENDHLSL

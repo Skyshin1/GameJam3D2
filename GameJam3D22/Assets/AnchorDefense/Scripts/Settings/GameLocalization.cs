@@ -60,8 +60,7 @@ namespace AnchorDefense
             { "TURRET ANCHOR PROTOCOLS  /  炮塔与轨道升级", "TURRET ANCHOR PROTOCOLS  /  TURRET & RING UPGRADES" },
             { "核心失守", "CORE LOST" }, { "生存时间 00:00", "SURVIVED 00:00" },
             { "生存  00:00", "SURVIVAL  00:00" }, { "核心  100 / 100", "CORE  100 / 100" },
-            { "重新开始", "RESTART" }, { "敌人  0", "ENEMIES  0" },
-            { "点击轨道 / 按住鼠标左键拖动旋转", "CLICK A RING  /  HOLD LEFT MOUSE AND DRAG TO ROTATE" }
+            { "重新开始", "RESTART" }, { "敌人  0", "ENEMIES  0" }
         };
 
         private static readonly Dictionary<string, string> Chinese = BuildReverse();

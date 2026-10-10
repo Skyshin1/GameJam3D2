@@ -38,7 +38,7 @@ namespace AnchorDefense.Tests
         public IEnumerator ScanAndStarburstEndWhileTwinklingStarsRemainAndFadeWithTheField()
         {
             var marker = Create("Scan Marker").AddComponent<AICommandFieldMarker>();
-            marker.Initialize(new[] { strike }, 7f, 0f, camera, 2f);
+            marker.Initialize(new[] { repair }, 7f, 0f, camera, 2f);
             Assert.That(marker.transform.Find("Command Mist"), Is.Null);
             Assert.That(marker.GetComponentsInChildren<ParticleSystem>(), Is.Empty);
             var scan = marker.transform.Find("Command Starburst").GetComponent<MeshRenderer>();
@@ -60,11 +60,78 @@ namespace AnchorDefense.Tests
             foreach (var line in corners)
             {
                 Assert.That(float.IsNaN(line.startColor.a), Is.False);
-                Assert.That(line.startColor.a, Is.GreaterThan(0f));
+                // The boundary must stay readable after its short entrance flash.
+                Assert.That(line.startColor.a, Is.GreaterThan(0.5f));
+                Assert.That(line.sharedMaterial, Is.Not.Null);
             }
             yield return new WaitForSeconds(1.15f);
             Assert.That(marker.GetComponentsInChildren<LineRenderer>()[0].startColor.a, Is.Zero);
             Assert.That(stars.enabled, Is.False);
+        }
+
+        [Test]
+        public void AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables()
+        {
+            var marker = Create("Disintegration Marker").AddComponent<AICommandFieldMarker>();
+            marker.Initialize(new[] { strike }, 7f, 0f, camera, 6f, true);
+            Assert.That(marker.transform.Find("Command Disintegration"), Is.Null,
+                "A prepared command must not play the attack before activation.");
+            marker.NotifyActivation(strike);
+            var volume = marker.transform.Find("Command Disintegration");
+            var shell = volume.Find("Disintegration Shell").GetComponent<MeshRenderer>();
+            var coreVisual = volume.Find("Singularity Core").GetComponent<MeshRenderer>();
+            var scan = marker.transform.Find("Command Scan").GetComponent<MeshRenderer>();
+            var age = typeof(AICommandFieldMarker).GetField("elapsed", BindingFlags.Instance | BindingFlags.NonPublic);
+            var present = typeof(AICommandFieldMarker).GetMethod("RefreshPresentation", BindingFlags.Instance | BindingFlags.NonPublic);
+            void At(float time) { age.SetValue(marker, time); present.Invoke(marker, null); }
+
+            At(0.12f);
+            Assert.That(shell.transform.localScale.x, Is.LessThan(1f));
+            Assert.That(coreVisual.enabled, Is.True);
+            Assert.That(scan.enabled, Is.False);
+            At(1.05f);
+            Assert.That(marker.transform.Find("Command Starburst").GetComponent<MeshRenderer>().enabled, Is.False);
+            Assert.That(marker.transform.Find("Command Starlight").gameObject.activeSelf, Is.False);
+            Assert.That(shell.transform.localScale.x, Is.EqualTo(7f).Within(0.001f));
+            Assert.That(Quaternion.Angle(shell.transform.localRotation, Quaternion.identity), Is.LessThan(0.01f));
+            Assert.That(scan.enabled, Is.True);
+            Assert.That(scan.transform.localPosition.y, Is.InRange(-3.5f, 3.5f));
+            At(2f);
+            Assert.That(shell.enabled, Is.True);
+            Assert.That(coreVisual.enabled, Is.False);
+            Assert.That(scan.enabled, Is.False);
+            Assert.That(volume.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(2));
+            Assert.That(volume.GetComponentsInChildren<Collider>(), Is.Empty);
+            Assert.That(volume.GetComponentsInChildren<Light>(), Is.Empty);
+            // A later heal must not restart or erase an already active attack animation.
+            marker.NotifyActivation(repair);
+            At(5.65f);
+            Assert.That(shell.transform.localScale.x, Is.LessThan(4f));
+            Assert.That(coreVisual.enabled, Is.True);
+            At(6.1f);
+            Assert.That(shell.enabled, Is.False);
+            Assert.That(coreVisual.enabled, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker()
+        {
+            var marker = Create("Paused Disintegration").AddComponent<AICommandFieldMarker>();
+            marker.Initialize(new[] { strike }, 7f, 0f, camera, 6f);
+            yield return null;
+            var shell = marker.transform.Find("Command Disintegration/Disintegration Shell");
+            Mesh mesh = shell.GetComponent<MeshFilter>().sharedMesh;
+            Vector3 scale = shell.localScale;
+            Quaternion rotation = shell.localRotation;
+            Time.timeScale = 0f;
+            yield return new WaitForSecondsRealtime(0.08f);
+            Assert.That(shell.localScale, Is.EqualTo(scale));
+            Assert.That(shell.localRotation, Is.EqualTo(rotation));
+            Object.Destroy(marker.gameObject);
+            yield return null;
+            yield return null;
+            Assert.That(mesh == null, Is.True);
+            Time.timeScale = 1f;
         }
 
         [Test]

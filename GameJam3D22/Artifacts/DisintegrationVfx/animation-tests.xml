@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.1425491">
+  <test-suite type="TestSuite" id="1000" name="GameJam3D22" fullname="GameJam3D22" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.142549" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties />
+    <test-suite type="Assembly" id="1227" name="AnchorDefense.PlayModeTests.dll" fullname="C:/Users/Windows11/AppData/Local/Temp/AnchorWaveValidation20261006/Library/ScriptAssemblies/AnchorDefense.PlayModeTests.dll" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.136218" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="52792" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1228" name="AnchorDefense" fullname="AnchorDefense" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.134490" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1229" name="Tests" fullname="AnchorDefense.Tests" runstate="Runnable" testcasecount="200" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.133010" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="AICommandProtocolPlayModeTests" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="169" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.130998" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1100" name="AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" methodname="AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1845046904" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.110254" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1099" name="AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" methodname="AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1074261462" result="Passed" start-time="2026-10-09 12:06:11Z" end-time="2026-10-09 12:06:11Z" duration="0.007372" asserts="0">
+              <properties />
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

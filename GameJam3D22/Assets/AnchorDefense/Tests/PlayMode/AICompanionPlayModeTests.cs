@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -35,6 +36,28 @@ namespace AnchorDefense.Tests
             companion.Initialize(settings, provider, service, upgrades, health, enemies, turrets, flow, null);
             companion.enabled = false;
             return companion;
+        }
+
+        [Test]
+        public void FirstSightingWaitsForConversationAndFallsBackWhenProviderFails()
+        {
+            var mock = new CompanionMock { Respond = request => Task.FromResult(AICompanionReply.Failure()) };
+            var companion = Companion(mock, out _);
+            EnemyConfig enemy = UnityEditor.AssetDatabase.LoadAssetAtPath<EnemyConfig>("Assets/AnchorDefense/Configs/EnemyConfig.asset");
+            var shown = new List<CompanionSpeech>();
+            companion.Speech += shown.Add;
+            typeof(AICompanionService).GetMethod("OnFirstEnemySpawned", BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(companion, new object[] { enemy });
+            companion.ConversationOpen = true;
+            companion.Tick(0.02f);
+            Assert.That(mock.Requests, Is.Empty);
+            companion.ConversationOpen = false;
+            companion.Tick(0.02f);
+            Assert.That(mock.Requests.Count, Is.EqualTo(1));
+            Assert.That(mock.Requests[0].Purpose, Is.EqualTo(CompanionPurpose.EnemyIntroduction));
+            Assert.That(shown.Exists(s => s.Purpose == CompanionPurpose.EnemyIntroduction &&
+                s.Text == (GameLocalization.IsEnglish ? enemy.IntroEnglish : enemy.IntroChinese)), Is.True);
+            Assert.That(Time.timeScale, Is.EqualTo(1f));
         }
 
         [Test]

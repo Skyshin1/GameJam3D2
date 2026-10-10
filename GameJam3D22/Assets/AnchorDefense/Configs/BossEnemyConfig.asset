@@ -17,6 +17,9 @@ MonoBehaviour:
   <MaxHealth>k__BackingField: 100
   <MoveSpeed>k__BackingField: 1.8
   <CoreDamage>k__BackingField: 10
+  <IntroFacts>k__BackingField: Orbit boss; circles the core and fires projectiles at operational turrets. It can be damaged by turret shots and area attacks; focus fire while rotating to track it.
+  <IntroChinese>k__BackingField: Boss 会绕核心飞行并向炮塔开火。旋转炮塔追踪它，再集中火力击退！
+  <IntroEnglish>k__BackingField: The boss circles the core and shoots turrets. Rotate to track it and focus your fire!
   <AttackMode>k__BackingField: 2
   <RangedStopRadius>k__BackingField: 10.5
   <FireInterval>k__BackingField: 2

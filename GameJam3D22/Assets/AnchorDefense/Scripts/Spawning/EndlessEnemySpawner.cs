@@ -9,6 +9,7 @@ namespace AnchorDefense
         {
             public EnemyConfig Config;
             public float Weight;
+            public int FirstWave;
             public ComponentPool<EnemyController> Pool;
             public VfxService Vfx;
             public EnemyProjectileService Projectiles;
@@ -34,9 +35,18 @@ namespace AnchorDefense
         private int aliveBossCount;
 
         private float spawnTimer;
-        private float totalWeight;
+        private int surgeSpawned;
+        private readonly HashSet<EnemyConfig> introducedTypes = new HashSet<EnemyConfig>();
+        private readonly List<EnemyController> collisionEnemies = new List<EnemyController>();
+        private readonly Dictionary<EnemyController, (int version, Vector3 position)> previousEnemies = new Dictionary<EnemyController, (int, Vector3)>();
+        private readonly Dictionary<TurretHealth, Vector3> previousTurrets = new Dictionary<TurretHealth, Vector3>();
 
         public float ElapsedTime { get; private set; }
+        public int CurrentWave { get; private set; }
+        public bool IsSurgeActive { get; private set; }
+        public float SecondsUntilNextWave => Mathf.Max(0f, endlessConfig.WavePeriod * (CurrentWave + 1) - ElapsedTime);
+        public float SurgeSecondsRemaining => IsSurgeActive ? Mathf.Max(0f, endlessConfig.SurgeDuration - (ElapsedTime - CurrentWave * endlessConfig.WavePeriod)) : 0f;
+        public event System.Action<EnemyConfig> FirstEnemySpawned;
         public int TotalSpawned { get; private set; }
         public int EnemyTypeCount => enemyTypes.Count;
 
@@ -65,6 +75,12 @@ namespace AnchorDefense
             return index >= 0 && index < enemyTypes.Count ? enemyTypes[index].Config : null;
         }
 
+        public Sprite GetWaveIcon(int wave)
+        {
+            EnemyTypePool debut = enemyTypes.Find(type => type.FirstWave == wave);
+            return debut != null ? debut.Config.WaveIcon : null;
+        }
+
         public void Initialize(
             EndlessModeConfig modeConfig,
             EnemyConfig fallbackConfig,
@@ -89,12 +105,18 @@ namespace AnchorDefense
             TotalSpawned = 0;
             normalEnemiesSinceBoss = 0;
             aliveBossCount = 0;
+            CurrentWave = 0;
+            IsSurgeActive = false;
+            surgeSpawned = 0;
+            introducedTypes.Clear();
+            collisionEnemies.Clear();
+            previousEnemies.Clear();
+            previousTurrets.Clear();
         }
 
         private void BuildEnemyPools(EnemyConfig fallbackConfig, Transform poolRoot)
         {
             enemyTypes.Clear();
-            totalWeight = 0f;
             bossType = null;
             normalEnemiesSinceBoss = 0;
             aliveBossCount = 0;
@@ -115,13 +137,13 @@ namespace AnchorDefense
                         continue;
                     }
 
-                    AddEnemyType(entry.Enemy, entry.SpawnWeight, entry.PrewarmCount, poolRoot);
+                    AddEnemyType(entry.Enemy, entry.SpawnWeight, entry.PrewarmCount, entry.FirstWave, poolRoot);
                 }
             }
 
             if (enemyTypes.Count == 0 && fallbackConfig != null && fallbackConfig.Prefab != null)
             {
-                AddEnemyType(fallbackConfig, 1f, endlessConfig.EnemyPrewarmCount, poolRoot);
+                AddEnemyType(fallbackConfig, 1f, endlessConfig.EnemyPrewarmCount, 1, poolRoot);
             }
 
             if (bossConfig != null && bossConfig.Prefab != null)
@@ -134,12 +156,11 @@ namespace AnchorDefense
             }
         }
 
-        private void AddEnemyType(EnemyConfig config, float weight, int prewarmCount, Transform poolRoot)
+        private void AddEnemyType(EnemyConfig config, float weight, int prewarmCount, int firstWave, Transform poolRoot)
         {
             EnemyTypePool typePool = CreateEnemyTypePool(config, weight, prewarmCount, poolRoot);
-
+            typePool.FirstWave = firstWave;
             enemyTypes.Add(typePool);
-            totalWeight += weight;
         }
 
         private EnemyTypePool CreateEnemyTypePool(
@@ -178,38 +199,59 @@ namespace AnchorDefense
             }
 
             ElapsedTime += Time.deltaTime;
-
-            spawnTimer -= Time.deltaTime;
-            if (spawnTimer > 0f)
+            int wave = Mathf.FloorToInt(ElapsedTime / endlessConfig.WavePeriod);
+            if (wave > CurrentWave)
             {
-                return;
+                CurrentWave = wave;
+                IsSurgeActive = true;
+                surgeSpawned = 0;
             }
-
-            SpawnBatch();
-            spawnTimer += endlessConfig.GetSpawnInterval(ElapsedTime);
+            if (IsSurgeActive && ElapsedTime >= CurrentWave * endlessConfig.WavePeriod + endlessConfig.SurgeDuration)
+            {
+                IsSurgeActive = false;
+                spawnTimer = 0f;
+            }
+            if (IsSurgeActive)
+            {
+                int quota = endlessConfig.GetSurgeCount(CurrentWave);
+                float surgeElapsed = ElapsedTime - CurrentWave * endlessConfig.WavePeriod;
+                int batches = Mathf.Max(1, endlessConfig.SurgeBatches);
+                int batchIndex = Mathf.Clamp(Mathf.FloorToInt(surgeElapsed / endlessConfig.SurgeDuration * batches), 0, batches - 1);
+                int scheduled = Mathf.CeilToInt(quota * (batchIndex + 1) / (float)batches);
+                while (surgeSpawned < scheduled)
+                {
+                    if (registry.Count >= endlessConfig.MaxAliveEnemies) break;
+                    SpawnOne(true);
+                    surgeSpawned++;
+                }
+            }
+            else
+            {
+                spawnTimer -= Time.deltaTime;
+                if (spawnTimer <= 0f)
+                {
+                    if (registry.Count < endlessConfig.MaxAliveEnemies) SpawnOne(false);
+                    spawnTimer += endlessConfig.GetRegularInterval(CurrentWave);
+                }
+            }
         }
 
-        private void SpawnBatch()
+        private void SpawnOne(bool surge)
         {
-            int availableSlots = endlessConfig.MaxAliveEnemies - registry.Count;
-            int count = Mathf.Min(endlessConfig.GetBatchSize(ElapsedTime), availableSlots);
-
-            float healthMultiplier = endlessConfig.GetHealthMultiplier(ElapsedTime);
-            float speedMultiplier = endlessConfig.GetSpeedMultiplier(ElapsedTime);
-
-            for (int i = 0; i < count; i++)
+            float healthMultiplier = endlessConfig.GetWaveHealthMultiplier(Mathf.Max(1, CurrentWave));
+            bool guaranteedDebut = surge && surgeSpawned == 0 && (CurrentWave == 2 || CurrentWave == 3);
+            if (!guaranteedDebut && ShouldSpawnBoss())
             {
-                if (ShouldSpawnBoss())
-                {
-                    SpawnEnemy(bossType, healthMultiplier, speedMultiplier, true);
-                    normalEnemiesSinceBoss = 0;
-                    continue;
-                }
-
-                EnemyTypePool typePool = SelectEnemyType();
-                SpawnEnemy(typePool, healthMultiplier, speedMultiplier, false);
-                normalEnemiesSinceBoss++;
+                SpawnEnemy(bossType, healthMultiplier, 1f, true);
+                normalEnemiesSinceBoss = 0;
+                return;
             }
+            EnemyTypePool typePool = guaranteedDebut
+                ? enemyTypes.Find(t => t.FirstWave == CurrentWave)
+                : null;
+            if (typePool == null) typePool = SelectEnemyType();
+            SpawnEnemy(typePool, healthMultiplier, 1f, false);
+            normalEnemiesSinceBoss++;
         }
 
         private bool ShouldSpawnBoss()
@@ -223,10 +265,13 @@ namespace AnchorDefense
 
         private EnemyTypePool SelectEnemyType()
         {
-            float roll = Random.value * totalWeight;
+            float weight = 0f;
+            foreach (EnemyTypePool type in enemyTypes) if (type.FirstWave <= CurrentWave) weight += type.Weight;
+            float roll = Random.value * weight;
 
             for (int i = 0; i < enemyTypes.Count; i++)
             {
+                if (enemyTypes[i].FirstWave > CurrentWave) continue;
                 roll -= enemyTypes[i].Weight;
                 if (roll <= 0f)
                 {
@@ -234,7 +279,7 @@ namespace AnchorDefense
                 }
             }
 
-            return enemyTypes[enemyTypes.Count - 1];
+            return enemyTypes[0];
         }
 
         private void SpawnEnemy(
@@ -246,6 +291,21 @@ namespace AnchorDefense
             EnemyController enemy = typePool.Pool.Get();
 
             Vector3 direction = Random.onUnitSphere;
+            if (typePool.Config.TurretCollisionOnly)
+            {
+                var available = new List<TurretHealth>();
+                foreach (TurretHealth turret in turretRegistry.Turrets)
+                    if (turret != null && turret.gameObject.activeInHierarchy && turret.IsAlive) available.Add(turret);
+                if (available.Count > 0)
+                {
+                    TurretHealth turret = available[Random.Range(0, available.Count)];
+                    OrbitRingController ring = turret.GetComponentInParent<OrbitRingController>();
+                    Vector3 normal = ring != null ? ring.transform.up : Vector3.up;
+                    direction = Vector3.ProjectOnPlane(turret.transform.position - core.transform.position, normal);
+                    if (direction.sqrMagnitude < 0.001f) direction = Vector3.ProjectOnPlane(Random.onUnitSphere, normal);
+                    direction.Normalize();
+                }
+            }
 
             if (isBoss && typePool.Config.AttackMode == EnemyAttackMode.OrbitTurretBoss)
             {
@@ -300,6 +360,7 @@ namespace AnchorDefense
                 typePool.Projectiles);
 
             registry.Register(enemy);
+            if (typePool.Config.TurretCollisionOnly) collisionEnemies.Add(enemy);
 
             if (isBoss)
             {
@@ -307,11 +368,14 @@ namespace AnchorDefense
             }
 
             TotalSpawned++;
+            if (introducedTypes.Add(typePool.Config)) FirstEnemySpawned?.Invoke(typePool.Config);
         }
 
         private void ReleaseEnemy(EnemyTypePool typePool, EnemyController enemy)
         {
             registry.Unregister(enemy);
+            collisionEnemies.Remove(enemy);
+            previousEnemies.Remove(enemy);
 
             if (typePool == bossType && aliveBossCount > 0)
             {
@@ -331,6 +395,37 @@ namespace AnchorDefense
         private void HandleEnemyKilled(EnemyController enemy)
         {
             killWallet?.RegisterKill();
+        }
+
+        private void LateUpdate()
+        {
+            if (Time.timeScale <= 0f || gameFlow == null || !gameFlow.IsPlaying) return;
+            for (int i = collisionEnemies.Count - 1; i >= 0; i--)
+            {
+                EnemyController enemy = collisionEnemies[i];
+                if (enemy == null || !enemy.IsAlive || enemy.Definition == null || !enemy.Definition.TurretCollisionOnly) continue;
+                Vector3 end = enemy.transform.position;
+                Vector3 start = previousEnemies.TryGetValue(enemy, out var prior) && prior.version == enemy.SpawnVersion ? prior.position : end;
+                foreach (TurretHealth turret in turretRegistry.Turrets)
+                {
+                    if (turret == null || !turret.gameObject.activeInHierarchy || !turret.IsAlive) continue;
+                    Vector3 turretEnd = turret.transform.position;
+                    Vector3 turretStart = previousTurrets.TryGetValue(turret, out Vector3 position) ? position : turretEnd;
+                    Vector3 relativeStart = start - turretStart;
+                    Vector3 relativeStep = (end - start) - (turretEnd - turretStart);
+                    float fraction = relativeStep.sqrMagnitude > 0.000001f ? Mathf.Clamp01(-Vector3.Dot(relativeStart, relativeStep) / relativeStep.sqrMagnitude) : 0f;
+                    if ((relativeStart + relativeStep * fraction).sqrMagnitude <= enemy.Definition.TurretCollisionRadius * enemy.Definition.TurretCollisionRadius)
+                    {
+                        enemy.DestroyByTurretCollision();
+                        break;
+                    }
+                }
+                if (enemy.IsAlive) previousEnemies[enemy] = (enemy.SpawnVersion, end);
+            }
+            foreach (TurretHealth turret in turretRegistry.Turrets)
+                if (turret != null && turret.gameObject.activeInHierarchy && turret.IsAlive)
+                    previousTurrets[turret] = turret.transform.position;
+                else if (turret != null) previousTurrets.Remove(turret);
         }
     }
 }

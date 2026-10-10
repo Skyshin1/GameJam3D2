@@ -24,12 +24,18 @@ namespace AnchorDefense
         public bool IsPointerOverInput => inputStrip != null && RectTransformUtility.RectangleContainsScreenPoint(inputStrip,
             UnityEngine.InputSystem.Mouse.current?.position.ReadValue() ?? new Vector2(-1,-1), canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera);
         public float AvailableBubbleWidth => Mathf.Clamp(SafeRect().width - 180f, 240f, maximumBubbleWidth);
+        private float BubbleBottomOffset => console != null && console.IsOpen
+            ? sticker.gameObject.activeSelf ? 178f : 108f : sticker.gameObject.activeSelf ? 76f : 12f;
+        public float AvailableBubbleHeight => Mathf.Max(80f, SafeRect().height - 32f - BubbleBottomOffset -
+            (rescueChoices != null && rescueChoices.gameObject.activeSelf ? 72f : 0f));
+        public void ResizeBubble(Vector2 size) => bubbleSize = size;
         public void Initialize(AICompanionService service, AICommandConsoleController controller)
         {
             companion = service; console = controller; canvas = GetComponent<Canvas>();
             group = GetComponent<CanvasGroup>();
             editor = FindObjectOfType<CubeZoneEditModeController>(true);
             historyButton.GetComponent<Button>().onClick.AddListener(ToggleHistory);
+            CatCourierSpeechBubble.ConfigureScrollIndicator(historyPanel.GetComponentInChildren<ScrollRect>(true), historyPanel);
             historyPanel.gameObject.SetActive(false);
             GameLocalization.LanguageChanged += RefreshLanguage;
             RefreshLanguage(); ApplyLayout();
@@ -59,6 +65,7 @@ namespace AnchorDefense
             portrait.Thinking = companion.IsBusy;
             portrait.Worried = companion.RescuePending;
             portrait.reducedMotion = reducedMotion;
+            if (!bubble.gameObject.activeSelf && portrait.SpeechEmotion.HasValue) portrait.ClearSpeechEmotion();
             alertText.gameObject.SetActive(companion.RescuePending || companion.IsBusy);
             alertText.text = companion.RescuePending ? "!" : "…";
             if (companion.RescuePending) historyPanel.gameObject.SetActive(false);
@@ -87,18 +94,17 @@ namespace AnchorDefense
             inputX = Mathf.Clamp(inputX, left + width * .5f, right - width * .5f);
             Place(inputStrip, inputX, bottom + 47f, width, 94f);
             float bw = bubbleSize.x > 0 ? Mathf.Min(bubbleSize.x, AvailableBubbleWidth) : maximumBubbleWidth;
-            float bh = bubbleSize.y > 0 ? bubbleSize.y : 112f;
+            float bh = Mathf.Min(CatCourierSpeechBubble.CompactHeight, AvailableBubbleHeight);
             float bx = leftDock ? left + 128f + bw * .5f : right - 128f - bw * .5f;
             bx = Mathf.Clamp(bx, left + bw * .5f, right - bw * .5f);
-            float bubbleBottom = bottom + (open ? 108f : sticker.gameObject.activeSelf ? 76f : 12f);
+            float bubbleBottom = bottom + BubbleBottomOffset;
             Place(bubble, bx, bubbleBottom + bh * .5f, bw, bh);
             Place(sticker, bx, bottom + (open ? 135f : 35f), Mathf.Min(300f, bw), 58f);
-            if (open && sticker.gameObject.activeSelf) Place(bubble, bx, bottom + 178f + bh * .5f, bw, bh);
             float choicesWidth = Mathf.Min(400f, safe.width - 36f);
             Place(rescueChoices, Mathf.Clamp(bx, left + choicesWidth * .5f, right - choicesWidth * .5f), bubbleBottom + bh + 36f, choicesWidth, 54f);
             Place(historyButton, catX, bottom + 125f, 52f, 30f);
-            float historyWidth = Mathf.Min(500f, safe.width - 36f), historyHeight = Mathf.Min(320f, safe.height - 210f);
-            Place(historyPanel, Mathf.Clamp(bx, left + historyWidth * .5f, right - historyWidth * .5f), bottom + 162f + historyHeight * .5f, historyWidth, historyHeight);
+            float historyWidth = bw, historyHeight = bh;
+            Place(historyPanel, bx, bubbleBottom + historyHeight * .5f, historyWidth, historyHeight);
             historyButton.gameObject.SetActive(companion == null || !companion.RescuePending);
         }
         private Rect SafeRect()

@@ -15,20 +15,31 @@ MonoBehaviour:
   <MinSpawnRadius>k__BackingField: 15
   <MaxSpawnRadius>k__BackingField: 18
   <StartingInterval>k__BackingField: 1.05
-  <MinimumInterval>k__BackingField: 0.12
-  <IntervalDecayPerSecond>k__BackingField: 0.012
-  <StartingBatchSize>k__BackingField: 1
-  <BatchIncreaseEverySeconds>k__BackingField: 35
-  <MaxBatchSize>k__BackingField: 7
-  <HealthIncreasePerMinute>k__BackingField: 0.3
-  <SpeedIncreasePerMinute>k__BackingField: 0.08
+  <MinimumInterval>k__BackingField: 0.6
   <MaxAliveEnemies>k__BackingField: 350
   <EnemyPrewarmCount>k__BackingField: 70
   <ProjectilePrewarmCount>k__BackingField: 90
+  <WavePeriod>k__BackingField: 30
+  <SurgeDuration>k__BackingField: 10
+  <SurgeBatches>k__BackingField: 5
+  <FirstSurgeCount>k__BackingField: 24
+  <SurgeIncreasePerWave>k__BackingField: 1
+  <IntervalReductionPerWave>k__BackingField: 0.03
+  <HealthIncreasePerWave>k__BackingField: 0.08
   <EnemyTypes>k__BackingField:
   - enemy: {fileID: 11400000, guid: 1f365d736b385034ab564d892820ec0d, type: 2}
     spawnWeight: 75
     prewarmCount: 52
+    firstWave: 1
   - enemy: {fileID: 11400000, guid: de9bd65ea5067bc47aec10ecd9fe51e5, type: 2}
     spawnWeight: 25
     prewarmCount: 18
+    firstWave: 1
+  - enemy: {fileID: 11400000, guid: 7e62c1b409d74d6fa48f760b2d0e8a12, type: 2}
+    spawnWeight: 7
+    prewarmCount: 4
+    firstWave: 2
+  - enemy: {fileID: 11400000, guid: 3c624c29e22c4d3a95761c30d708f198, type: 2}
+    spawnWeight: 6
+    prewarmCount: 4
+    firstWave: 3

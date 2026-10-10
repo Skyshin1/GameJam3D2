@@ -1,0 +1,1804 @@
+[
+  {
+    "file": "01-editorial-collage.svg",
+    "images": [
+      "pool",
+      "lifecycle",
+      "input",
+      "result",
+      "skill",
+      "config-effects"
+    ],
+    "issues": [],
+    "boxes": [
+      {
+        "kind": "text",
+        "text": "Game development",
+        "x": 64,
+        "y": 62.36,
+        "w": 479.0,
+        "h": 52
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE",
+        "x": 1700.6,
+        "y": 45.7,
+        "w": 155.4,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "TECH + TEAM / 03",
+        "x": 1711.5,
+        "y": 79.7,
+        "w": 144.5,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "01",
+        "x": 64,
+        "y": 151.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Object pooling",
+        "x": 106,
+        "y": 142.04,
+        "w": 197.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "I prewarm and reuse enemies, projectiles and effects",
+        "x": 64,
+        "y": 191.96,
+        "w": 508.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "through a shared object pool. On checkout, each instance",
+        "x": 64,
+        "y": 219.96,
+        "w": 554.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "resets its state; on return, it is deactivated and stored for",
+        "x": 64,
+        "y": 247.96,
+        "w": 539.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "reuse. The same lifecycle keeps frequent spawns organised",
+        "x": 64,
+        "y": 275.96,
+        "w": 576.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "during dense enemy waves.",
+        "x": 64,
+        "y": 303.96,
+        "w": 270.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "pool",
+        "x": 64,
+        "y": 383,
+        "w": 584,
+        "h": 240.02810304449648
+      },
+      {
+        "kind": "text",
+        "text": "Unity Play Mode / active and pooled instances",
+        "x": 64,
+        "y": 632.9081030444964,
+        "w": 327.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "lifecycle",
+        "x": 96,
+        "y": 666,
+        "w": 354,
+        "h": 215.6551724137931
+      },
+      {
+        "kind": "text",
+        "text": "ComponentPool<T> / checkout and return",
+        "x": 96,
+        "y": 891.5351724137931,
+        "w": 296.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "Reuse the",
+        "x": 478,
+        "y": 709.78,
+        "w": 102.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "same lifecycle.",
+        "x": 478,
+        "y": 736.78,
+        "w": 152.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "Enemies.",
+        "x": 478,
+        "y": 780.42,
+        "w": 81.0,
+        "h": 19
+      },
+      {
+        "kind": "text",
+        "text": "Projectiles. Effects.",
+        "x": 478,
+        "y": 805.42,
+        "w": 163.0,
+        "h": 19
+      },
+      {
+        "kind": "text",
+        "text": "02",
+        "x": 718,
+        "y": 179.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "AI integration",
+        "x": 760,
+        "y": 170.04,
+        "w": 181.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Player requests become structured game",
+        "x": 718,
+        "y": 219.96,
+        "w": 396.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "operations. Unity checks the source text, known",
+        "x": 718,
+        "y": 247.96,
+        "w": 460.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "skills, targets and costs before spending points",
+        "x": 718,
+        "y": 275.96,
+        "w": 450.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "and executing the plan. The companion then",
+        "x": 718,
+        "y": 303.96,
+        "w": 427.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "reports the result, connecting a conversational",
+        "x": 718,
+        "y": 331.96,
+        "w": 443.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "request to a visible action on the battlefield.",
+        "x": 718,
+        "y": 359.96,
+        "w": 416.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "input",
+        "x": 696,
+        "y": 438,
+        "w": 506,
+        "h": 138.68950749464668
+      },
+      {
+        "kind": "text",
+        "text": "01 / A request in the player\u2019s own words",
+        "x": 696,
+        "y": 586.5695074946467,
+        "w": 281.96875,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "result",
+        "x": 754,
+        "y": 646,
+        "w": 448,
+        "h": 133.71428571428572
+      },
+      {
+        "kind": "text",
+        "text": "02 / Actual execution feedback",
+        "x": 754,
+        "y": 789.5942857142858,
+        "w": 216.984375,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "Interpret. Validate. Execute.",
+        "x": 718,
+        "y": 847.78,
+        "w": 279.984375,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "03",
+        "x": 1284,
+        "y": 145.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Skill tree",
+        "x": 1326,
+        "y": 136.04,
+        "w": 119.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Players spend kill points to expand the rings, strengthen",
+        "x": 1284,
+        "y": 184.96,
+        "w": 538.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "turrets and unlock zone effects.",
+        "x": 1284,
+        "y": 212.96,
+        "w": 301.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "skill",
+        "x": 1260,
+        "y": 303,
+        "w": 596,
+        "h": 318.82592121982213
+      },
+      {
+        "kind": "text",
+        "text": "Live upgrade tree / ring and turret branches",
+        "x": 1260,
+        "y": 631.7059212198221,
+        "w": 304.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "ScriptableObject nodes define costs, prerequisites and",
+        "x": 1284,
+        "y": 661.96,
+        "w": 525.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "effects. Purchases check the node state and balance",
+        "x": 1284,
+        "y": 689.96,
+        "w": 509.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "before applying upgrades and refreshing the UI.",
+        "x": 1284,
+        "y": 717.96,
+        "w": 458.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "UPGRADE PATH / CONFIGURED VALUES",
+        "x": 1284,
+        "y": 798.52,
+        "w": 295.553125,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "Inner ring",
+        "x": 1284.0,
+        "y": 828.6,
+        "w": 93.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "8 pts  /  +2 turrets",
+        "x": 1284.0,
+        "y": 856.88,
+        "w": 120.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "\u2192",
+        "x": 1446.0,
+        "y": 826.96,
+        "w": 22.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Middle ring",
+        "x": 1474.0,
+        "y": 828.6,
+        "w": 108.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "12 pts  /  +2 turrets",
+        "x": 1474.0,
+        "y": 856.88,
+        "w": 129.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "\u2192",
+        "x": 1636.0,
+        "y": 826.96,
+        "w": 22.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Outer ring",
+        "x": 1664.0,
+        "y": 828.6,
+        "w": 98.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "16 pts  /  +2 turrets",
+        "x": 1664.0,
+        "y": 856.88,
+        "w": 129.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "04",
+        "x": 64,
+        "y": 953.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Leading the build",
+        "x": 106,
+        "y": 944.04,
+        "w": 233.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "TEAM CAPTAIN + LEAD PROGRAMMER",
+        "x": 106,
+        "y": 989.34,
+        "w": 248.0,
+        "h": 13
+      },
+      {
+        "kind": "text",
+        "text": "As team captain and lead programmer, I coordinated Git contributions and divided the work into clear tasks. I",
+        "x": 450,
+        "y": 940.78,
+        "w": 1038.984375,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "exposed gameplay and visual settings through configuration assets and prefabs, so artists could tune the",
+        "x": 450,
+        "y": 967.78,
+        "w": 1006.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "game without changing its core logic.",
+        "x": 450,
+        "y": 994.78,
+        "w": 355.0,
+        "h": 21
+      },
+      {
+        "kind": "image",
+        "text": "config-effects",
+        "x": 1620,
+        "y": 930,
+        "w": 236,
+        "h": 90.04488778054863
+      },
+      {
+        "kind": "text",
+        "text": "Artist-facing configuration",
+        "x": 1620,
+        "y": 1029.9248877805487,
+        "w": 180.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE / DEVELOPMENT NOTES",
+        "x": 64,
+        "y": 1050.16,
+        "w": 285.3,
+        "h": 12
+      },
+      {
+        "kind": "text",
+        "text": "01 EDITORIAL COLLAGE",
+        "x": 1700.8,
+        "y": 1050.16,
+        "w": 155.2,
+        "h": 12
+      }
+    ]
+  },
+  {
+    "file": "02-skill-tree-spotlight.svg",
+    "images": [
+      "skill-branches",
+      "prerequisite",
+      "input",
+      "result",
+      "pool",
+      "lifecycle"
+    ],
+    "issues": [],
+    "boxes": [
+      {
+        "kind": "text",
+        "text": "Game development",
+        "x": 64,
+        "y": 62.36,
+        "w": 479.0,
+        "h": 52
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE",
+        "x": 1700.6,
+        "y": 45.7,
+        "w": 155.4,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "TECH + TEAM / 03",
+        "x": 1711.5,
+        "y": 79.7,
+        "w": 144.5,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "03",
+        "x": 64,
+        "y": 158.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Skill tree",
+        "x": 106,
+        "y": 149.04,
+        "w": 119.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Make every point a choice.",
+        "x": 64,
+        "y": 196.78,
+        "w": 272.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "Players spend kill points to expand the rings, strengthen turrets and unlock zone effects.",
+        "x": 64,
+        "y": 234.96,
+        "w": 845.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "skill-branches",
+        "x": 64,
+        "y": 293,
+        "w": 695,
+        "h": 414.48349307774225
+      },
+      {
+        "kind": "text",
+        "text": "Live tree / expansion, firepower and range",
+        "x": 64,
+        "y": 717.3634930777422,
+        "w": 297.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "prerequisite",
+        "x": 807,
+        "y": 331,
+        "w": 235,
+        "h": 362.4926686217009
+      },
+      {
+        "kind": "text",
+        "text": "Requires Inner Ring Expansion",
+        "x": 807,
+        "y": 703.3726686217009,
+        "w": 223.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "ScriptableObject nodes define costs, prerequisites and effects. Purchases check the node state and",
+        "x": 64,
+        "y": 753.96,
+        "w": 958.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "balance before applying upgrades and refreshing the UI.",
+        "x": 64,
+        "y": 781.96,
+        "w": 540.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "UPGRADE PATH / CONFIGURED VALUES",
+        "x": 64,
+        "y": 824.52,
+        "w": 295.553125,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "Inner ring",
+        "x": 64.0,
+        "y": 854.6,
+        "w": 93.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "8 pts  /  +2 turrets",
+        "x": 64.0,
+        "y": 882.88,
+        "w": 120.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "\u2192",
+        "x": 381.3333333333333,
+        "y": 852.96,
+        "w": 22.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Middle ring",
+        "x": 409.3333333333333,
+        "y": 854.6,
+        "w": 108.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "12 pts  /  +2 turrets",
+        "x": 409.3333333333333,
+        "y": 882.88,
+        "w": 129.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "\u2192",
+        "x": 726.6666666666666,
+        "y": 852.96,
+        "w": 22.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Outer ring",
+        "x": 754.6666666666666,
+        "y": 854.6,
+        "w": 98.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "16 pts  /  +2 turrets",
+        "x": 754.6666666666666,
+        "y": 882.88,
+        "w": 129.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "02",
+        "x": 1196,
+        "y": 143.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "AI integration",
+        "x": 1238,
+        "y": 134.04,
+        "w": 181.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Player requests become structured game operations. Unity checks",
+        "x": 1196,
+        "y": 181.96,
+        "w": 639.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "the source text, known skills, targets and costs before spending",
+        "x": 1196,
+        "y": 209.96,
+        "w": 609.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "points and executing the plan. The companion then reports the",
+        "x": 1196,
+        "y": 237.96,
+        "w": 600.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "result, connecting a conversational request to a visible action on the",
+        "x": 1196,
+        "y": 265.96,
+        "w": 651.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "battlefield.",
+        "x": 1196,
+        "y": 293.96,
+        "w": 99.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "input",
+        "x": 1196,
+        "y": 340,
+        "w": 460,
+        "h": 126.0813704496788
+      },
+      {
+        "kind": "text",
+        "text": "Request / natural-language input",
+        "x": 1196,
+        "y": 475.9613704496788,
+        "w": 232.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "result",
+        "x": 1370,
+        "y": 518,
+        "w": 486,
+        "h": 145.05612244897958
+      },
+      {
+        "kind": "text",
+        "text": "Result / confirmed execution",
+        "x": 1370,
+        "y": 672.9361224489795,
+        "w": 201.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "01",
+        "x": 1196,
+        "y": 724.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Object pooling",
+        "x": 1238,
+        "y": 715.04,
+        "w": 197.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "I prewarm and reuse enemies, projectiles and effects through a",
+        "x": 1196,
+        "y": 764.78,
+        "w": 604.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "shared object pool. On checkout, each instance resets its state; on",
+        "x": 1196,
+        "y": 790.78,
+        "w": 638.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "return, it is deactivated and stored for reuse. The same lifecycle",
+        "x": 1196,
+        "y": 816.78,
+        "w": 609.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "keeps frequent spawns organised during dense enemy waves.",
+        "x": 1196,
+        "y": 842.78,
+        "w": 598.0,
+        "h": 21
+      },
+      {
+        "kind": "image",
+        "text": "pool",
+        "x": 1196,
+        "y": 884,
+        "w": 380,
+        "h": 156.18266978922716
+      },
+      {
+        "kind": "text",
+        "text": "Source / pool lifecycle",
+        "x": 1626,
+        "y": 877.88,
+        "w": 156.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "lifecycle",
+        "x": 1626,
+        "y": 907,
+        "w": 230,
+        "h": 140.11494252873564
+      },
+      {
+        "kind": "text",
+        "text": "04",
+        "x": 64,
+        "y": 944.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Leading the build",
+        "x": 106,
+        "y": 935.04,
+        "w": 233.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "ART / PREFABS / CONFIGS",
+        "x": 106,
+        "y": 982.52,
+        "w": 180.0,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "As team captain and lead programmer, I coordinated Git contributions and",
+        "x": 429,
+        "y": 929.6,
+        "w": 659.984375,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "divided the work into clear tasks. I exposed gameplay and visual settings",
+        "x": 429,
+        "y": 955.6,
+        "w": 645.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "through configuration assets and prefabs, so artists could tune the game",
+        "x": 429,
+        "y": 981.6,
+        "w": 645.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "without changing its core logic.",
+        "x": 429,
+        "y": 1007.6,
+        "w": 272.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE / DEVELOPMENT NOTES",
+        "x": 64,
+        "y": 1050.16,
+        "w": 285.3,
+        "h": 12
+      },
+      {
+        "kind": "text",
+        "text": "02 SKILL TREE SPOTLIGHT",
+        "x": 1683.4,
+        "y": 1050.16,
+        "w": 172.6,
+        "h": 12
+      }
+    ]
+  },
+  {
+    "file": "03-staggered-spread.svg",
+    "images": [
+      "pool",
+      "lifecycle",
+      "input",
+      "result",
+      "skill",
+      "config"
+    ],
+    "issues": [],
+    "boxes": [
+      {
+        "kind": "text",
+        "text": "Game development",
+        "x": 64,
+        "y": 62.36,
+        "w": 479.0,
+        "h": 52
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE",
+        "x": 1700.6,
+        "y": 45.7,
+        "w": 155.4,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "TECH + TEAM / 03",
+        "x": 1711.5,
+        "y": 79.7,
+        "w": 144.5,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "01",
+        "x": 64,
+        "y": 158.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Object pooling",
+        "x": 106,
+        "y": 149.04,
+        "w": 197.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "I prewarm and reuse enemies, projectiles",
+        "x": 64,
+        "y": 199.96,
+        "w": 396.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "and effects through a shared object pool.",
+        "x": 64,
+        "y": 227.96,
+        "w": 392.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "On checkout, each instance resets its state;",
+        "x": 64,
+        "y": 255.96,
+        "w": 420.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "on return, it is deactivated and stored for",
+        "x": 64,
+        "y": 283.96,
+        "w": 387.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "reuse. The same lifecycle keeps frequent",
+        "x": 64,
+        "y": 311.96,
+        "w": 395.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "spawns organised during dense enemy",
+        "x": 64,
+        "y": 339.96,
+        "w": 377.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "waves.",
+        "x": 64,
+        "y": 367.96,
+        "w": 68.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "pool",
+        "x": 533,
+        "y": 194,
+        "w": 494,
+        "h": 203.03747072599532
+      },
+      {
+        "kind": "text",
+        "text": "Battle + pool hierarchy",
+        "x": 533,
+        "y": 406.9174707259953,
+        "w": 159.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "lifecycle",
+        "x": 750,
+        "y": 456,
+        "w": 277,
+        "h": 168.7471264367816
+      },
+      {
+        "kind": "text",
+        "text": "Source / ComponentPool<T>",
+        "x": 750,
+        "y": 634.6271264367816,
+        "w": 207.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "Many spawns.",
+        "x": 64,
+        "y": 440.78,
+        "w": 145.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "One reusable lifecycle.",
+        "x": 64,
+        "y": 471.78,
+        "w": 232.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "02",
+        "x": 1100,
+        "y": 203.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "AI integration",
+        "x": 1142,
+        "y": 194.04,
+        "w": 181.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Player requests become structured game operations. Unity checks the source",
+        "x": 1100,
+        "y": 243.96,
+        "w": 746.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "text, known skills, targets and costs before spending points and executing the",
+        "x": 1100,
+        "y": 271.96,
+        "w": 743.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "plan. The companion then reports the result, connecting a conversational",
+        "x": 1100,
+        "y": 299.96,
+        "w": 699.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "request to a visible action on the battlefield.",
+        "x": 1100,
+        "y": 327.96,
+        "w": 416.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "input",
+        "x": 1100,
+        "y": 421,
+        "w": 565,
+        "h": 154.8608137044968
+      },
+      {
+        "kind": "text",
+        "text": "Player intent",
+        "x": 1100,
+        "y": 585.7408137044968,
+        "w": 89.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "result",
+        "x": 1360,
+        "y": 625,
+        "w": 496,
+        "h": 148.0408163265306
+      },
+      {
+        "kind": "text",
+        "text": "Execution feedback",
+        "x": 1360,
+        "y": 782.9208163265306,
+        "w": 140.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "03",
+        "x": 64,
+        "y": 623.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Skill tree",
+        "x": 106,
+        "y": 614.04,
+        "w": 119.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Players spend kill points to expand the rings, strengthen turrets and unlock zone effects.",
+        "x": 64,
+        "y": 662.96,
+        "w": 845.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "skill",
+        "x": 64,
+        "y": 725,
+        "w": 558,
+        "h": 298.49809402795427
+      },
+      {
+        "kind": "text",
+        "text": "Gameplay / choosing the next upgrade",
+        "x": 64,
+        "y": 1033.3780940279544,
+        "w": 273.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "ScriptableObject nodes define",
+        "x": 694,
+        "y": 768.96,
+        "w": 290.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "costs, prerequisites and effects.",
+        "x": 694,
+        "y": 796.96,
+        "w": 305.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Purchases check the node state",
+        "x": 694,
+        "y": 824.96,
+        "w": 309.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "and balance before applying",
+        "x": 694,
+        "y": 852.96,
+        "w": 272.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "upgrades and refreshing the UI.",
+        "x": 694,
+        "y": 880.96,
+        "w": 304.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Inner \u2192 Middle \u2192 Outer",
+        "x": 694,
+        "y": 944.78,
+        "w": 242.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "8 / 12 / 16 points \u00b7 +2 each",
+        "x": 694,
+        "y": 980.24,
+        "w": 214.0,
+        "h": 18
+      },
+      {
+        "kind": "text",
+        "text": "04",
+        "x": 1100,
+        "y": 830.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Leading the build",
+        "x": 1142,
+        "y": 821.04,
+        "w": 233.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "As team captain and lead programmer, I coordinated",
+        "x": 1100,
+        "y": 872.78,
+        "w": 503.984375,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "Git contributions and divided the work into clear",
+        "x": 1100,
+        "y": 899.78,
+        "w": 454.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "tasks. I exposed gameplay and visual settings",
+        "x": 1100,
+        "y": 926.78,
+        "w": 442.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "through configuration assets and prefabs, so artists",
+        "x": 1100,
+        "y": 953.78,
+        "w": 491.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "could tune the game without changing its core logic.",
+        "x": 1100,
+        "y": 980.78,
+        "w": 497.0,
+        "h": 21
+      },
+      {
+        "kind": "image",
+        "text": "config",
+        "x": 1672,
+        "y": 811,
+        "w": 184,
+        "h": 207.40149625935163
+      },
+      {
+        "kind": "text",
+        "text": "Tunable skill asset",
+        "x": 1672,
+        "y": 1028.2814962593518,
+        "w": 133.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE / DEVELOPMENT NOTES",
+        "x": 64,
+        "y": 1050.16,
+        "w": 285.3,
+        "h": 12
+      },
+      {
+        "kind": "text",
+        "text": "03 STAGGERED SPREAD",
+        "x": 1696.6,
+        "y": 1050.16,
+        "w": 159.4,
+        "h": 12
+      }
+    ]
+  },
+  {
+    "file": "04-development-notebook.svg",
+    "images": [
+      "config-effects",
+      "input",
+      "result",
+      "config",
+      "skill",
+      "prerequisite",
+      "pool",
+      "lifecycle"
+    ],
+    "issues": [],
+    "boxes": [
+      {
+        "kind": "text",
+        "text": "Game",
+        "x": 64,
+        "y": 67.64,
+        "w": 134.0,
+        "h": 48
+      },
+      {
+        "kind": "text",
+        "text": "development",
+        "x": 64,
+        "y": 129.2,
+        "w": 244.0,
+        "h": 40
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE",
+        "x": 64,
+        "y": 196.52,
+        "w": 139.6,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "TECH + TEAM / 03",
+        "x": 64,
+        "y": 226.52,
+        "w": 121.0,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "04 / TEAM + PROCESS",
+        "x": 64,
+        "y": 309.52,
+        "w": 161.8,
+        "h": 14
+      },
+      {
+        "kind": "text",
+        "text": "Leading",
+        "x": 64,
+        "y": 344.58,
+        "w": 119.0,
+        "h": 31
+      },
+      {
+        "kind": "text",
+        "text": "the build.",
+        "x": 64,
+        "y": 381.58,
+        "w": 139.0,
+        "h": 31
+      },
+      {
+        "kind": "text",
+        "text": "As team captain and lead",
+        "x": 64,
+        "y": 437.96,
+        "w": 245.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "programmer, I coordinated",
+        "x": 64,
+        "y": 466.96,
+        "w": 253.984375,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Git contributions and",
+        "x": 64,
+        "y": 495.96,
+        "w": 199.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "divided the work into clear",
+        "x": 64,
+        "y": 524.96,
+        "w": 251.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "tasks. I exposed gameplay",
+        "x": 64,
+        "y": 553.96,
+        "w": 257.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "and visual settings through",
+        "x": 64,
+        "y": 582.96,
+        "w": 258.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "configuration assets and",
+        "x": 64,
+        "y": 611.96,
+        "w": 235.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "prefabs, so artists could",
+        "x": 64,
+        "y": 640.96,
+        "w": 229.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "tune the game without",
+        "x": 64,
+        "y": 669.96,
+        "w": 213.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "changing its core logic.",
+        "x": 64,
+        "y": 698.96,
+        "w": 221.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Built to be tuned.",
+        "x": 64,
+        "y": 829.78,
+        "w": 174.0,
+        "h": 21
+      },
+      {
+        "kind": "text",
+        "text": "Art / Prefabs / Configs",
+        "x": 64,
+        "y": 869.24,
+        "w": 176.0,
+        "h": 18
+      },
+      {
+        "kind": "image",
+        "text": "config-effects",
+        "x": 64,
+        "y": 925,
+        "w": 270,
+        "h": 103.01745635910224
+      },
+      {
+        "kind": "text",
+        "text": "INTENT / SYSTEMS / PLAYER CHOICE",
+        "x": 413,
+        "y": 49.7,
+        "w": 311.184375,
+        "h": 15
+      },
+      {
+        "kind": "text",
+        "text": "02",
+        "x": 413,
+        "y": 106.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "AI integration",
+        "x": 455,
+        "y": 97.04,
+        "w": 181.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Player requests become structured game operations. Unity checks the source text, known skills, targets and",
+        "x": 413,
+        "y": 145.96,
+        "w": 1036.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "costs before spending points and executing the plan. The companion then reports the result, connecting a",
+        "x": 413,
+        "y": 173.96,
+        "w": 1012.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "conversational request to a visible action on the battlefield.",
+        "x": 413,
+        "y": 201.96,
+        "w": 562.0,
+        "h": 22
+      },
+      {
+        "kind": "image",
+        "text": "input",
+        "x": 413,
+        "y": 299,
+        "w": 550,
+        "h": 150.74946466809422
+      },
+      {
+        "kind": "text",
+        "text": "01 / Ask for support",
+        "x": 413,
+        "y": 459.6294646680942,
+        "w": 135.984375,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "result",
+        "x": 1000,
+        "y": 373,
+        "w": 485,
+        "h": 144.7576530612245
+      },
+      {
+        "kind": "text",
+        "text": "02 / Report what happened",
+        "x": 1000,
+        "y": 527.6376530612245,
+        "w": 192.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "config",
+        "x": 1576,
+        "y": 168,
+        "w": 280,
+        "h": 315.6109725685786
+      },
+      {
+        "kind": "text",
+        "text": "Configured skills / Unity Inspector",
+        "x": 1576,
+        "y": 493.49097256857857,
+        "w": 237.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "03",
+        "x": 413,
+        "y": 534.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Skill tree",
+        "x": 455,
+        "y": 525.04,
+        "w": 119.0,
+        "h": 28
+      },
+      {
+        "kind": "text",
+        "text": "Players spend kill points to expand the rings, strengthen turrets and unlock zone",
+        "x": 413,
+        "y": 571.96,
+        "w": 769.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "effects.",
+        "x": 413,
+        "y": 599.96,
+        "w": 70.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "ScriptableObject nodes define costs, prerequisites and effects. Purchases",
+        "x": 413,
+        "y": 629.96,
+        "w": 710.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "check the node state and balance before applying upgrades and refreshing the",
+        "x": 413,
+        "y": 657.96,
+        "w": 754.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "UI.",
+        "x": 413,
+        "y": 685.96,
+        "w": 28.0,
+        "h": 22
+      },
+      {
+        "kind": "text",
+        "text": "Inner \u2192 Middle \u2192 Outer: 8 / 12 / 16 pts \u00b7 +2 turrets each",
+        "x": 413,
+        "y": 715.06,
+        "w": 426.0,
+        "h": 17
+      },
+      {
+        "kind": "image",
+        "text": "skill",
+        "x": 413,
+        "y": 755,
+        "w": 500,
+        "h": 267.4714104193138
+      },
+      {
+        "kind": "text",
+        "text": "Upgrade tree / live gameplay",
+        "x": 413,
+        "y": 1032.3514104193139,
+        "w": 204.0,
+        "h": 16
+      },
+      {
+        "kind": "image",
+        "text": "prerequisite",
+        "x": 963,
+        "y": 762,
+        "w": 175,
+        "h": 269.94134897360703
+      },
+      {
+        "kind": "text",
+        "text": "Prerequisite check",
+        "x": 963,
+        "y": 1041.8213489736072,
+        "w": 132.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "01",
+        "x": 1250,
+        "y": 566.06,
+        "w": 18.0,
+        "h": 17
+      },
+      {
+        "kind": "text",
+        "text": "Object pooling",
+        "x": 1292,
+        "y": 557.04,
+        "w": 197.0,
+        "h": 28
+      },
+      {
+        "kind": "image",
+        "text": "pool",
+        "x": 1250,
+        "y": 620,
+        "w": 606,
+        "h": 249.07025761124123
+      },
+      {
+        "kind": "text",
+        "text": "Live battle beside the object pool",
+        "x": 1250,
+        "y": 878.9502576112412,
+        "w": 233.0,
+        "h": 16
+      },
+      {
+        "kind": "text",
+        "text": "I prewarm enemies, projectiles and effects",
+        "x": 1250,
+        "y": 901.6,
+        "w": 377.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "in a shared pool. Checkout resets each",
+        "x": 1250,
+        "y": 925.6,
+        "w": 348.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "instance; returning deactivates and stores it",
+        "x": 1250,
+        "y": 949.6,
+        "w": 388.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "for reuse. This reusable lifecycle supports",
+        "x": 1250,
+        "y": 973.6,
+        "w": 370.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "frequent spawning while keeping object",
+        "x": 1250,
+        "y": 997.6,
+        "w": 347.0,
+        "h": 20
+      },
+      {
+        "kind": "text",
+        "text": "state consistent across successive uses.",
+        "x": 1250,
+        "y": 1021.6,
+        "w": 362.0,
+        "h": 20
+      },
+      {
+        "kind": "image",
+        "text": "lifecycle",
+        "x": 1658,
+        "y": 916,
+        "w": 198,
+        "h": 120.62068965517241
+      },
+      {
+        "kind": "text",
+        "text": "FLUFFY DEFENSE / DEVELOPMENT NOTES",
+        "x": 64,
+        "y": 1050.16,
+        "w": 285.3,
+        "h": 12
+      },
+      {
+        "kind": "text",
+        "text": "04 DEVELOPMENT NOTEBOOK",
+        "x": 1660.4,
+        "y": 1050.16,
+        "w": 195.6,
+        "h": 12
+      }
+    ]
+  }
+]

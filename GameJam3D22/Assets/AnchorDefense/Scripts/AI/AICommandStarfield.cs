@@ -112,7 +112,8 @@ namespace AnchorDefense
             }
         }
 
-        public void Present(Camera camera, float time, float activationAge, float remaining, float fadeDuration)
+        public void Present(Camera camera, float time, float activationAge, float remaining, float fadeDuration,
+            Color skillColor, float contraction = 0f)
         {
             if (mesh == null) return;
             visual.enabled = remaining > 0f && brightness > 0f && homes.Length > 0;
@@ -130,13 +131,15 @@ namespace AnchorDefense
                 Vector3 position = homes[i];
                 if (i >= 8) position += new Vector3(Mathf.Sin(time * driftSpeed + phase),
                     Mathf.Sin(time * driftSpeed * 0.7f + phase), Mathf.Cos(time * driftSpeed + phase)) * cubeSize * 0.018f;
+                position *= Mathf.Lerp(1f, 0.06f, Mathf.SmoothStep(0f, 1f, contraction));
                 float size = sizes[i] * (0.85f + blink * 0.35f);
                 Vector3 x = right * size * 0.5f, y = up * size * 0.5f;
                 int v = i * 4;
                 vertices[v] = position - x - y; vertices[v + 1] = position + x - y;
                 vertices[v + 2] = position - x + y; vertices[v + 3] = position + x + y;
-                Color tint = Color.Lerp(Palette(phase / (Mathf.PI * 2f) + time * 0.008f), Color.white, blink * 0.12f);
-                tint.a = Mathf.Clamp01(0.12f + blink * 0.88f + burst) * fade * entrance;
+                Color tint = Color.Lerp(Palette(phase / (Mathf.PI * 2f) + time * 0.008f), skillColor, i < 8 ? 0.75f : 0.35f);
+                tint = Color.Lerp(tint, Color.white, blink * 0.2f);
+                tint.a = Mathf.Clamp01((i < 8 ? 0.4f : 0.16f) + blink * 0.75f + burst) * fade * entrance;
                 for (int j = 0; j < 4; j++) colors[v + j] = tint;
             }
             mesh.vertices = vertices;

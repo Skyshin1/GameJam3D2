@@ -26,7 +26,7 @@ namespace AnchorDefense.Editor
             var stage = PrefabStageUtility.GetCurrentPrefabStage();
             if (stage != null && stage.assetPath == Prefab && stage.scene.isDirty) return;
             var existing = AssetDatabase.LoadAssetAtPath<GameObject>(Prefab).GetComponent<CatCourierLayout>();
-            if (existing != null && existing.layoutVersion >= 5) return;
+            if (existing != null && existing.layoutVersion >= 6) return;
             if (existing != null && existing.layoutVersion >= 2)
             {
                 // Incremental repair: preserve all artist overrides on the installed layout.
@@ -43,7 +43,8 @@ namespace AnchorDefense.Editor
                         label.rectTransform.offsetMax = new Vector2(-14, -8);
                     }
                     UpgradeInputAndStationery(repair);
-                    repair.GetComponent<CatCourierLayout>().layoutVersion = 5;
+                    UpgradeExpressionsAndSpeech(repair);
+                    repair.GetComponent<CatCourierLayout>().layoutVersion = 6;
                     PrefabUtility.SaveAsPrefabAsset(repair, Prefab);
                 }
                 finally { PrefabUtility.UnloadPrefabContents(repair); }
@@ -56,7 +57,7 @@ namespace AnchorDefense.Editor
             {
                 if (root.GetComponent<AICompanionView>() == null) return;
                 var layout = root.GetComponent<CatCourierLayout>() ?? root.AddComponent<CatCourierLayout>();
-                layout.layoutVersion = 5;
+                layout.layoutVersion = 6;
                 if (root.GetComponent<CanvasGroup>() == null) root.AddComponent<CanvasGroup>();
                 var panel = (RectTransform)root.transform.Find("Command Panel");
                 var bubble = (RectTransform)root.transform.Find("Companion Chat Bubble");
@@ -84,7 +85,7 @@ namespace AnchorDefense.Editor
                 bubble.Find("Bubble Tail")?.gameObject.SetActive(false);
                 var speech = bubble.Find("Companion Speech").GetComponent<TMP_Text>();
                 speech.fontSize = 23; speech.color = Ink; speech.richText = false;
-                speech.overflowMode = TextOverflowModes.Page;
+                speech.overflowMode = TextOverflowModes.Overflow;
                 RectTransform input = (RectTransform)panel.Find("Command Input");
                 input.anchorMin = new Vector2(0,0); input.anchorMax = new Vector2(1,1);
                 input.offsetMin = new Vector2(18,30); input.offsetMax = new Vector2(-92,-13);
@@ -137,10 +138,27 @@ namespace AnchorDefense.Editor
                 layout.historyPanel.gameObject.SetActive(false);
                 opener.SetAsLastSibling(); layout.alertText.raycastTarget = false;
                 UpgradeInputAndStationery(root);
+                UpgradeExpressionsAndSpeech(root);
                 layout.ApplyLayout(); panel.gameObject.SetActive(false); bubble.gameObject.SetActive(false);
                 PrefabUtility.SaveAsPrefabAsset(root, Prefab);
             }
             finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+        private static void UpgradeExpressionsAndSpeech(GameObject root)
+        {
+            const string helplessPath = "Assets/AnchorDefense/Art/UI/CatCourierHelpless.png";
+            var importer = AssetImporter.GetAtPath(helplessPath) as TextureImporter;
+            if (importer != null && (importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single))
+            {
+                importer.textureType = TextureImporterType.Sprite; importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true; importer.mipmapEnabled = false;
+                importer.maxTextureSize = 1024; importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.SaveAndReimport();
+            }
+            var layout = root.GetComponent<CatCourierLayout>();
+            layout.portrait.helplessExpression = AssetDatabase.LoadAssetAtPath<Sprite>(helplessPath);
+            var speech = layout.bubble.GetComponentsInChildren<TMP_Text>(true).First(t => t.name == "Companion Speech");
+            CatCourierSpeechBubble.Configure(layout.bubble, speech);
         }
         private static void UpgradeInputAndStationery(GameObject root)
         {

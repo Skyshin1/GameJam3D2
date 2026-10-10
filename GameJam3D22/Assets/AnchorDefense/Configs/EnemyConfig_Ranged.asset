@@ -17,6 +17,9 @@ MonoBehaviour:
   <MaxHealth>k__BackingField: 36
   <MoveSpeed>k__BackingField: 1.25
   <CoreDamage>k__BackingField: 0
+  <IntroFacts>k__BackingField: Ranged enemy; stops near the core and fires projectiles at operational turrets; shots can damage turrets. It does not deal core contact damage. Turret fire and area attacks can destroy it.
+  <IntroChinese>k__BackingField: 远程怪会停在外围向炮塔开火，不会直接撞伤核心。用炮塔或区域技能尽快清除！
+  <IntroEnglish>k__BackingField: Ranged enemies stop outside and shoot your turrets. Clear them with turret fire or area skills!
   <AttackMode>k__BackingField: 1
   <RangedStopRadius>k__BackingField: 10.5
   <FireInterval>k__BackingField: 2.2

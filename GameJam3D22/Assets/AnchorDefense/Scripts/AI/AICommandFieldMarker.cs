@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace AnchorDefense
 {
-    // Presentation only: prismatic scan, breathing corners and twinkling stars.
+    // Presentation only: geometric attack envelope, prismatic scan and twinkling stars.
     // Gameplay and targeting stay in AICommandField; this object has no collider.
     public sealed class AICommandFieldMarker : MonoBehaviour
     {
@@ -14,21 +14,21 @@ namespace AnchorDefense
         [Header("Starlight Burst")]
         [SerializeField] private Material signalMaterial;
         [SerializeField, Min(0.1f)] private float starBurstDuration = 0.75f;
-        [SerializeField, Range(0f, 1f)] private float starBurstOpacity = 0.5f;
-        [SerializeField, Range(0f, 0.5f)] private float cornerBreathAmount = 0.18f;
+        [SerializeField, Range(0f, 1f)] private float starBurstOpacity = 0.38f;
+        [SerializeField, Range(0f, 0.5f)] private float cornerBreathAmount = 0.08f;
         [SerializeField, Min(0.1f)] private float endingFadeDuration = 0.45f;
 
         [Header("Prismatic Scan")]
         [UnityEngine.Serialization.FormerlySerializedAs("scanDuration")]
         [SerializeField, Min(0.1f)] private float scanSweepDuration = 0.9f;
         [UnityEngine.Serialization.FormerlySerializedAs("scanOpacity")]
-        [SerializeField, Range(0f, 1f)] private float scanSweepOpacity = 0.38f;
-        [SerializeField, Range(0f, 1f)] private float cornerColorVariation = 0.6f;
+        [SerializeField, Range(0f, 1f)] private float scanSweepOpacity = 0.48f;
+        [SerializeField, Range(0f, 1f)] private float cornerColorVariation = 0.32f;
 
         [Header("Twinkling Stars")]
         [SerializeField, Range(0, 128)] private int starCount = 42;
-        [SerializeField, Min(0.01f)] private float starWorldSize = 0.3f;
-        [SerializeField, Range(0f, 1f)] private float starOpacity = 0.85f;
+        [SerializeField, Min(0.01f)] private float starWorldSize = 0.42f;
+        [SerializeField, Range(0f, 1f)] private float starOpacity = 0.7f;
         [SerializeField, Range(0f, 2f)] private float starDriftSpeed = 0.35f;
 
         [Header("Actor Feedback")]
@@ -39,11 +39,18 @@ namespace AnchorDefense
         public float ActorCueOpacity => actorCueOpacity;
 
         [Header("Cube Corners")]
-        [SerializeField, Range(0.05f, 0.4f)] private float cornerLengthRatio = 0.18f;
-        [SerializeField, Min(0.005f)] private float lineWidth = 0.055f;
-        [SerializeField] private Color flashColor = new Color(0.55f, 0.95f, 1f, 0.78f);
-        [SerializeField] private Color restingColor = new Color(0.35f, 0.78f, 1f, 0.13f);
+        [SerializeField, Range(0.05f, 0.4f)] private float cornerLengthRatio = 0.23f;
+        [SerializeField, Min(0.005f)] private float lineWidth = 0.095f;
+        [SerializeField] private Color flashColor = new Color(0.85f, 0.88f, 1f, 0.9f);
+        [SerializeField] private Color restingColor = new Color(0.65f, 0.7f, 0.92f, 0.78f);
+        [SerializeField, Range(1f, 3f)] private float cornerRadiance = 1.25f;
         [SerializeField, Min(0.05f)] private float flashDuration = 0.6f;
+
+        [Header("Attack Disintegration Sequence")]
+        [SerializeField] private bool disintegrationAttack = true;
+        [SerializeField, Range(0.3f, 1.5f)] private float formationDuration = 0.75f;
+        [SerializeField, Range(0.3f, 1.5f)] private float collapseDuration = 0.7f;
+        [SerializeField, Range(0f, 1f)] private float volumeOpacity = 0.4f;
 
         private ActiveSkillDefinition[] operations;
         private Camera gameplayCamera;
@@ -64,6 +71,12 @@ namespace AnchorDefense
         private AICommandStarfield stars;
         private MeshRenderer scanRenderer;
         private MaterialPropertyBlock scanProperties;
+        private MaterialPropertyBlock cornerProperties;
+        private bool attackPresentation;
+        private AICommandDisintegrationVolume disintegrationVolume;
+        private float attackStarted = float.NegativeInfinity;
+        private float attackEndsAt;
+        private bool HasActiveDisintegration => disintegrationVolume != null && elapsed < attackEndsAt;
 
         public void Initialize(ActiveSkillDefinition[] commandOperations, float targetCubeSize,
             float staggerSeconds, Camera camera, float lifetime = 6f, bool externallyDriven = false)
@@ -78,13 +91,15 @@ namespace AnchorDefense
             shownOperation = -1;
             endsAt = fieldDuration;
             burstStarted = float.NegativeInfinity;
+            attackStarted = float.NegativeInfinity;
+            attackEndsAt = 0f;
             initialized = true;
             if (cornerSegments == null || cornerSegments.Length != 24)
                 cornerSegments = GetComponentsInChildren<LineRenderer>(true);
             if (cornerSegments.Length != 24) CreateRuntimeCornerSegments();
             HideLegacyBadge();
-            SetCornerGeometry();
             CreateBurst();
+            SetCornerGeometry();
             CreateScan();
             if (stars == null && SignalMaterial != null)
             {
@@ -104,6 +119,19 @@ namespace AnchorDefense
             if (!initialized || operation == null) return;
             shownOperation = operations != null ? System.Array.IndexOf(operations, operation) : -1;
             burstColor = AICommandActorFeedback.ColorFor(operation.Effect);
+            attackPresentation = operation.Effect is AreaDamageSkillEffect;
+            if (attackPresentation && disintegrationAttack && SignalMaterial != null)
+            {
+                attackStarted = elapsed;
+                attackEndsAt = elapsed + fieldDuration;
+                if (disintegrationVolume == null)
+                {
+                    var volumeObject = new GameObject("Command Disintegration");
+                    volumeObject.transform.SetParent(transform, false);
+                    disintegrationVolume = volumeObject.AddComponent<AICommandDisintegrationVolume>();
+                    disintegrationVolume.Initialize(SignalMaterial, cubeSize);
+                }
+            }
             burstStarted = elapsed;
             endsAt = elapsed + fieldDuration;
             RefreshPresentation();
@@ -154,13 +182,15 @@ namespace AnchorDefense
         private void UpdateBurst()
         {
             if (burstRenderer == null) return;
-            float t = (elapsed - burstStarted) / Mathf.Max(0.1f, starBurstDuration);
+            if (HasActiveDisintegration) { burstRenderer.enabled = false; return; }
+            float delay = attackPresentation && disintegrationAttack ? formationDuration : 0f;
+            float t = (elapsed - burstStarted - delay) / Mathf.Max(0.1f, starBurstDuration);
             burstRenderer.enabled = t >= 0f && t < 1f;
             if (!burstRenderer.enabled) return;
             Camera view = gameplayCamera != null ? gameplayCamera : Camera.main;
             if (view != null) burstRenderer.transform.rotation = view.transform.rotation;
             burstRenderer.transform.localPosition = Vector3.up * cubeSize * t * 0.025f;
-            burstProperties.SetColor("_TintColor", Color.Lerp(burstColor, new Color(0.6f, 0.83f, 1f), 0.75f));
+            burstProperties.SetColor("_TintColor", burstColor);
             burstProperties.SetFloat("_Style", 0f);
             burstProperties.SetFloat("_Progress", t);
             burstProperties.SetFloat("_Opacity", starBurstOpacity * Mathf.Sin(t * Mathf.PI));
@@ -185,14 +215,17 @@ namespace AnchorDefense
         private void UpdateScan(float activationAge)
         {
             if (scanRenderer == null) return;
-            float progress = activationAge / Mathf.Max(0.1f, scanSweepDuration);
+            float delay = attackPresentation && disintegrationAttack ? formationDuration : 0f;
+            float progress = (activationAge - delay) / Mathf.Max(0.1f, scanSweepDuration);
             scanRenderer.enabled = progress >= 0f && progress < 1f;
             if (!scanRenderer.enabled) return;
             scanRenderer.transform.localPosition = Vector3.up * Mathf.Lerp(cubeSize * 0.48f, -cubeSize * 0.48f, progress);
-            scanProperties.SetFloat("_Style", 6f);
+            scanProperties.SetFloat("_Style", HasActiveDisintegration ? 11f : 6f);
             scanProperties.SetFloat("_Progress", progress);
-            scanProperties.SetFloat("_Opacity", scanSweepOpacity * Mathf.Sin(progress * Mathf.PI));
-            scanProperties.SetColor("_TintColor", Color.white);
+            scanProperties.SetFloat("_Opacity", scanSweepOpacity * Mathf.Sin(progress * Mathf.PI) *
+                (HasActiveDisintegration ? 0.6f : 1f));
+            scanProperties.SetColor("_TintColor", attackPresentation && disintegrationAttack
+                ? new Color(0.45f, 0.58f, 0.8f) : burstColor);
             scanRenderer.SetPropertyBlock(scanProperties);
         }
 
@@ -220,6 +253,11 @@ namespace AnchorDefense
                     line.SetPosition(0, corner);
                     line.SetPosition(1, corner + inward);
                     line.widthMultiplier = lineWidth;
+                    line.widthCurve = new AnimationCurve(new Keyframe(0f, 0.85f),
+                        new Keyframe(0.12f, 1f), new Keyframe(0.8f, 0.75f), new Keyframe(1f, 0.2f));
+                    line.numCapVertices = 3;
+                    // The signal shader is unlit and keeps a crisp core inside a soft edge.
+                    if (SignalMaterial != null) line.sharedMaterial = SignalMaterial;
                 }
             }
         }
@@ -264,23 +302,54 @@ namespace AnchorDefense
             if (flash <= 0f && ending <= 0f)
                 current.a *= 1f + Mathf.Sin(elapsed * 2f) * cornerBreathAmount;
             current.a *= Mathf.Clamp01(remaining / Mathf.Min(0.22f, endingFadeDuration));
+            // Once formed, the shell marks the boundary by itself: no stacked bright corner lines.
+            if (HasActiveDisintegration)
+            {
+                float forming = 1f - Mathf.SmoothStep(0f, 1f,
+                    Mathf.InverseLerp(formationDuration * 0.6f, formationDuration, elapsed - attackStarted));
+                float closing = 1f - Mathf.Clamp01((attackEndsAt - elapsed) / collapseDuration);
+                current.a *= Mathf.Max(forming, closing) * 0.6f;
+            }
+            if (cornerProperties == null) cornerProperties = new MaterialPropertyBlock();
+            cornerProperties.SetFloat("_Style", 8f);
+            cornerProperties.SetFloat("_Progress", elapsed);
+            cornerProperties.SetFloat("_Opacity", 1f);
+            cornerProperties.SetColor("_TintColor", new Color(cornerRadiance, cornerRadiance, cornerRadiance, 1f));
             if (cornerSegments != null)
                 for (int i = 0; i < cornerSegments.Length; i++)
                 {
                     LineRenderer line = cornerSegments[i];
                     if (line == null) continue;
-                    Color color = Color.Lerp(current, AICommandStarfield.Palette(i / 24f + elapsed * 0.012f), cornerColorVariation);
+                    // Muted periwinkle frames sit naturally against space; other skills retain their tint.
+                    float blend = 0.5f + 0.5f * Mathf.Sin(i / 3f * 1.7f + elapsed * 0.35f);
+                    Color accent = attackPresentation ? new Color(0.72f, 0.55f, 0.88f) :
+                        Color.Lerp(burstColor, new Color(0.75f, 0.42f, 1f), 0.35f);
+                    Color baseColor = attackPresentation ? current : Color.Lerp(burstColor, flashColor, flash * 0.35f);
+                    Color color = Color.Lerp(baseColor, accent, cornerColorVariation * blend);
                     color.a = current.a;
                     line.startColor = color;
-                    Color tip = Color.Lerp(color, AICommandStarfield.Palette(i / 24f + 0.08f), 0.25f);
-                    tip.a = color.a;
+                    Color tip = Color.Lerp(color, accent, 0.6f);
+                    tip.a = color.a * 0.6f;
                     line.endColor = tip;
+                    line.widthMultiplier = lineWidth * (1f + flash * 0.3f);
+                    line.SetPropertyBlock(cornerProperties);
                 }
 
             UpdateBurst();
             UpdateScan(activationAge);
             Camera currentCamera = gameplayCamera != null ? gameplayCamera : Camera.main;
-            if (stars != null) stars.Present(currentCamera, elapsed, activationAge, remaining, endingFadeDuration);
+            float attackRemaining = Mathf.Max(0f, attackEndsAt - elapsed);
+            if (disintegrationVolume != null)
+                disintegrationVolume.Present(currentCamera, elapsed - attackStarted, attackRemaining,
+                    formationDuration, collapseDuration, volumeOpacity);
+            if (stars != null)
+            {
+                // Keep the interior empty apart from one sweep; no star shower or orbiting arcs.
+                stars.gameObject.SetActive(!HasActiveDisintegration);
+                if (stars.gameObject.activeSelf)
+                    stars.Present(currentCamera, elapsed, activationAge, remaining,
+                        endingFadeDuration, burstColor);
+            }
         }
 
 #if UNITY_EDITOR

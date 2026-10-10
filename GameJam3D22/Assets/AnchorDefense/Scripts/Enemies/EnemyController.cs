@@ -48,6 +48,7 @@ namespace AnchorDefense
         private static int attackSoundsInWindow;
 
         public bool IsAlive => isAlive;
+        public bool CanTakeDamage => config != null && !config.TurretCollisionOnly;
         public EnemyConfig Definition => config;
         public float CurrentHealth => currentHealth;
         public float EffectiveMoveSpeed => moveSpeed * zoneSpeedMultiplier * commandSlowMultiplier;
@@ -153,7 +154,7 @@ namespace AnchorDefense
 
         public void TakeDamage(DamageInfo damage)
         {
-            if (!isAlive || damage.Amount <= 0f)
+            if (!isAlive || !CanTakeDamage || damage.Amount <= 0f)
             {
                 return;
             }
@@ -201,7 +202,7 @@ namespace AnchorDefense
 
             if (Time.time >= commandSlowUntil) commandSlowMultiplier = 1f;
 
-            if (zoneDamagePerSecond > 0f)
+            if (CanTakeDamage && zoneDamagePerSecond > 0f)
             {
                 currentHealth -= zoneDamagePerSecond * Time.deltaTime;
                 if (currentHealth <= 0f)
@@ -437,6 +438,11 @@ namespace AnchorDefense
             deathEffectAction?.Invoke(transform.position, config.BaseColor);
             Killed?.Invoke(this);
             releaseAction?.Invoke(this);
+        }
+
+        public void DestroyByTurretCollision()
+        {
+            if (isAlive && config != null && config.TurretCollisionOnly) Die();
         }
 
         private void SetColor(Color color)

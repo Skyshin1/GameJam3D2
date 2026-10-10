@@ -1,0 +1,11 @@
+ASSET PROVENANCE
+All screenshot images are real captures, cropped without altering game or editor content.
+pool, lifecycle, input, result, config: existing TechnicalShowcase captures.
+skill, skill-branches: new Unity Play Mode capture of the actual upgrade UI.
+prerequisite: new Unity capture of Middle Ring Expansion with its prerequisite locked.
+Background: embedded background from the supplied 3.svg; darkened for text readability.
+Skill-tree values: actual Ring01/02/03Capacity assets; costs 8/12/16, each adds two turrets.
+Upgrade runtime: UpgradeSystem.GetState / TryPurchase; UpgradeNodeDefinition; UpgradeEffect.
+Leadership wording: supplied portfolio copy. No team timeline or Git history is fabricated.
+The input/result images demonstrate player input and execution feedback, not a raw model response.
+The original SVG and gameplay source files are not edited by this artifact generator.

@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="169" result="Skipped:Ignored" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.9317563">
+  <test-suite type="TestSuite" id="1000" name="GameJam3D22" fullname="GameJam3D22" runstate="Runnable" testcasecount="200" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.931756" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0">
+    <properties />
+    <reason>
+      <message><![CDATA[One or more child tests were ignored]]></message>
+    </reason>
+    <test-suite type="Assembly" id="1227" name="AnchorDefense.PlayModeTests.dll" fullname="C:/Users/Windows11/AppData/Local/Temp/AnchorWaveValidation20261006/Library/ScriptAssemblies/AnchorDefense.PlayModeTests.dll" runstate="Runnable" testcasecount="200" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.926055" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0">
+      <properties>
+        <property name="_PID" value="50156" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+      </properties>
+      <reason>
+        <message><![CDATA[One or more child tests were ignored]]></message>
+      </reason>
+      <test-suite type="TestSuite" id="1228" name="AnchorDefense" fullname="AnchorDefense" runstate="Runnable" testcasecount="200" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.924517" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0">
+        <properties />
+        <reason>
+          <message><![CDATA[One or more child tests were ignored]]></message>
+        </reason>
+        <test-suite type="TestSuite" id="1229" name="Tests" fullname="AnchorDefense.Tests" runstate="Runnable" testcasecount="200" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.922952" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0">
+          <properties />
+          <reason>
+            <message><![CDATA[One or more child tests were ignored]]></message>
+          </reason>
+          <test-suite type="TestFixture" id="1001" name="AICommandProtocolPlayModeTests" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="169" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:43Z" end-time="2026-10-09 12:03:11Z" duration="27.920516" total="169" passed="168" failed="0" inconclusive="0" skipped="1" asserts="0">
+            <properties />
+            <reason>
+              <message><![CDATA[One or more child tests were ignored]]></message>
+            </reason>
+            <test-case id="1097" name="ActorCueUsesTheMainVisualInsteadOfASmallBaseMesh" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ActorCueUsesTheMainVisualInsteadOfASmallBaseMesh" methodname="ActorCueUsesTheMainVisualInsteadOfASmallBaseMesh" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1645520762" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.017467" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1033" name="AlreadyPurchasedGenericUpgradeReportsCompletionAndFreeUpgradeWorksWithoutPoints" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AlreadyPurchasedGenericUpgradeReportsCompletionAndFreeUpgradeWorksWithoutPoints" methodname="AlreadyPurchasedGenericUpgradeReportsCompletionAndFreeUpgradeWorksWithoutPoints" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="158309242" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.020657" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1100" name="AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" methodname="AttackAnimationFreezesOnPauseAndReleasesItsMeshesWithTheMarker" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1122325912" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.095483" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1099" name="AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" methodname="AttackVolumeFormsAtTheRealBoundsThenCollapsesAndDisables" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="783376573" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.005830" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1065" name="AutomaticCombinationSharesOneTargetAndRawSourceOrderIsEnforced" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.AutomaticCombinationSharesOneTargetAndRawSourceOrderIsEnforced" methodname="AutomaticCombinationSharesOneTargetAndRawSourceOrderIsEnforced" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1446474067" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.006698" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1170" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.012089" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1164" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Happy)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Happy)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="63231556" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.007167" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1165" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Helpless)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Helpless)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="982253827" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001184" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1166" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Worried)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Worried)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="725456238" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.000650" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1167" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Thinking)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Thinking)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="104484597" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.000545" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1168" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Curious)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Curious)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2024499436" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.000447" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1169" name="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Neutral)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatPublishesReplyEmotionRatherThanPlayerInputEmotion(Neutral)" methodname="ChatPublishesReplyEmotionRatherThanPlayerInputEmotion" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1231043659" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.000431" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1183" name="ChatterCyclesThroughJokesLoreAndEncouragementWithShortIntervals" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ChatterCyclesThroughJokesLoreAndEncouragementWithShortIntervals" methodname="ChatterCyclesThroughJokesLoreAndEncouragementWithShortIntervals" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="772820195" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.002390" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1015" name="CombinedCostsAreCheckedBeforeEitherAttackOrPurchase" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CombinedCostsAreCheckedBeforeEitherAttackOrPurchase" methodname="CombinedCostsAreCheckedBeforeEitherAttackOrPurchase" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="138623892" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001521" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1111" name="CompanionBubbleTypesThenKeepsFullReadingTime" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionBubbleTypesThenKeepsFullReadingTime" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.203746" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1109" name="CompanionBubbleTypesThenKeepsFullReadingTime(&quot;一起守护星球，我们能赢！&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionBubbleTypesThenKeepsFullReadingTime(&quot;一起守护星球，我们能赢！&quot;)" methodname="CompanionBubbleTypesThenKeepsFullReadingTime" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="897152482" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.194867" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1110" name="CompanionBubbleTypesThenKeepsFullReadingTime(&quot;Together we can protect our planet!&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionBubbleTypesThenKeepsFullReadingTime(&quot;Together we can protect our planet!&quot;)" methodname="CompanionBubbleTypesThenKeepsFullReadingTime" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1354631589" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.008111" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1119" name="CompanionChatIsFreeAndHistoryContainsActualPlayerAndAssistantText" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionChatIsFreeAndHistoryContainsActualPlayerAndAssistantText" methodname="CompanionChatIsFreeAndHistoryContainsActualPlayerAndAssistantText" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1431517056" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001689" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1117" name="CompanionDeclineReleasesOnlyItsPauseAndWorksAfterNetworkFailure" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionDeclineReleasesOnlyItsPauseAndWorksAfterNetworkFailure" methodname="CompanionDeclineReleasesOnlyItsPauseAndWorksAfterNetworkFailure" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="517661306" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.002029" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1122" name="CompanionDiscardsRecommendationThatBecameUnaffordableInFlight" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionDiscardsRecommendationThatBecameUnaffordableInFlight" methodname="CompanionDiscardsRecommendationThatBecameUnaffordableInFlight" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="899873861" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.005157" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1123" name="CompanionFollowingRecommendationProducesEncouragement" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionFollowingRecommendationProducesEncouragement" methodname="CompanionFollowingRecommendationProducesEncouragement" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1887146886" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001000" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1125" name="CompanionGameOverDiscardsLatePlayerResponse" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionGameOverDiscardsLatePlayerResponse" methodname="CompanionGameOverDiscardsLatePlayerResponse" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1784270257" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001698" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1120" name="CompanionJsonEnvelopeKeepsExistingCommandValidation" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionJsonEnvelopeKeepsExistingCommandValidation" methodname="CompanionJsonEnvelopeKeepsExistingCommandValidation" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1935577773" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.003547" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1126" name="CompanionLiveDeepSeekSmoke" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionLiveDeepSeekSmoke" methodname="CompanionLiveDeepSeekSmoke" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Explicit" seed="1336503372" result="Skipped" label="Ignored" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.003006" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="_SKIPREASON" value="Paid DeepSeek smoke test: only run with explicit developer authorization." />
+              </properties>
+              <reason>
+                <message><![CDATA[Paid API is disabled in automatic test runs.]]></message>
+              </reason>
+            </test-case>
+            <test-case id="1115" name="CompanionNoCandidatesSkipsRecommendationAndRejectsInventedNode" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionNoCandidatesSkipsRecommendationAndRejectsInventedNode" methodname="CompanionNoCandidatesSkipsRecommendationAndRejectsInventedNode" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2144197225" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.001951" asserts="0">
+              <properties />
+              <output><![CDATA[[Companion] 主动对话：闲聊已到期；距上次回复 62 秒；闲聊剩余 0.0 秒；最近结果：尚未请求
+]]></output>
+            </test-case>
+            <test-case id="1124" name="CompanionPauseDoesNotAccumulateChatterAndNewRunHasNoHistory" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionPauseDoesNotAccumulateChatterAndNewRunHasNoHistory" methodname="CompanionPauseDoesNotAccumulateChatterAndNewRunHasNoHistory" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2027241725" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.000701" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1118" name="CompanionPreemptsStaleChatterAndRejectsAmbiguousRescueAnswer" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionPreemptsStaleChatterAndRejectsAmbiguousRescueAnswer" methodname="CompanionPreemptsStaleChatterAndRejectsAmbiguousRescueAnswer" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="129325326" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:44Z" duration="0.002484" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1107" name="CompanionPrefabRendersChineseAndEnglishAcrossAspectRatios" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionPrefabRendersChineseAndEnglishAcrossAspectRatios" methodname="CompanionPrefabRendersChineseAndEnglishAcrossAspectRatios" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1106695097" result="Passed" start-time="2026-10-09 12:02:44Z" end-time="2026-10-09 12:02:52Z" duration="7.885153" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1121" name="CompanionRecommendationExpiresAndFailedPurchaseNeverConsumesFeedback" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionRecommendationExpiresAndFailedPurchaseNeverConsumesFeedback" methodname="CompanionRecommendationExpiresAndFailedPurchaseNeverConsumesFeedback" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="570844669" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.002263" asserts="0">
+              <properties />
+              <output><![CDATA[[Companion] 主动对话：玩家输入框仍然打开；距上次回复 61 秒；闲聊剩余 0.0 秒；最近结果：已送入显示：Recommendation
+]]></output>
+            </test-case>
+            <test-case id="1114" name="CompanionRecommendsOnlyAffordableNodesAndEvaluatesOnePurchase" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionRecommendsOnlyAffordableNodesAndEvaluatesOnePurchase" methodname="CompanionRecommendsOnlyAffordableNodesAndEvaluatesOnePurchase" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1414224453" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.001110" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1116" name="CompanionRescueClearsActorsOnceWithoutRewardsOrHealing" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CompanionRescueClearsActorsOnceWithoutRewardsOrHealing" methodname="CompanionRescueClearsActorsOnceWithoutRewardsOrHealing" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1966013953" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.086775" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1149" name="ConversationGuardSeparatesInformationFromAction" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.008437" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1134" name="ConversationGuardSeparatesInformationFromAction(&quot;Tell me about the alien invaders&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Tell me about the alien invaders&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1711917990" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.001058" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1135" name="ConversationGuardSeparatesInformationFromAction(&quot;Can you tell me about the alien invaders?&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Can you tell me about the alien invaders?&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="251945293" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000513" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1136" name="ConversationGuardSeparatesInformationFromAction(&quot;Please explain how to rotate the rings&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Please explain how to rotate the rings&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="725590510" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000449" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1137" name="ConversationGuardSeparatesInformationFromAction(&quot;How do I attack C01?&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;How do I attack C01?&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1563276838" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000436" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1138" name="ConversationGuardSeparatesInformationFromAction(&quot;What does the turret upgrade do?&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;What does the turret upgrade do?&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="409087149" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000436" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1139" name="ConversationGuardSeparatesInformationFromAction(&quot;给我介绍一下外星入侵者&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;给我介绍一下外星入侵者&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1544513675" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000434" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1140" name="ConversationGuardSeparatesInformationFromAction(&quot;告诉我怎么攻击 C01&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;告诉我怎么攻击 C01&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1681749882" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000426" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1141" name="ConversationGuardSeparatesInformationFromAction(&quot;讲个笑话&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;讲个笑话&quot;,True)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1936504998" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000433" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1142" name="ConversationGuardSeparatesInformationFromAction(&quot;Can you take over the rings?&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Can you take over the rings?&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="849930245" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000438" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1143" name="ConversationGuardSeparatesInformationFromAction(&quot;Attack C01 and heal C02&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Attack C01 and heal C02&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1388014075" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000434" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1144" name="ConversationGuardSeparatesInformationFromAction(&quot;帮我接管所有轨道&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;帮我接管所有轨道&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1221667352" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000435" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1145" name="ConversationGuardSeparatesInformationFromAction(&quot;升级炮塔&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;升级炮塔&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="805324148" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000425" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1146" name="ConversationGuardSeparatesInformationFromAction(&quot;Tell me about the aliens, then rotate the first ring&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Tell me about the aliens, then rotate the first ring&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="788886839" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000450" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1147" name="ConversationGuardSeparatesInformationFromAction(&quot;Tell me a joke and attack C01&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;Tell me a joke and attack C01&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="297220570" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000443" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1148" name="ConversationGuardSeparatesInformationFromAction(&quot;介绍一下敌人，然后攻击 C01&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationGuardSeparatesInformationFromAction(&quot;介绍一下敌人，然后攻击 C01&quot;,False)" methodname="ConversationGuardSeparatesInformationFromAction" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="894044269" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.000446" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1156" name="ConversationRetryCannotPublishAfterGameEnds" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ConversationRetryCannotPublishAfterGameEnds" methodname="ConversationRetryCannotPublishAfterGameEnds" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="406143320" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.002354" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1112" name="CourierInputRemainsReadableWhileTypingAndAfterReopening" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CourierInputRemainsReadableWhileTypingAndAfterReopening" methodname="CourierInputRemainsReadableWhileTypingAndAfterReopening" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1442780304" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.036103" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1108" name="CourierRescueShowsCatAndChoicesAndDeclinesWithoutStuckPause" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.CourierRescueShowsCatAndChoicesAndDeclinesWithoutStuckPause" methodname="CourierRescueShowsCatAndChoicesAndDeclinesWithoutStuckPause" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="386757417" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:52Z" duration="0.016820" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1096" name="DeferredFailureReportsPartialExecutionAndCancelsTheRemainingRing" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.DeferredFailureReportsPartialExecutionAndCancelsTheRemainingRing" methodname="DeferredFailureReportsPartialExecutionAndCancelsTheRemainingRing" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2082792622" result="Passed" start-time="2026-10-09 12:02:52Z" end-time="2026-10-09 12:02:53Z" duration="0.703449" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[InvalidOperationException: 测试激活失败
+]]></output>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1074" name="DensityPhrasingSelectsEnemyCount" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.DensityPhrasingSelectsEnemyCount" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.002109" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1072" name="DensityPhrasingSelectsEnemyCount(&quot;攻击最密集的地方&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.DensityPhrasingSelectsEnemyCount(&quot;攻击最密集的地方&quot;)" methodname="DensityPhrasingSelectsEnemyCount" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="34686615" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001002" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1073" name="DensityPhrasingSelectsEnemyCount(&quot;Attack the most crowded area&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.DensityPhrasingSelectsEnemyCount(&quot;Attack the most crowded area&quot;)" methodname="DensityPhrasingSelectsEnemyCount" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="933741391" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.000688" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1005" name="DynamicCatalogIncludesFreshNodeCostsStatesAndRequirementsInPrompt" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.DynamicCatalogIncludesFreshNodeCostsStatesAndRequirementsInPrompt" methodname="DynamicCatalogIncludesFreshNodeCostsStatesAndRequirementsInPrompt" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1720289121" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.002234" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1163" name="EmotionMetadataIsOptionalAndDoesNotRelaxCommandEnvelope" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EmotionMetadataIsOptionalAndDoesNotRelaxCommandEnvelope" methodname="EmotionMetadataIsOptionalAndDoesNotRelaxCommandEnvelope" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="23024761" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.000943" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1152" name="EnemyQuestionUsesChatPromptAndIsFree" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyQuestionUsesChatPromptAndIsFree" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.002653" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1150" name="EnemyQuestionUsesChatPromptAndIsFree(&quot;Tell me about the alien invaders&quot;,English)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyQuestionUsesChatPromptAndIsFree(&quot;Tell me about the alien invaders&quot;,English)" methodname="EnemyQuestionUsesChatPromptAndIsFree" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="423106965" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001559" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1151" name="EnemyQuestionUsesChatPromptAndIsFree(&quot;介绍一下外星入侵者&quot;,SimplifiedChinese)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyQuestionUsesChatPromptAndIsFree(&quot;介绍一下外星入侵者&quot;,SimplifiedChinese)" methodname="EnemyQuestionUsesChatPromptAndIsFree" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="333725157" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.000653" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1071" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.014433" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1066" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击最密集的地方&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击最密集的地方&quot;)" methodname="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1035114236" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.006253" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1067" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击敌人最集中的位置&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击敌人最集中的位置&quot;)" methodname="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="834670377" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.002150" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1068" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;Attack the most crowded area&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;Attack the most crowded area&quot;)" methodname="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1413724975" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001853" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1069" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;Attack the densest cluster&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;Attack the densest cluster&quot;)" methodname="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="734047106" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001672" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1070" name="EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击敌人&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnemyTargetCountWinsOverOutsidePressureAndModelGuess(&quot;攻击敌人&quot;)" methodname="EnemyTargetCountWinsOverOutsidePressureAndModelGuess" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1033215441" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001592" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1047" name="EnglishContinuousRingCommandKeepsTurningUntilStopped" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnglishContinuousRingCommandKeepsTurningUntilStopped" methodname="EnglishContinuousRingCommandKeepsTurningUntilStopped" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1882460084" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.602141" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1044" name="EnglishInputStillWorksWithChineseInterface" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnglishInputStillWorksWithChineseInterface" methodname="EnglishInputStillWorksWithChineseInterface" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1276714512" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001633" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1043" name="EnglishRequestUsesEnglishPromptAndExecutesExistingZoneSkill" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnglishRequestUsesEnglishPromptAndExecutesExistingZoneSkill" methodname="EnglishRequestUsesEnglishPromptAndExecutesExistingZoneSkill" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1647637870" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001143" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1046" name="EnglishSpatialAndSelectionWordsAreRecognizedLocally" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnglishSpatialAndSelectionWordsAreRecognizedLocally" methodname="EnglishSpatialAndSelectionWordsAreRecognizedLocally" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="796795436" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.000911" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1045" name="EnglishUpgradeAndRingControlKeepExistingCostsAndSafety" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EnglishUpgradeAndRingControlKeepExistingCostsAndSafety" methodname="EnglishUpgradeAndRingControlKeepExistingCostsAndSafety" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="943691165" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001260" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1075" name="EveryGroupContributesToTheGlobalOperationLimit" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.EveryGroupContributesToTheGlobalOperationLimit" methodname="EveryGroupContributesToTheGlobalOperationLimit" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1188120412" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.000905" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1179" name="ExpiredRecommendationIsNotRevivedFromTheDisplayQueue" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ExpiredRecommendationIsNotRevivedFromTheDisplayQueue" methodname="ExpiredRecommendationIsNotRevivedFromTheDisplayQueue" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1970499960" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.007784" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1190" name="FailedAndRejectedChatterExposeDifferentDiagnosticReasons" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedAndRejectedChatterExposeDifferentDiagnosticReasons" methodname="FailedAndRejectedChatterExposeDifferentDiagnosticReasons" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1108772669" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:53Z" duration="0.001335" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1018" name="FailedAttackAfterSuccessfulPurchaseRefundsOnlyUnusedCommandFee" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedAttackAfterSuccessfulPurchaseRefundsOnlyUnusedCommandFee" methodname="FailedAttackAfterSuccessfulPurchaseRefundsOnlyUnusedCommandFee" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1746657208" result="Passed" start-time="2026-10-09 12:02:53Z" end-time="2026-10-09 12:02:54Z" duration="0.402716" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[InvalidOperationException: 测试激活失败
+]]></output>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1131" name="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.012943" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1127" name="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;network&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;network&quot;)" methodname="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1102365690" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.004451" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1128" name="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;invalid_json&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;invalid_json&quot;)" methodname="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1542302943" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.002168" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1129" name="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;long_text&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;long_text&quot;)" methodname="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1852917965" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.001758" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1130" name="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;exception&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOptionalCommentaryCannotOverwriteSuccessfulExecution(&quot;exception&quot;)" methodname="FailedOptionalCommentaryCannotOverwriteSuccessfulExecution" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="893115465" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.003867" asserts="0">
+                <properties />
+                <output><![CDATA[Companion request failed: InvalidOperationException
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-case id="1132" name="FailedOriginalRequestStillReportsAnErrorWithoutExecuting" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedOriginalRequestStillReportsAnErrorWithoutExecuting" methodname="FailedOriginalRequestStillReportsAnErrorWithoutExecuting" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="804641831" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.001328" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1186" name="FailedWorldLoreTurnIsRetriedInsteadOfSkipped" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedWorldLoreTurnIsRetriedInsteadOfSkipped" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.002743" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1184" name="FailedWorldLoreTurnIsRetriedInsteadOfSkipped(False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedWorldLoreTurnIsRetriedInsteadOfSkipped(False)" methodname="FailedWorldLoreTurnIsRetriedInsteadOfSkipped" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="723431328" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.001216" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1185" name="FailedWorldLoreTurnIsRetriedInsteadOfSkipped(True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailedWorldLoreTurnIsRetriedInsteadOfSkipped(True)" methodname="FailedWorldLoreTurnIsRetriedInsteadOfSkipped" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1739835023" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.000674" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1095" name="FailureBeforeFirstActivationRefundsTheCharge" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FailureBeforeFirstActivationRefundsTheCharge" methodname="FailureBeforeFirstActivationRefundsTheCharge" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="642974688" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:54Z" duration="0.002504" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: 测试激活失败
+]]></output>
+            </test-case>
+            <test-case id="1089" name="FiniteRotationCompletesThreeStepsAndStops" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FiniteRotationCompletesThreeStepsAndStops" methodname="FiniteRotationCompletesThreeStepsAndStops" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="26911916" result="Passed" start-time="2026-10-09 12:02:54Z" end-time="2026-10-09 12:02:56Z" duration="2.702354" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1113" name="FirstSightingWaitsForConversationAndFallsBackWhenProviderFails" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.FirstSightingWaitsForConversationAndFallsBackWhenProviderFails" methodname="FirstSightingWaitsForConversationAndFallsBackWhenProviderFails" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="500713993" result="Passed" start-time="2026-10-09 12:02:56Z" end-time="2026-10-09 12:02:56Z" duration="0.009945" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1088" name="ForgedOrNegationStrippedSourceCannotExecute" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ForgedOrNegationStrippedSourceCannotExecute" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:56Z" end-time="2026-10-09 12:02:56Z" duration="0.002314" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1086" name="ForgedOrNegationStrippedSourceCannotExecute(&quot;攻击 C01&quot;,&quot;治疗 C01&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ForgedOrNegationStrippedSourceCannotExecute(&quot;攻击 C01&quot;,&quot;治疗 C01&quot;)" methodname="ForgedOrNegationStrippedSourceCannotExecute" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="251903978" result="Passed" start-time="2026-10-09 12:02:56Z" end-time="2026-10-09 12:02:56Z" duration="0.001016" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1087" name="ForgedOrNegationStrippedSourceCannotExecute(&quot;不要攻击 C01&quot;,&quot;攻击 C01&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ForgedOrNegationStrippedSourceCannotExecute(&quot;不要攻击 C01&quot;,&quot;攻击 C01&quot;)" methodname="ForgedOrNegationStrippedSourceCannotExecute" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="215128393" result="Passed" start-time="2026-10-09 12:02:56Z" end-time="2026-10-09 12:02:56Z" duration="0.000731" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1093" name="GameOverCancelsQueuedCommandsBeforeTheyActivate" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.GameOverCancelsQueuedCommandsBeforeTheyActivate" methodname="GameOverCancelsQueuedCommandsBeforeTheyActivate" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1332813426" result="Passed" start-time="2026-10-09 12:02:56Z" end-time="2026-10-09 12:02:57Z" duration="0.401729" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1157" name="GameplayAfterConversationStillUsesPlannerAndChargesOnce" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.GameplayAfterConversationStillUsesPlannerAndChargesOnce" methodname="GameplayAfterConversationStillUsesPlannerAndChargesOnce" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="217819590" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.002763" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1004" name="GenericUpgradeRecoversModelRejectionAndChoosesCheapestAvailableConfiguredNode" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.GenericUpgradeRecoversModelRejectionAndChoosesCheapestAvailableConfiguredNode" methodname="GenericUpgradeRecoversModelRejectionAndChoosesCheapestAvailableConfiguredNode" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1853904516" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.001706" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1103" name="HealingCueOnlyAppearsWhenHealthActuallyIncreasesAndCleansUpWithTheField" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.HealingCueOnlyAppearsWhenHealthActuallyIncreasesAndCleansUpWithTheField" methodname="HealingCueOnlyAppearsWhenHealthActuallyIncreasesAndCleansUpWithTheField" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="211127865" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.252530" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1180" name="HistoryAndRescueHoldQueuedSpeechAndLanguageChangeClearsIt" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.HistoryAndRescueHoldQueuedSpeechAndLanguageChangeClearsIt" methodname="HistoryAndRescueHoldQueuedSpeechAndLanguageChangeClearsIt" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1760200065" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.012652" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1104" name="HitFlashSurvivesADeadEnemyButExpiresPromptly" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.HitFlashSurvivesADeadEnemyButExpiresPromptly" methodname="HitFlashSurvivesADeadEnemyButExpiresPromptly" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="603248396" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.402494" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1083" name="InvalidLastTargetPreventsAllExecutionAndSpending" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InvalidLastTargetPreventsAllExecutionAndSpending" methodname="InvalidLastTargetPreventsAllExecutionAndSpending" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1240055443" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.001220" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1079" name="InvalidRingNumbersAnglesAndCountsAreRejected" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InvalidRingNumbersAnglesAndCountsAreRejected" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.002930" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1076" name="InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第四星环转45度&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第四星环转45度&quot;)" methodname="InvalidRingNumbersAnglesAndCountsAreRejected" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2101759898" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.001166" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1077" name="InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第一星环转1045度&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第一星环转1045度&quot;)" methodname="InvalidRingNumbersAnglesAndCountsAreRejected" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1013273323" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.000627" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1078" name="InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第一星环转21次&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InvalidRingNumbersAnglesAndCountsAreRejected(&quot;第一星环转21次&quot;)" methodname="InvalidRingNumbersAnglesAndCountsAreRejected" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="380340411" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.000534" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1091" name="InventedRepeatCountAndRingConflictsAreRejectedBeforeSpending" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.InventedRepeatCountAndRingConflictsAreRejectedBeforeSpending" methodname="InventedRepeatCountAndRingConflictsAreRejectedBeforeSpending" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="297261746" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:57Z" duration="0.001834" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1177" name="JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:57Z" end-time="2026-10-09 12:02:58Z" duration="0.025574" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1175" name="JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor(True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor(True)" methodname="JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1080823634" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.011993" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1176" name="JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor(False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor(False)" methodname="JokeAndRecommendationWaitForEachOtherAndUseTheirOwnPaperColor" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="86082144" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.013162" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1002" name="JsonAcceptsUpgradeAndRegionSelectorsButRejectsCrossTypeParameters" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.JsonAcceptsUpgradeAndRegionSelectorsButRejectsCrossTypeParameters" methodname="JsonAcceptsUpgradeAndRegionSelectorsButRejectsCrossTypeParameters" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="680630712" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.001037" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1049" name="JsonRejectsUnknownNestedFieldsDuplicateKeysAndNonEmptyReservedSkills" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.JsonRejectsUnknownNestedFieldsDuplicateKeysAndNonEmptyReservedSkills" methodname="JsonRejectsUnknownNestedFieldsDuplicateKeysAndNonEmptyReservedSkills" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2019113004" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.000818" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1042" name="LanguageChoiceIsSavedWithoutResettingOtherSettings" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.LanguageChoiceIsSavedWithoutResettingOtherSettings" methodname="LanguageChoiceIsSavedWithoutResettingOtherSettings" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="391630984" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.001141" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1101" name="LegacyCartoonBadgeStaysHiddenAfterSkillActivation" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.LegacyCartoonBadgeStaysHiddenAfterSkillActivation" methodname="LegacyCartoonBadgeStaysHiddenAfterSkillActivation" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="454358162" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.001446" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1012" name="LockedPurchasedAndUnaffordableUpgradesGiveSpecificFeedbackWithoutSpending" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.LockedPurchasedAndUnaffordableUpgradesGiveSpecificFeedbackWithoutSpending" methodname="LockedPurchasedAndUnaffordableUpgradesGiveSpecificFeedbackWithoutSpending" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="706496212" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.001609" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1017" name="LockedSkillCannotExecuteWithoutAnEarlierUnlockPurchase" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.LockedSkillCannotExecuteWithoutAnEarlierUnlockPurchase" methodname="LockedSkillCannotExecuteWithoutAnEarlierUnlockPurchase" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1754904462" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.000952" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1172" name="LongReplyKeepsCompactSizeAndScrollsToTheFinalLine" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.LongReplyKeepsCompactSizeAndScrollsToTheFinalLine" methodname="LongReplyKeepsCompactSizeAndScrollsToTheFinalLine" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="367457630" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:58Z" duration="0.031070" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1090" name="ManualControlInterruptsFiniteRotation" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ManualControlInterruptsFiniteRotation" methodname="ManualControlInterruptsFiniteRotation" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1346836198" result="Passed" start-time="2026-10-09 12:02:58Z" end-time="2026-10-09 12:02:59Z" duration="1.202982" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1106" name="MarkerWaitsForTheActualSecondRegionActivationAcrossAnInterleavedRing" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MarkerWaitsForTheActualSecondRegionActivationAcrossAnInterleavedRing" methodname="MarkerWaitsForTheActualSecondRegionActivationAcrossAnInterleavedRing" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1217180352" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:02:59Z" duration="0.652331" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1155" name="MisclassifiedQuestionRetriesOnceAndNeverExecutes" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MisclassifiedQuestionRetriesOnceAndNeverExecutes" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:02:59Z" duration="0.003501" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1153" name="MisclassifiedQuestionRetriesOnceAndNeverExecutes(False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MisclassifiedQuestionRetriesOnceAndNeverExecutes(False)" methodname="MisclassifiedQuestionRetriesOnceAndNeverExecutes" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="351347160" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:02:59Z" duration="0.002021" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1154" name="MisclassifiedQuestionRetriesOnceAndNeverExecutes(True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MisclassifiedQuestionRetriesOnceAndNeverExecutes(True)" methodname="MisclassifiedQuestionRetriesOnceAndNeverExecutes" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="232506861" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:02:59Z" duration="0.000831" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1187" name="MissingChatterSequenceStillIncludesWorldLore" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MissingChatterSequenceStillIncludesWorldLore" methodname="MissingChatterSequenceStillIncludesWorldLore" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="260665497" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:02:59Z" duration="0.000939" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1082" name="MixedCommandsPreserveOrderAndDistinctRingTargets" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MixedCommandsPreserveOrderAndDistinctRingTargets" methodname="MixedCommandsPreserveOrderAndDistinctRingTargets" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1854741397" result="Passed" start-time="2026-10-09 12:02:59Z" end-time="2026-10-09 12:03:00Z" duration="0.901804" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1040" name="ModelRegionMisclassificationOfAnUpgradeDoesNotCreateARegionField" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ModelRegionMisclassificationOfAnUpgradeDoesNotCreateARegionField" methodname="ModelRegionMisclassificationOfAnUpgradeDoesNotCreateARegionField" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="876122233" result="Passed" start-time="2026-10-09 12:03:00Z" end-time="2026-10-09 12:03:00Z" duration="0.001986" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1039" name="ModelRingMisclassificationOfAnUpgradeRecoversOnlyTheNativePurchase" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ModelRingMisclassificationOfAnUpgradeRecoversOnlyTheNativePurchase" methodname="ModelRingMisclassificationOfAnUpgradeRecoversOnlyTheNativePurchase" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="683673957" result="Passed" start-time="2026-10-09 12:03:00Z" end-time="2026-10-09 12:03:00Z" duration="0.001521" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1023" name="MostDenseRawIntentOverridesModelPressureAndCannotBeOmittedFromSource" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MostDenseRawIntentOverridesModelPressureAndCannotBeOmittedFromSource" methodname="MostDenseRawIntentOverridesModelPressureAndCannotBeOmittedFromSource" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1825992811" result="Passed" start-time="2026-10-09 12:03:00Z" end-time="2026-10-09 12:03:00Z" duration="0.001846" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1094" name="MultiTargetAttackSharesOneDamageBudget" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MultiTargetAttackSharesOneDamageBudget" methodname="MultiTargetAttackSharesOneDamageBudget" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="925717689" result="Passed" start-time="2026-10-09 12:03:00Z" end-time="2026-10-09 12:03:01Z" duration="0.402321" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1080" name="MultiTargetOperationsKeepTheirTargetsAndSpendOnce" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.MultiTargetOperationsKeepTheirTargetsAndSpendOnce" methodname="MultiTargetOperationsKeepTheirTargetsAndSpendOnce" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="306965039" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.402425" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1041" name="NativePurchaseEffectFailureReportsCommittedNodeAndRefundsUnusedSkillFee" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.NativePurchaseEffectFailureReportsCommittedNodeAndRefundsUnusedSkillFee" methodname="NativePurchaseEffectFailureReportsCommittedNodeAndRefundsUnusedSkillFee" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="187188043" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.003218" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: 测试升级效果失败
+]]></output>
+            </test-case>
+            <test-case id="1048" name="NewJsonParsesNestedOperationsAndNullableCounts" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.NewJsonParsesNestedOperationsAndNullableCounts" methodname="NewJsonParsesNestedOperationsAndNullableCounts" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1916539915" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.001260" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1092" name="OldSingleTargetProtocolRemainsUsableWithPlayerTargetPrecedence" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.OldSingleTargetProtocolRemainsUsableWithPlayerTargetPrecedence" methodname="OldSingleTargetProtocolRemainsUsableWithPlayerTargetPrecedence" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1111115346" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.000988" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1188" name="ParkedMouseCannotKeepTheBubbleAndConversationLockedForever" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ParkedMouseCannotKeepTheBubbleAndConversationLockedForever" methodname="ParkedMouseCannotKeepTheBubbleAndConversationLockedForever" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1851061218" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.007395" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1178" name="PlayerReplyInterruptsButRetainsUnfinishedAmbientMessage" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PlayerReplyInterruptsButRetainsUnfinishedAmbientMessage" methodname="PlayerReplyInterruptsButRetainsUnfinishedAmbientMessage" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="18343902" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.012622" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1173" name="PortraitCanBeResetBeforeAwakeWithoutBecomingInvisible" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PortraitCanBeResetBeforeAwakeWithoutBecomingInvisible" methodname="PortraitCanBeResetBeforeAwakeWithoutBecomingInvisible" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="542823990" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:01Z" duration="0.003432" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1171" name="PortraitHoldsEmotionThroughReadingAndTransitionsSettle" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PortraitHoldsEmotionThroughReadingAndTransitionsSettle" methodname="PortraitHoldsEmotionThroughReadingAndTransitionsSettle" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="290223318" result="Passed" start-time="2026-10-09 12:03:01Z" end-time="2026-10-09 12:03:03Z" duration="1.885138" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[The character with Unicode value \u7B3A was not found in the [AnchorChineseTMP] font asset or any potential fallbacks. It was replaced by Unicode character \u25A1 in text object [Label].
+]]></output>
+            </test-case>
+            <test-case id="1174" name="PortraitRecoversAnAlreadyCollapsedInstance" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PortraitRecoversAnAlreadyCollapsedInstance" methodname="PortraitRecoversAnAlreadyCollapsedInstance" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2044319559" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.001572" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1013" name="PrerequisitesCanBePurchasedEarlierInTheSameOrderedPlan" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PrerequisitesCanBePurchasedEarlierInTheSameOrderedPlan" methodname="PrerequisitesCanBePurchasedEarlierInTheSameOrderedPlan" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1814842128" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.402559" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1162" name="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.007123" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1158" name="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(True,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(True,False)" methodname="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="547697107" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.002789" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1159" name="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(False,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(False,False)" methodname="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1611338967" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.001104" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1160" name="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(True,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(True,True)" methodname="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="182654836" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.000965" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1161" name="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(False,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline(False,True)" methodname="PurchaseEmotionUsesActualChoiceEvenWithWrongModelEmotionOrOffline" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="296564479" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:03Z" duration="0.001272" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1085" name="PureMultiRingStopIsFreeWithNoPoints" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PureMultiRingStopIsFreeWithNoPoints" methodname="PureMultiRingStopIsFreeWithNoPoints" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="700674863" result="Passed" start-time="2026-10-09 12:03:03Z" end-time="2026-10-09 12:03:04Z" duration="0.402721" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="PureUpgradeUsesNativeCostAndEffectsWithoutCommandFeeOrSkills" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.PureUpgradeUsesNativeCostAndEffectsWithoutCommandFeeOrSkills" methodname="PureUpgradeUsesNativeCostAndEffectsWithoutCommandFeeOrSkills" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1192911914" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.002931" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1181" name="ReadingLocksAutomaticRequestsUntilTheBubbleIsFinished" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ReadingLocksAutomaticRequestsUntilTheBubbleIsFinished" methodname="ReadingLocksAutomaticRequestsUntilTheBubbleIsFinished" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1726086388" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001492" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1182" name="RecommendationDoesNotResetChatterAndOverdueJokeGetsTheNextTurn" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RecommendationDoesNotResetChatterAndOverdueJokeGetsTheNextTurn" methodname="RecommendationDoesNotResetChatterAndOverdueJokeGetsTheNextTurn" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1101617379" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001119" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1022" name="RegionSelectorsUseIndependentExactMetrics" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RegionSelectorsUseIndependentExactMetrics" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.006727" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1019" name="RegionSelectorsUseIndependentExactMetrics(&quot;enemy_count&quot;,&quot;desc&quot;,0)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RegionSelectorsUseIndependentExactMetrics(&quot;enemy_count&quot;,&quot;desc&quot;,0)" methodname="RegionSelectorsUseIndependentExactMetrics" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2146800886" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.002777" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1020" name="RegionSelectorsUseIndependentExactMetrics(&quot;enemy_count&quot;,&quot;asc&quot;,1)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RegionSelectorsUseIndependentExactMetrics(&quot;enemy_count&quot;,&quot;asc&quot;,1)" methodname="RegionSelectorsUseIndependentExactMetrics" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="658049120" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001487" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1021" name="RegionSelectorsUseIndependentExactMetrics(&quot;enemy_pressure&quot;,&quot;desc&quot;,1)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RegionSelectorsUseIndependentExactMetrics(&quot;enemy_pressure&quot;,&quot;desc&quot;,1)" methodname="RegionSelectorsUseIndependentExactMetrics" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1779206335" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001342" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1105" name="ReusingAPooledEnemyInvalidatesItsPreviousStatusCue" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ReusingAPooledEnemyInvalidatesItsPreviousStatusCue" methodname="ReusingAPooledEnemyInvalidatesItsPreviousStatusCue" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1022241750" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.002581" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="ReversePrerequisiteOrderAndRepeatedUpgradeRejectTheWholePlan" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ReversePrerequisiteOrderAndRepeatedUpgradeRejectTheWholePlan" methodname="ReversePrerequisiteOrderAndRepeatedUpgradeRejectTheWholePlan" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1463327573" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001193" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1032" name="RingCapacityUpgradeValidatesTheRingAndNeverRotates" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingCapacityUpgradeValidatesTheRingAndNeverRotates" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.004043" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1030" name="RingCapacityUpgradeValidatesTheRingAndNeverRotates(True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingCapacityUpgradeValidatesTheRingAndNeverRotates(True)" methodname="RingCapacityUpgradeValidatesTheRingAndNeverRotates" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="656514452" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.002590" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1031" name="RingCapacityUpgradeValidatesTheRingAndNeverRotates(False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingCapacityUpgradeValidatesTheRingAndNeverRotates(False)" methodname="RingCapacityUpgradeValidatesTheRingAndNeverRotates" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="972222023" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001027" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1058" name="RingIntentRequiresAnActualControlVerb" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.006918" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1050" name="RingIntentRequiresAnActualControlVerb(&quot;攻击轨道附近的敌人&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;攻击轨道附近的敌人&quot;,False)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="734550160" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000902" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1051" name="RingIntentRequiresAnActualControlVerb(&quot;在区域减速并控制敌人&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;在区域减速并控制敌人&quot;,False)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="715574133" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000786" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1052" name="RingIntentRequiresAnActualControlVerb(&quot;治疗第一轨道附近的炮塔&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;治疗第一轨道附近的炮塔&quot;,False)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1278473162" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000723" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1053" name="RingIntentRequiresAnActualControlVerb(&quot;攻击第一轨道转角处的敌人&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;攻击第一轨道转角处的敌人&quot;,False)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1832871874" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000748" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1054" name="RingIntentRequiresAnActualControlVerb(&quot;攻击旋转的轨道附近的敌人&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;攻击旋转的轨道附近的敌人&quot;,False)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2065618806" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000707" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1055" name="RingIntentRequiresAnActualControlVerb(&quot;操作第一星环&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;操作第一星环&quot;,True)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1335171945" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000681" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1056" name="RingIntentRequiresAnActualControlVerb(&quot;第一轨道逆时针转90度&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;第一轨道逆时针转90度&quot;,True)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1463706957" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000765" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1057" name="RingIntentRequiresAnActualControlVerb(&quot;停止所有星环&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RingIntentRequiresAnActualControlVerb(&quot;停止所有星环&quot;,True)" methodname="RingIntentRequiresAnActualControlVerb" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2140186585" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000708" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1038" name="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.003353" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1035" name="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;I&quot;,0)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;I&quot;,0)" methodname="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="718737527" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001402" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1036" name="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;II&quot;,1)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;II&quot;,1)" methodname="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1963324967" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000749" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1037" name="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;III&quot;,2)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix(&quot;III&quot;,2)" methodname="RomanUpgradeLabelMatchesTheWholeTokenInsteadOfItsPrefix" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1627780466" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.000705" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1084" name="SameSkillCanTargetDifferentZonesButCannotDuplicateOneZone" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.SameSkillCanTargetDifferentZonesButCannotDuplicateOneZone" methodname="SameSkillCanTargetDifferentZonesButCannotDuplicateOneZone" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="743683599" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:04Z" duration="0.001219" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1098" name="ScanAndStarburstEndWhileTwinklingStarsRemainAndFadeWithTheField" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ScanAndStarburstEndWhileTwinklingStarsRemainAndFadeWithTheField" methodname="ScanAndStarburstEndWhileTwinklingStarsRemainAndFadeWithTheField" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="465099513" result="Passed" start-time="2026-10-09 12:03:04Z" end-time="2026-10-09 12:03:06Z" duration="2.152517" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1081" name="ShortLivedFieldWaitsForItsQueuedOperations" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ShortLivedFieldWaitsForItsQueuedOperations" methodname="ShortLivedFieldWaitsForItsQueuedOperations" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1022216292" result="Passed" start-time="2026-10-09 12:03:06Z" end-time="2026-10-09 12:03:07Z" duration="0.502125" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1102" name="SlowCueIsReusedAndFadesWhenTheEnemyLeavesTheField" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.SlowCueIsReusedAndFadesWhenTheEnemyLeavesTheField" methodname="SlowCueIsReusedAndFadesWhenTheEnemyLeavesTheField" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1602638056" result="Passed" start-time="2026-10-09 12:03:07Z" end-time="2026-10-09 12:03:07Z" duration="0.702538" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1064" name="SourceCannotOmitAnExplicitTargetAndTurnItIntoAutomaticSelection" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.SourceCannotOmitAnExplicitTargetAndTurnItIntoAutomaticSelection" methodname="SourceCannotOmitAnExplicitTargetAndTurnItIntoAutomaticSelection" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="431745701" result="Passed" start-time="2026-10-09 12:03:07Z" end-time="2026-10-09 12:03:07Z" duration="0.001390" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1133" name="SuccessfulCommandClosesInputEvenWhileOptionalCommentaryIsPending" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.SuccessfulCommandClosesInputEvenWhileOptionalCommentaryIsPending" methodname="SuccessfulCommandClosesInputEvenWhileOptionalCommentaryIsPending" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1846559586" result="Passed" start-time="2026-10-09 12:03:07Z" end-time="2026-10-09 12:03:11Z" duration="3.320875" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1029" name="ThenSeparatedUpgradeFallbackPreservesDependencyOrder" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.ThenSeparatedUpgradeFallbackPreservesDependencyOrder" methodname="ThenSeparatedUpgradeFallbackPreservesDependencyOrder" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="32100820" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.402137" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1028" name="TurretAndMissingHealthSelectorsUseActualActors" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TurretAndMissingHealthSelectorsUseActualActors" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.004894" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1024" name="TurretAndMissingHealthSelectorsUseActualActors(&quot;turret_count&quot;,&quot;desc&quot;,0)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TurretAndMissingHealthSelectorsUseActualActors(&quot;turret_count&quot;,&quot;desc&quot;,0)" methodname="TurretAndMissingHealthSelectorsUseActualActors" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1120003062" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001935" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1025" name="TurretAndMissingHealthSelectorsUseActualActors(&quot;turret_count&quot;,&quot;asc&quot;,1)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TurretAndMissingHealthSelectorsUseActualActors(&quot;turret_count&quot;,&quot;asc&quot;,1)" methodname="TurretAndMissingHealthSelectorsUseActualActors" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="937665332" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000885" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1026" name="TurretAndMissingHealthSelectorsUseActualActors(&quot;missing_health&quot;,&quot;desc&quot;,1)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TurretAndMissingHealthSelectorsUseActualActors(&quot;missing_health&quot;,&quot;desc&quot;,1)" methodname="TurretAndMissingHealthSelectorsUseActualActors" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="924571288" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000790" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1027" name="TurretAndMissingHealthSelectorsUseActualActors(&quot;missing_health&quot;,&quot;asc&quot;,0)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TurretAndMissingHealthSelectorsUseActualActors(&quot;missing_health&quot;,&quot;asc&quot;,0)" methodname="TurretAndMissingHealthSelectorsUseActualActors" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1616315014" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000757" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-case id="1189" name="TwentyMinuteRunWithAllUpgradesBoughtStillProducesSlightlyLongerChatter" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.TwentyMinuteRunWithAllUpgradesBoughtStillProducesSlightlyLongerChatter" methodname="TwentyMinuteRunWithAllUpgradesBoughtStillProducesSlightlyLongerChatter" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="930223163" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.017440" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1034" name="UnknownExplicitUpgradeCannotMatchTheSuffixOfAKnownId" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.UnknownExplicitUpgradeCannotMatchTheSuffixOfAKnownId" methodname="UnknownExplicitUpgradeCannotMatchTheSuffixOfAKnownId" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="2057890458" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001490" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1063" name="UnrecoverableMisclassificationDoesNotRotateOrSpend" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.UnrecoverableMisclassificationDoesNotRotateOrSpend" methodname="UnrecoverableMisclassificationDoesNotRotateOrSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="794068330" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001292" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1016" name="UpgradeCanUnlockASkillAndDoesNotReduceItsPowerBudget" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.UpgradeCanUnlockASkillAndDoesNotReduceItsPowerBudget" methodname="UpgradeCanUnlockASkillAndDoesNotReduceItsPowerBudget" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1798310649" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.402678" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="UpgradeSourceCannotEraseTheExplicitDirection" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.UpgradeSourceCannotEraseTheExplicitDirection" methodname="UpgradeSourceCannotEraseTheExplicitDirection" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1935686295" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001464" asserts="0">
+              <properties />
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1010" name="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.004076" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1006" name="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;range&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;range&quot;,False)" methodname="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1030936383" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001300" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1007" name="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;damage&quot;,True)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;damage&quot;,True)" methodname="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="874361193" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000801" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1008" name="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;不要升级炮塔伤害&quot;,&quot;damage&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;不要升级炮塔伤害&quot;,&quot;damage&quot;,False)" methodname="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1467827458" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000718" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1009" name="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;invented&quot;,False)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend(&quot;升级炮塔伤害&quot;,&quot;invented&quot;,False)" methodname="WrongDirectionNegationAndUnknownUpgradeIdsCannotSpend" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="991843398" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.000694" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1062" name="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.004639" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1059" name="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;攻击 C01&quot;,&quot;anchor_strike&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;攻击 C01&quot;,&quot;anchor_strike&quot;)" methodname="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="1444187707" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001788" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1060" name="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;治疗 C01&quot;,&quot;repair_pulse&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;治疗 C01&quot;,&quot;repair_pulse&quot;)" methodname="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="247142258" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001195" asserts="0">
+                <properties />
+              </test-case>
+              <test-case id="1061" name="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;减速 C01&quot;,&quot;slow_field&quot;)" fullname="AnchorDefense.Tests.AICommandProtocolPlayModeTests.WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill(&quot;减速 C01&quot;,&quot;slow_field&quot;)" methodname="WrongModelRingClassificationRecoversOnlyTheExplicitRegionSkill" classname="AnchorDefense.Tests.AICommandProtocolPlayModeTests" runstate="Runnable" seed="875746795" result="Passed" start-time="2026-10-09 12:03:11Z" end-time="2026-10-09 12:03:11Z" duration="0.001177" asserts="0">
+                <properties />
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

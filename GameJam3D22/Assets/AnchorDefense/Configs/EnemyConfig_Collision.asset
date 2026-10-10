@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b005f2de3d2af4e9f646374938ce14, type: 3}
+  m_Name: EnemyConfig_Collision
+  m_EditorClassIdentifier: 
+  <Prefab>k__BackingField: {fileID: 4480680133650565963, guid: 24df1557372a44cc9c6d4c96a19615a7,
+    type: 3}
+  <MaxHealth>k__BackingField: 24
+  <MoveSpeed>k__BackingField: 1.0
+  <CoreDamage>k__BackingField: 10
+  <TurretCollisionOnly>k__BackingField: 1
+  <TurretCollisionRadius>k__BackingField: 0.8
+  <WaveIcon>k__BackingField: {fileID: 21300000, guid: 6413c8d7654ba7545aa29d21138f1456, type: 3}
+  <IntroFacts>k__BackingField: Collision enemy; speed 1.0; cannot be damaged by bullets, area attacks or damage over time. Slow and push still work. Any living turret contact destroys it and awards one point; reaches core for 10 damage. Rotate or position turrets to intercept.
+  <IntroChinese>k__BackingField: 碰撞怪免疫所有伤害，但能被减速和推离。让存活炮塔碰到它才能消灭它！
+  <IntroEnglish>k__BackingField: This creature ignores all damage, but slows and pushes work. Touch it with a living turret to destroy it!
+  <AttackMode>k__BackingField: 0
+  <RangedStopRadius>k__BackingField: 10.5
+  <FireInterval>k__BackingField: 2.2
+  <ProjectileDamage>k__BackingField: 18
+  <ProjectileSpeed>k__BackingField: 8
+  <ProjectileLifetime>k__BackingField: 4
+  <ProjectileHitRadius>k__BackingField: 0.18
+  <ProjectilePrefab>k__BackingField: {fileID: 3928814468507712704, guid: 3611861485cf92942aa89325b992c2b1,
+    type: 3}
+  <ProjectileColor>k__BackingField: {r: 1, g: 0.22, b: 0.08, a: 1}
+  <OrbitRadius>k__BackingField: 13
+  <OrbitAxis>k__BackingField: {x: 0, y: 1, z: 0}
+  <OrbitHeight>k__BackingField: 0
+  <OrbitAngularSpeed>k__BackingField: 35
+  <OrbitPositionSmoothness>k__BackingField: 8
+  <OrbitProjectileFireOffset>k__BackingField: 0.85
+  <OrbitBobAmplitude>k__BackingField: 1.2
+  <OrbitBobFrequency>k__BackingField: 0.65
+  <RandomizeOrbitBobPhase>k__BackingField: 1
+  <Size>k__BackingField: 0.55
+  <BaseColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <HitColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <HitFlashDuration>k__BackingField: 0.1
+  <HitEffectPrefab>k__BackingField: {fileID: -6159039040866376367, guid: 5eff8f0e0d3965a44ac5515a2b0aa180,
+    type: 3}
+  <DeathEffectPrefab>k__BackingField: {fileID: 5660198245418926790, guid: 009079b785f659a4b90ae3917a06e3e3,
+    type: 3}

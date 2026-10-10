@@ -8,10 +8,12 @@ namespace AnchorDefense
         [SerializeField] private EnemyConfig enemy;
         [SerializeField, Min(0f)] private float spawnWeight = 1f;
         [SerializeField, Min(0)] private int prewarmCount = 16;
+        [SerializeField, Min(1)] private int firstWave = 1;
 
         public EnemyConfig Enemy => enemy;
         public float SpawnWeight => spawnWeight;
         public int PrewarmCount => prewarmCount;
+        public int FirstWave => Mathf.Max(1, firstWave);
     }
 
     [CreateAssetMenu(menuName = "Anchor Defense/Endless Mode Config", fileName = "EndlessModeConfig")]
@@ -23,16 +25,24 @@ namespace AnchorDefense
 
         [field: Header("Difficulty")]
         [field: SerializeField, Min(0.03f)] public float StartingInterval { get; private set; } = 1.05f;
-        [field: SerializeField, Min(0.03f)] public float MinimumInterval { get; private set; } = 0.12f;
-        [field: SerializeField, Min(0f)] public float IntervalDecayPerSecond { get; private set; } = 0.012f;
-        [field: SerializeField, Min(1)] public int StartingBatchSize { get; private set; } = 1;
-        [field: SerializeField, Min(1f)] public float BatchIncreaseEverySeconds { get; private set; } = 35f;
-        [field: SerializeField, Min(1)] public int MaxBatchSize { get; private set; } = 7;
-        [field: SerializeField, Min(0f)] public float HealthIncreasePerMinute { get; private set; } = 0.3f;
-        [field: SerializeField, Min(0f)] public float SpeedIncreasePerMinute { get; private set; } = 0.08f;
+        [field: SerializeField, Min(0.6f)] public float MinimumInterval { get; private set; } = 0.6f;
         [field: SerializeField, Min(1)] public int MaxAliveEnemies { get; private set; } = 350;
         [field: SerializeField, Min(0)] public int EnemyPrewarmCount { get; private set; } = 70;
         [field: SerializeField, Min(0)] public int ProjectilePrewarmCount { get; private set; } = 90;
+
+        [field: Header("Timed Waves")]
+        [field: SerializeField, Min(1f)] public float WavePeriod { get; private set; } = 30f;
+        [field: SerializeField, Min(1f)] public float SurgeDuration { get; private set; } = 10f;
+        [field: SerializeField, Min(1)] public int SurgeBatches { get; private set; } = 5;
+        [field: SerializeField, Min(1)] public int FirstSurgeCount { get; private set; } = 24;
+        [field: SerializeField, Min(0)] public int SurgeIncreasePerWave { get; private set; } = 1;
+        [field: SerializeField, Range(0f, 0.5f)] public float IntervalReductionPerWave { get; private set; } = 0.03f;
+        [field: SerializeField, Min(0f)] public float HealthIncreasePerWave { get; private set; } = 0.08f;
+
+        public float GetRegularInterval(int completedWaves) =>
+            Mathf.Max(Mathf.Max(0.6f, MinimumInterval), StartingInterval * Mathf.Pow(1f - IntervalReductionPerWave, Mathf.Max(0, completedWaves)));
+        public float GetWaveHealthMultiplier(int wave) => 1f + Mathf.Max(0, wave - 1) * HealthIncreasePerWave;
+        public int GetSurgeCount(int wave) => FirstSurgeCount + Mathf.Max(0, wave - 1) * SurgeIncreasePerWave;
 
         [field: Header("Enemy Roster")]
         [field: SerializeField] public EnemySpawnEntry[] EnemyTypes { get; private set; }
@@ -56,25 +66,5 @@ namespace AnchorDefense
             }
         }
 
-        public float GetSpawnInterval(float elapsedSeconds)
-        {
-            return Mathf.Max(MinimumInterval, StartingInterval * Mathf.Exp(-IntervalDecayPerSecond * elapsedSeconds));
-        }
-
-        public int GetBatchSize(float elapsedSeconds)
-        {
-            int increases = Mathf.FloorToInt(elapsedSeconds / BatchIncreaseEverySeconds);
-            return Mathf.Min(MaxBatchSize, StartingBatchSize + increases);
-        }
-
-        public float GetHealthMultiplier(float elapsedSeconds)
-        {
-            return 1f + HealthIncreasePerMinute * elapsedSeconds / 60f;
-        }
-
-        public float GetSpeedMultiplier(float elapsedSeconds)
-        {
-            return 1f + SpeedIncreasePerMinute * elapsedSeconds / 60f;
-        }
     }
 }

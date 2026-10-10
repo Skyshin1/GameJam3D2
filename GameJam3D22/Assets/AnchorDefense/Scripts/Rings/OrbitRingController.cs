@@ -19,6 +19,8 @@ namespace AnchorDefense
         [SerializeField] private Renderer[] selectionRenderers;
         [SerializeField] private Color normalColor = new Color(0.2f, 0.75f, 1f);
         [SerializeField] private Color selectedColor = Color.white;
+        [Header("Stellar Decorations")]
+        [SerializeField] private Renderer[] decorationRenderers;
         [Header("Turret Slots")]
         [SerializeField] private OrbitRingId ringId;
         [SerializeField] private TurretController[] initialTurrets;
@@ -39,6 +41,11 @@ namespace AnchorDefense
             selectionRenderers = renderers;
             normalColor = idleColor;
             selectedColor = highlightColor;
+        }
+
+        public void ConfigureDecorations(Renderer[] renderers)
+        {
+            decorationRenderers = renderers;
         }
 
         public void ConfigureTurretSlots(
@@ -335,16 +342,20 @@ namespace AnchorDefense
 
         public void SetSelected(bool selected)
         {
-            if (selectionRenderers == null)
-            {
-                return;
-            }
-
             propertyBlock = propertyBlock ?? new MaterialPropertyBlock();
             Color color = selected ? selectedColor : normalColor;
-            for (int i = 0; i < selectionRenderers.Length; i++)
+            ApplySelectionColor(selectionRenderers, color, selected ? 2f : 0.7f);
+            Color pearl = Color.Lerp(normalColor, Color.white, selected ? 0.62f : 0.55f);
+            pearl.a = 1f;
+            ApplySelectionColor(decorationRenderers, pearl, selected ? 0.45f : 0.25f);
+        }
+
+        private void ApplySelectionColor(Renderer[] renderers, Color color, float emission)
+        {
+            if (renderers == null) return;
+            for (int i = 0; i < renderers.Length; i++)
             {
-                Renderer targetRenderer = selectionRenderers[i];
+                Renderer targetRenderer = renderers[i];
                 if (targetRenderer == null)
                 {
                     continue;
@@ -353,7 +364,7 @@ namespace AnchorDefense
                 targetRenderer.GetPropertyBlock(propertyBlock);
                 propertyBlock.SetColor(BaseColorId, color);
                 propertyBlock.SetColor(ColorId, color);
-                propertyBlock.SetColor(EmissionColorId, color * (selected ? 2f : 0.7f));
+                propertyBlock.SetColor(EmissionColorId, color * emission);
                 targetRenderer.SetPropertyBlock(propertyBlock);
             }
         }

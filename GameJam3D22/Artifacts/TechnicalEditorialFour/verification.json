@@ -1,0 +1,14 @@
+{
+  "canvas": "1920x1080",
+  "standalone_embedded_images": true,
+  "four_sections_in_every_file": true,
+  "original_unchanged": true,
+  "rendered_and_visually_reviewed": true,
+  "figma_import_tested": false,
+  "files": [
+    "01-editorial-collage.svg",
+    "02-skill-tree-spotlight.svg",
+    "03-staggered-spread.svg",
+    "04-development-notebook.svg"
+  ]
+}

@@ -45,16 +45,18 @@ namespace AnchorDefense.Tests
                     var texture = new RenderTexture(size.x, size.y, 24); owned.Add(texture);
                     preview.targetTexture = texture;
                     view.GetType().GetMethod("Show", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, new object[] {
-                        new CompanionSpeech { Text = english ? "Our planet is counting on us. Those invaders picked the wrong team!" : "我们的星球可不是软柿子。一起把这些外星捣蛋鬼赶回去！", Purpose = CompanionPurpose.Chatter } });
+                        new CompanionSpeech { Text = english ? "Oh well, we can try your plan. Whatever happens among these stars, I will stay beside you and help protect our little planet." : "好耶，听我的建议啦！星星已经替我们点亮前方，一起守住这颗小小的星球，把外星捣蛋鬼赶回去。", Purpose = CompanionPurpose.Chatter, Emotion = english ? CompanionEmotion.Helpless : CompanionEmotion.Happy } });
                     Canvas.ForceUpdateCanvases(); yield return new WaitForSecondsRealtime(.3f);
                     view.GetType().GetMethod("AdvanceBubble", BindingFlags.NonPublic | BindingFlags.Instance)
                         .Invoke(view, new object[] { Time.unscaledTime + 60f });
-                    TMP_Text speech = root.transform.Find("Companion Chat Bubble/Companion Speech").GetComponent<TMP_Text>();
+                    TMP_Text speech = root.transform.Find("Companion Chat Bubble/Speech Viewport/Companion Speech").GetComponent<TMP_Text>();
                     speech.ForceMeshUpdate();
-                    Assert.That(speech.overflowMode, Is.EqualTo(TextOverflowModes.Page));
+                    Assert.That(speech.overflowMode, Is.EqualTo(TextOverflowModes.Overflow));
                     var courier = root.GetComponent<CatCourierLayout>();
                     Assert.That(courier, Is.Not.Null);
                     Assert.That(courier.portrait.expressions.Length, Is.EqualTo(6));
+                    Assert.That(courier.portrait.helplessExpression, Is.Not.Null);
+                    Assert.That(speech.textInfo.pageCount, Is.EqualTo(1));
                     foreach (var paper in root.GetComponentsInChildren<CourierPaperGraphic>(true))
                         Assert.That(paper.GetComponent<CanvasRenderer>(), Is.Not.Null, paper.transform.parent.name);
                     Assert.That(courier.bubble.GetComponent<CanvasGroup>().alpha, Is.GreaterThan(.95f));
@@ -62,7 +64,7 @@ namespace AnchorDefense.Tests
                     AssertInsideCourierCanvas(rect, courier.bubble);
                     CaptureCompanionPreview(preview, texture, $"bubble-{(english ? "en" : "zh")}-{size.x}x{size.y}");
                     view.GetType().GetMethod("OnRescue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(view, new object[] { true });
-                    console.ShowCompanionMessage(english ? "The core is in trouble. Want me to clear the invaders?" : "核心快撑不住了，要我帮你把敌人清走吗？", false);
+                    console.ShowCompanionMessage(english ? "The core is in trouble. Want me to clear the invaders?" : "核心快撑不住了，要我帮你把敌人清走吗？", false, true);
                     console.InputField.text = english ? "Help me protect our planet!" : "小猫，帮我保护星球！";
                     Canvas.ForceUpdateCanvases(); yield return new WaitForSecondsRealtime(.3f);
                     view.GetType().GetMethod("AdvanceBubble", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -135,7 +137,7 @@ namespace AnchorDefense.Tests
             var bubble = root.transform.Find("Companion Chat Bubble").gameObject;
             var text = bubble.GetComponentInChildren<TMP_Text>(true);
             float start = Time.unscaledTime;
-            show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter } });
+            show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter, Emotion = CompanionEmotion.Happy } });
             Assert.That(text.text, Is.EqualTo(message), "Keep complete text for stable wrapping.");
             Assert.That(text.maxVisibleCharacters, Is.Zero);
             // Stay away from the exact float boundary (4.999999 may floor to 4).
@@ -145,10 +147,12 @@ namespace AnchorDefense.Tests
             Assert.That(text.maxVisibleCharacters, Is.EqualTo(int.MaxValue));
             advance.Invoke(view, new object[] { start + 26f });
             Assert.That(bubble.activeSelf, Is.True, "Reading time starts after the final character.");
+            Assert.That(root.GetComponent<CatCourierLayout>().portrait.SpeechEmotion, Is.EqualTo(CompanionEmotion.Happy));
             advance.Invoke(view, new object[] { start + 28f });
             advance.Invoke(view, new object[] { start + 28.3f });
             Assert.That(bubble.activeSelf, Is.False);
-            show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter } });
+            Assert.That(root.GetComponent<CatCourierLayout>().portrait.SpeechEmotion, Is.Null);
+            show.Invoke(view, new object[] { new CompanionSpeech { Text = message, Purpose = CompanionPurpose.Chatter, Emotion = CompanionEmotion.Happy } });
             Assert.That(text.maxVisibleCharacters, Is.Zero, "Replacement starts a fresh reveal.");
             typeof(AICompanionView).GetMethod("OnConsoleOpen", flags).Invoke(view, new object[] { true });
             // The courier keeps replies separate from the input strip; disabling still cancels them.
@@ -217,14 +221,16 @@ namespace AnchorDefense.Tests
         private static void CaptureCompanionPreview(Camera camera, RenderTexture texture, string name)
         {
             RenderTexture previous = RenderTexture.active;
-            camera.Render(); RenderTexture.active = texture;
+            camera.Render(); camera.Render(); camera.Render(); RenderTexture.active = texture;
             var pixels = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
             pixels.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0); pixels.Apply();
             Color32[] colors = pixels.GetPixels32(); int visible = 0;
             for (int i = 0; i < colors.Length; i += 8)
                 if (!colors[i].Equals(colors[0])) visible++;
             Assert.That(visible, Is.GreaterThan(100), "UI preview must contain visible graphics, not just a clear camera.");
-            System.IO.File.WriteAllBytes("Temp/companion-" + name + ".png", pixels.EncodeToPNG());
+            const string previews = "Library/TestArtifacts/Companion";
+            System.IO.Directory.CreateDirectory(previews);
+            System.IO.File.WriteAllBytes(previews + "/companion-" + name + ".png", pixels.EncodeToPNG());
             Object.Destroy(pixels); RenderTexture.active = previous;
         }
     }

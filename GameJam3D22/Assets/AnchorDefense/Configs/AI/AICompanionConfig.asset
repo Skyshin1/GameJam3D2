@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recommendationInterval: 25
   recommendationLifetime: 30
-  chatterMinimum: 8
-  chatterMaximum: 12
+  chatterMinimum: 4
+  chatterMaximum: 7
+  chatterSequence: 000000000100000000000000020000000000000001000000
   bubbleSeconds: 7
+  proactiveChatterBubbleColor: {r: 0.86, g: 0.83, b: 0.96, a: 1}
   temperature: 0.8
   typewriterEnabled: 1
   typewriterCharactersPerSecond: 28
